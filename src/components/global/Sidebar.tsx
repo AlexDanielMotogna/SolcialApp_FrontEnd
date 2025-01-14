@@ -90,7 +90,7 @@ const Sidebar: FC = () => {
                 onClick={() => handleNavigation("/dashboard/tournaments")}
               >
                 <Tournaments />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Tournaments</p>
+                <p className="font-medium text-[#ACB5BB] text-2xl">Ads</p>
               </div>
 
               <div

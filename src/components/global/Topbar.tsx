@@ -104,7 +104,7 @@ const Topbar = () => {
             </div>
           </div>
 
-          <div className="items-center justify-center border border-[#2C2C30] rounded-2xl w-14 h-14 hidden md:flex">
+          <div className="items-center justify-center border border-[#2C2C30] rounded-2xl w-14 h-14 hidden md:flex cursor-pointer">
             <User />
           </div>
         </div>
