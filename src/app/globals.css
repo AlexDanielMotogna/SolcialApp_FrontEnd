@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  font-size: 10px;
+}
+
+.box {
+  width: 100%;
+  max-width: 1500px;
+  padding: 0 5rem;
+  margin: 0 auto;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: visible;
+}
+
+a {
+ text-decoration: none;
+}
+
+
+@layer components {
+  .gradient {
+      @apply bg-gradient-to-r from-[#9945FF] to-[#0BCB7B];
+  }
+  .link-style {
+      @apply text-white text-[1.85rem] font-medium no-underline;
+  }
+}
