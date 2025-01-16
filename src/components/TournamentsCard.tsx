@@ -11,6 +11,7 @@ interface TournamentsCardProps {
   priceUnit: string;
   liveText: string;
   liveBgColor: string;
+  onJoin: () => void;
 }
 
 const TournamentsCard: React.FC<TournamentsCardProps> = ({
@@ -22,6 +23,7 @@ const TournamentsCard: React.FC<TournamentsCardProps> = ({
   priceUnit,
   liveText,
   liveBgColor,
+  onJoin,
 }) => {
   return (
     <div className="w-full p-[1.6rem] bg-[#1E1E20] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start gap-4">
@@ -59,7 +61,7 @@ const TournamentsCard: React.FC<TournamentsCardProps> = ({
       <h3 className="text-[1.8rem] font-semibold text-[#EDF1F3]">
         {price} <span className="text-[#9945FF]">{priceUnit}</span>
       </h3>
-      <div className="w-full">
+      <div className="w-full" onClick={onJoin}>
         <ButtonBorder text="Join Tournament" />
       </div>
     </div>

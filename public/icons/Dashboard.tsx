@@ -1,13 +1,41 @@
 const Dashboard = () => {
     return (
-        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M3.33331 7.38607H4.66665C5.99998 7.38607 6.66665 6.7194 6.66665 5.38607V4.05273C6.66665 2.7194 5.99998 2.05273 4.66665 2.05273H3.33331C1.99998 2.05273 1.33331 2.7194 1.33331 4.05273V5.38607C1.33331 6.7194 1.99998 7.38607 3.33331 7.38607Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M11.3333 7.38607H12.6666C14 7.38607 14.6666 6.7194 14.6666 5.38607V4.05273C14.6666 2.7194 14 2.05273 12.6666 2.05273H11.3333C9.99998 2.05273 9.33331 2.7194 9.33331 4.05273V5.38607C9.33331 6.7194 9.99998 7.38607 11.3333 7.38607Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M11.3333 15.3861H12.6666C14 15.3861 14.6666 14.7194 14.6666 13.3861V12.0527C14.6666 10.7194 14 10.0527 12.6666 10.0527H11.3333C9.99998 10.0527 9.33331 10.7194 9.33331 12.0527V13.3861C9.33331 14.7194 9.99998 15.3861 11.3333 15.3861Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M3.33331 15.3861H4.66665C5.99998 15.3861 6.66665 14.7194 6.66665 13.3861V12.0527C6.66665 10.7194 5.99998 10.0527 4.66665 10.0527H3.33331C1.99998 10.0527 1.33331 10.7194 1.33331 12.0527V13.3861C1.33331 14.7194 1.99998 15.3861 3.33331 15.3861Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-    )
-};
-
-export default Dashboard
+      <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M3.33331 7.38607H4.66665C5.99998 7.38607 6.66665 6.7194 6.66665 5.38607V4.05273C6.66665 2.7194 5.99998 2.05273 4.66665 2.05273H3.33331C1.99998 2.05273 1.33331 2.7194 1.33331 4.05273V5.38607C1.33331 6.7194 1.99998 7.38607 3.33331 7.38607Z"
+          stroke="white"
+          strokeWidth="1.2"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M11.3333 7.38607H12.6666C14 7.38607 14.6666 6.7194 14.6666 5.38607V4.05273C14.6666 2.7194 14 2.05273 12.6666 2.05273H11.3333C9.99998 2.05273 9.33331 2.7194 9.33331 4.05273V5.38607C9.33331 6.7194 9.99998 7.38607 11.3333 7.38607Z"
+          stroke="white"
+          strokeWidth="1.2"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M11.3333 15.3861H12.6666C14 15.3861 14.6666 14.7194 14.6666 13.3861V12.0527C14.6666 10.7194 14 10.0527 12.6666 10.0527H11.3333C9.99998 10.0527 9.33331 10.7194 9.33331 12.0527V13.3861C9.33331 14.7194 9.99998 15.3861 11.3333 15.3861Z"
+          stroke="white"
+          strokeWidth="1.2"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M3.33331 15.3861H4.66665C5.99998 15.3861 6.66665 14.7194 6.66665 13.3861V12.0527C6.66665 10.7194 5.99998 10.0527 4.66665 10.0527H3.33331C1.99998 10.0527 1.33331 10.7194 1.33331 12.0527V13.3861C1.33331 14.7194 1.99998 15.3861 3.33331 15.3861Z"
+          stroke="white"
+          strokeWidth="1.2"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  };
+  
+  export default Dashboard;
+  

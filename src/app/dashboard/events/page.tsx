@@ -1,19 +1,18 @@
-// import { useState } from "react";
-// import ArrowRight from "../../assets/icons/ArrowRight";
+"use client";
+
+import Image from "next/image";
+
+import { useState } from "react";
 import EventCard from "../../../components/EventCard";
 import TournamentsCard from "../../../components/TournamentsCard";
+import EventModal from "@/components/modals/EventModal";
 
 const Events: React.FC = () => {
 
-    // const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
-      // const openModal = () => {
-      //   setIsModalOpen(true);
-      // };
-    
-      // const closeModal = () => {
-      //   setIsModalOpen(false);
-      // };
+      const openModal = () => setIsModalOpen(true);
+      const closeModal = () => setIsModalOpen(false);
 
   const eventData = [
     {
@@ -107,7 +106,7 @@ const Events: React.FC = () => {
       </div>
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-5">
         {eventData.map((event, index) => (
-          <EventCard key={index} {...event} />
+          <EventCard key={index} {...event} onJoin={openModal}/>
         ))}
       </div>
 
@@ -120,109 +119,11 @@ const Events: React.FC = () => {
 
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5">
         {TournamentData.map((event, index) => (
-          <TournamentsCard key={index} {...event} />
+          <TournamentsCard key={index} {...event} onJoin={openModal}/>
         ))}
       </div>
 
-      {/* {isModalOpen && (
-        <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-center z-50">
-          <div
-            className="bg-[#161618] max-h-[90vh] overflow-y-auto flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
-            style={{
-              boxShadow: "0px -5px 10px 0px #FFFFFF1A inset",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
-              <h3 className="text-[1.8rem] text-white font-semibold">
-                Social Media Engagement Quest
-              </h3>
-
-              <Close onClick={closeModal} />
-            </div>
-
-            <div className="w-full flex flex-col items-start justify-start gap-6 px-8">
-              <img src={SocialMedia} className="w-full" />
-
-              <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h4 className="text-white font-semibold text-[1.8rem]">
-                  Social Media Engagement Quest
-                </h4>
-                <p className="text-[#ACB5BB] text-[1.4rem]">
-                  Engage with our social media posts to win prizes.
-                </p>
-              </div>
-
-              <div className="w-full flex flex-col items-start justify-start gap-[0.8rem]">
-                <div className="w-full flex items-end justify-between bg-[#2C2C30] border border-[#44444A] rounded-lg px-4 py-[0.6rem]">
-                  <span className="text-[1.4rem] text-[#ACB5BB]">Reward</span>
-                  <p className="text-[#EDF1F3] font-semibold text-[1.4rem]">
-                    500 SOL
-                  </p>
-                </div>
-                <div className="w-full flex items-end justify-between bg-[#2C2C30] border border-[#44444A] rounded-lg px-4 py-[0.6rem]">
-                  <span className="text-[1.4rem] text-[#ACB5BB]">
-                    Start Date
-                  </span>
-                  <p className="text-[#EDF1F3] font-semibold text-[1.4rem]">
-                    22/11/2024, 11:00:00
-                  </p>
-                </div>
-                <div className="w-full flex items-end justify-between bg-[#2C2C30] border border-[#44444A] rounded-lg px-4 py-[0.6rem]">
-                  <span className="text-[1.4rem] text-[#ACB5BB]">End Date</span>
-                  <p className="text-[#EDF1F3] font-semibold text-[1.4rem]">
-                    25/11/2024, 11:00:00
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full flex flex-col items-start justify-start px-8 gap-6">
-              <h5 className="text-white text-[1.6rem] font-semibold">Tasks</h5>
-
-              <div className="w-full flex flex-col items-start justify-start gap-[0.8rem]">
-                <div className="w-full bg-[#2C2C30] p-5 flex items-center justify-between rounded-md border border-[#44444A]">
-                  <div className="flex items-center justify-center gap-[0.6rem]">
-                    <TwitterLg />
-                    <p className="text-white font-medium text-[1.4rem]">
-                      Like my twitter post
-                    </p>
-                  </div>
-
-                  <ArrowRight />
-                </div>
-
-                <div className="w-full bg-[#2C2C30] p-5 flex items-center justify-between rounded-md border border-[#44444A]">
-                  <div className="flex items-center justify-center gap-[0.6rem]">
-                    <TwitterLg />
-                    <p className="text-white font-medium text-[1.4rem]">
-                      Follow my twitter page
-                    </p>
-                  </div>
-
-                  <ArrowRight />
-                </div>
-
-                <div className="w-full bg-[#2C2C30] p-5 flex items-center justify-between rounded-md border border-[#44444A]">
-                  <div className="flex items-center justify-center gap-[0.6rem]">
-                    <TwitterLg />
-                    <p className="text-white font-medium text-[1.4rem]">
-                      Retweet my twitter post
-                    </p>
-                  </div>
-
-                  <ArrowRight />
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full border-t border-[#44444A] p-8">
-              <Button text="Claim Reward" />
-            </div>
-          </div>
-        </div>
-      )} */}
+      {isModalOpen && <EventModal isOpen={isModalOpen} onClose={closeModal} />}
     </div>
   );
 };

@@ -35,6 +35,7 @@ import Telegram from "../../../public/icons/Telegram";
 import Twitch from "../../../public/imgs/Twitch.svg";
 import Chat from "../../../public/imgs/Chat.png";
 import Global from "../../../public/icons/Global";
+import WalletChart from "@/components/WalletChart";
 
 const DashboardMain = () => {
   return (
@@ -1043,7 +1044,7 @@ const DashboardMain = () => {
 
       <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_302px] gap-8">
         <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-8 px-10 flex flex-col items-start justify-start gap-8">
-          <div className="w-full flex flex-col md:flex-col items-start md:items-center justify-between gap-4">
+          <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <h2 className="w-full text-white font-semibold text-[1.8rem]">
               Wallet Balance History
             </h2>
@@ -1069,7 +1070,8 @@ const DashboardMain = () => {
             </div>
           </div>
 
-          <Image src={Graph} className="w-full" alt="" />
+          {/* <Image src={Graph} className="w-full" alt="" /> */}
+          <WalletChart />
         </div>
 
         <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl overflow-hidden relative">
