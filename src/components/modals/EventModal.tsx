@@ -7,6 +7,8 @@ import TwitterLg from "../../../public/icons/TwitterLg";
 import ArrowRight from "../../../public/icons/ArrowRight";
 import Button from "../../components/ButtonBorder";
 import Gold from "../../../public/imgs/Gold.png";
+import Silver from "../../../public/imgs/Silver.png";
+import Bronze from "../../../public/imgs/Bronze.png";
 import CleanShotCircle4 from "../../../public/imgs/CleanShotCircle4.png";
 
 import Image from "next/image";
@@ -140,23 +142,90 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
                   </div>
                   <Image src={CleanShotCircle4} alt="Clean Shot" />
                 </div>
-                
               </div>
               <div className="w-full grid grid-cols-2">
-              <div className="w-full bg-[#12B3A8] border border-[#033D55] rounded-tl-[6px] rounded-bl-[6px] py-1 px-[0.8rem] flex items-center justify-between">
-                <p className="text-white text-[1rem] font-normal">Wins</p>
-                <p className="text-[#EDF1F3] text-[1rem] font-normal"><span className="font-bold">160</span> - 80%</p>
-              </div>
-
-              <div className="w-full bg-[#C65468] border border-[#5F103B] rounded-tr-[6px] rounded-br-[6px] py-1 px-[0.8rem] flex items-center justify-between">
-                <p className="text-white text-[1rem] font-normal">Lost</p>
-
-                <p className="text-[#EDF1F3] text-[1rem] font-normal"><span className="font-bold">40</span> - 20%</p>
-              </div>
-              
-
+                <div className="w-full bg-[#12B3A8] border border-[#033D55] rounded-tl-[6px] rounded-bl-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Wins</p>
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">160</span> - 80%
+                  </p>
                 </div>
+
+                <div className="w-full bg-[#C65468] border border-[#5F103B] rounded-tr-[6px] rounded-br-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Lost</p>
+
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">40</span> - 20%
+                  </p>
+                </div>
+              </div>
             </div>
+            <div className="w-full border border-[#ACB5BB] rounded-[1.4rem] p-5 flex flex-col items-start justify-start gap-4">
+              <div className="w-full flex items-center justify-between">
+                <div className="w-full flex items-center justify-start gap-[0.4rem]">
+                  <Image src={Silver} alt="Badge" />
+                  <div className="w-full flex flex-col items-start justify-start gap-1">
+                    <h4 className="text-[#EDF1F3] text-[1.6rem] font-medium">
+                      John Doe
+                    </h4>
+                    <h5 className="text-[#ACB5BB] text-[1.4rem] font-normal">
+                      12,789% - Prize Money : $$$
+                    </h5>
+                  </div>
+                  <Image src={CleanShotCircle4} alt="Clean Shot" />
+                </div>
+              </div>
+              <div className="w-full grid grid-cols-2">
+                <div className="w-full bg-[#12B3A8] border border-[#033D55] rounded-tl-[6px] rounded-bl-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Wins</p>
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">160</span> - 80%
+                  </p>
+                </div>
+
+                <div className="w-full bg-[#C65468] border border-[#5F103B] rounded-tr-[6px] rounded-br-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Lost</p>
+
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">40</span> - 20%
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="w-full border border-[#ECAC31] rounded-[1.4rem] p-5 flex flex-col items-start justify-start gap-4">
+              <div className="w-full flex items-center justify-between">
+                <div className="w-full flex items-center justify-start gap-[0.4rem]">
+                  <Image src={Bronze} alt="Badge" />
+                  <div className="w-full flex flex-col items-start justify-start gap-1">
+                    <h4 className="text-[#EDF1F3] text-[1.6rem] font-medium">
+                      John Doe
+                    </h4>
+                    <h5 className="text-[#ACB5BB] text-[1.4rem] font-normal">
+                      12,789% - Prize Money : $$$
+                    </h5>
+                  </div>
+                  <Image src={CleanShotCircle4} alt="Clean Shot" />
+                </div>
+              </div>
+              <div className="w-full grid grid-cols-2">
+                <div className="w-full bg-[#12B3A8] border border-[#033D55] rounded-tl-[6px] rounded-bl-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Wins</p>
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">160</span> - 80%
+                  </p>
+                </div>
+
+                <div className="w-full bg-[#C65468] border border-[#5F103B] rounded-tr-[6px] rounded-br-[6px] py-1 px-[0.8rem] flex items-center justify-between">
+                  <p className="text-white text-[1rem] font-normal">Lost</p>
+
+                  <p className="text-[#EDF1F3] text-[1rem] font-normal">
+                    <span className="font-bold">40</span> - 20%
+                  </p>
+                </div>
+              </div>
+            </div>
+
+
           </div>
         </div>
 

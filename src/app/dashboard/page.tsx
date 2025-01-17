@@ -1112,7 +1112,7 @@ const DashboardMain = () => {
               </div>
 
               <div className="w-full flex flex-col items-center justify-center gap-6">
-                <Button text="Create Advertisement" />
+                <Button text="Create Advertisement" size="sm"/>
                 <a className="cursor-pointer text-white font-semibold text-[1.2rem]">
                   Learn more
                 </a>
