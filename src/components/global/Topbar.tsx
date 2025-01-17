@@ -18,16 +18,6 @@ const Topbar = () => {
       </div>
 
       <div className="w-full flex items-center justify-end gap-10">
-        {/* <div className="flex items-center justify-start gap-3">
-            <Search />
-            <input
-              className="border-none outline-none bg-transparent text-[1.4rem] font-normal text-[#6C7278]"
-              placeholder="Search anything..."
-            />
-          </div> */}
-
-        {/* <div className="h-[27px] w-[1px] bg-[#2C2C30]"></div> */}
-
         <div className="flex items-center justify-start gap-4">
           <div className="w-[162px] hidden md:block">
             <ButtonSm text="Connect Wallet" />

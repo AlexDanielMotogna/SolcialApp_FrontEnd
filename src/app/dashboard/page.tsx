@@ -33,13 +33,14 @@ import Twitter from "../../../public/icons/Twitter";
 import Discord from "../../../public/icons/Discord";
 import Telegram from "../../../public/icons/Telegram";
 import Twitch from "../../../public/imgs/Twitch.svg";
-import Chat from "../../../public/imgs/Chat.png";
 import Global from "../../../public/icons/Global";
 import WalletChart from "@/components/WalletChart";
-import Close from "../../../public/icons/Close";
-import ChatAvatar from "../../../public/imgs/ChatAvatar.png";
+import Chat from "@/components/global/Chat";
+import WalletTabs from "./components/WalletTabs";
 
 const DashboardMain = () => {
+
+  
   return (
     <div className="w-full py-8 px-10 flex flex-col items-start justify-start gap-7 overflow-y-auto">
       <div className="w-full bg-[#1E1E20] p-5 border border-[#2C2C30] rounded-2xl flex flex-col md:flex-row items-center justify-center gap-5">
@@ -1045,25 +1046,9 @@ const DashboardMain = () => {
               Wallet Balance History
             </h2>
 
-            <div className="w-max bg-[#2C2C30] border border-[#26262C] p-2 rounded-xl flex items-center justify-center gap-2  drop-shadow-[0_6px_10px_-3px_rgba(0,0,0,0.25)]">
-              <span className="p-[0.8rem] flex items-center justify-center rounded-lg text-[#ACB5BB] text-xl text-nowrap cursor-pointer">
-                1 Day
-              </span>
-              <span
-                className="p-[0.8rem] bg-[#44444A] flex items-center justify-center rounded-lg text-white text-xl text-nowrap cursor-pointer shadow-[0px_6px_10px_-3px_rgba(0,0,0,0.25)]"
-                style={{
-                  boxShadow: "inset 0px -5px 10px 0px rgba(255, 255, 255, 0.1)",
-                }}
-              >
-                7 Days
-              </span>
-              <span className="p-[0.8rem] flex items-center justify-center rounded-lg text-[#ACB5BB] text-xl text-nowrap cursor-pointer">
-                30 Days
-              </span>
-              <span className="p-[0.8rem] flex items-center justify-center rounded-lg text-[#ACB5BB] text-xl text-nowrap cursor-pointer">
-                Custom
-              </span>
-            </div>
+            <WalletTabs
+        options={['1 Day', '7 Days', '30 Days', 'Custom']}
+      />
           </div>
 
           {/* <Image src={Graph} className="w-full" alt="" /> */}
@@ -1122,127 +1107,7 @@ const DashboardMain = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-6 right-16 flex items-end justify-end group">
-        <div
-          className="bg-[#161618]/80 border border-[#44444A] rounded-2xl p-[1.8rem] flex flex-col items-start justify-start opacity-0 group-hover:opacity-100 transition-opacity duration-300 mb-5 mr-2 min-h-[411px]"
-          style={{
-            boxShadow:
-              "0px 16px 20px -6px #000000A6, 0px 14px 22px -9px #FFFFFF0F inset",
-            backdropFilter: "blur(14px)",
-          }}
-        >
-          <div className="w-full flex items-center justify-between border-b pb-[1.8rem] border-b-[#44444A]">
-            <div className="w-full flex items-center justify-start gap-[0.8rem]">
-              <span className="w-[10px] h-[10px] rounded-full bg-[#44D1BB]"></span>
-              <h4 className="text-white text-[1.6rem] font-semibold">
-                12.5K Players Connected
-              </h4>
-            </div>
-
-            <Close />
-          </div>
-
-          <div className="w-full flex flex-col items-start justify-start gap-2">
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-            
-            <div className="w-full flex items-center justify-start gap-[1.2rem] bg-[rgba(255,255,255,0.03)] border border-[#161618] p-[0.8rem] rounded-[0.8rem]">
-              <Image src={ChatAvatar} alt="chat avatar" />
-              <h6 className="text-[1.2rem] text-white font-medium">
-                LadderKing
-              </h6>
-              <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
-                Anyone up for a private match? 👊
-              </h5>
-            </div>
-
-          </div>
-        </div>
-
-        <Image
-          src={Chat}
-          className="w-[40px] h-[40px] md:w-auto md:h-auto cursor-pointer"
-          alt=""
-        />
-      </div>
+      <Chat />
     </div>
   );
 };

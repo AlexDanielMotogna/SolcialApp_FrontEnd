@@ -1,23 +1,23 @@
-const Help = () => {
+const Help = ({ color = "#ACB5BB" }: { color?: string }) => {
     return (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path 
                 d="M7.99998 14.6663C11.6666 14.6663 14.6666 11.6663 14.6666 7.99967C14.6666 4.33301 11.6666 1.33301 7.99998 1.33301C4.33331 1.33301 1.33331 4.33301 1.33331 7.99967C1.33331 11.6663 4.33331 14.6663 7.99998 14.6663Z" 
-                stroke="#ACB5BB" 
+                stroke={color} 
                 strokeWidth="1.2" 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 
             />
             <path 
                 d="M8 5.33301V8.66634" 
-                stroke="#ACB5BB" 
+                stroke={color} 
                 strokeWidth="1.2" 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 
             />
             <path 
                 d="M7.99634 10.667H8.00233" 
-                stroke="#ACB5BB" 
+                stroke={color} 
                 strokeWidth="1.2" 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 

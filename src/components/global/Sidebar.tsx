@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import React, { FC, useState, useCallback, JSX } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -19,113 +19,147 @@ import Sort from "../../../public/icons/Sort";
 import Settings from "../../../public/icons/Settings";
 import Help from "../../../public/icons/Help";
 
+interface MenuItemProps {
+  icon: JSX.Element;
+  label: string;
+  path: string;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+const MenuItem: FC<MenuItemProps> = ({
+  icon,
+  label,
+  path,
+  isActive,
+  onClick,
+}) => {
+  return (
+    <div
+      className={`w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer ${
+        isActive
+          ? "bg-[#2C2C30] border border-[#F6F7FA33] text-white shadow-[0px_8px_23px_-3px_rgba(0,0,0,1)]"
+          : "text-[#ACB5BB]"
+      }`}
+      style={
+        isActive
+          ? { boxShadow: "inset 0px -5px 10px 0px rgba(255, 255, 255, 0.1)" }
+          : {}
+      }
+      onClick={onClick}
+      aria-label={label}
+    >
+      {React.cloneElement(icon, { color: isActive ? "white" : "#ACB5BB" })}
+      <p className="font-medium text-2xl">{label}</p>
+    </div>
+  );
+};
 
 const Sidebar: FC = () => {
-
+  const [activePath, setActivePath] = useState<string>("/dashboard");
   const router = useRouter();
 
-  const handleNavigation = (path: string) => {
-    router.push(path); 
-  };
+  const handleNavigation = useCallback(
+    (path: string) => {
+      setActivePath(path);
+      router.push(path);
+    },
+    [router]
+  );
 
   return (
     <div className="w-full h-screen hidden md:block p-[2.4rem]">
       <div className="w-full h-full flex flex-col justify-between items-start">
         <div className="w-full flex flex-col items-start gap-10">
           <div className="w-full flex items-center justify-between">
-            <Image src={Logo} className="w-56" alt=""/>
+            <Image src={Logo} className="w-56" alt="Logo" />
             <Menu />
           </div>
 
-          <div className="w-full flex flex-col items-start justify-start gap-3">
-            <span className="text-[#6C7278] text-lg font-normal">MAIN MENU</span>
+          <div className="w-full flex flex-col items-start gap-3">
+            <span className="text-[#6C7278] text-lg font-normal">
+              MAIN MENU
+            </span>
 
-            <div className="w-full flex flex-col items-start justify-start gap-2">
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 border border-[#F6F7FA33] rounded-xl bg-[#2C2C30] shadow-[0px_8px_23px_-3px_rgba(0,0,0,1)] cursor-pointer"
-                style={{
-                  boxShadow: "inset 0px -5px 10px 0px rgba(255, 255, 255, 0.1)",
-                }}
+            <div className="w-full flex flex-col items-start gap-2">
+              <MenuItem
+                icon={<Analyzer />}
+                label="Analyzer"
+                path="/dashboard"
+                isActive={activePath === "/dashboard"}
                 onClick={() => handleNavigation("/dashboard")}
-              >
-                <Analyzer />
-                <p className="font-medium text-white text-2xl">Analyzer</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Matches />}
+                label="Matches"
+                path="/dashboard/matches"
+                isActive={activePath === "/dashboard/matches"}
                 onClick={() => handleNavigation("/dashboard/matches")}
-
-              >
-                <Matches />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Matches</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Quests />}
+                label="Quests"
+                path="/dashboard/quests"
+                isActive={activePath === "/dashboard/quests"}
                 onClick={() => handleNavigation("/dashboard/quests")}
-              >
-                <Quests />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Quests</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Profile />}
+                label="Profile"
+                path="/dashboard/profile"
+                isActive={activePath === "/dashboard/profile"}
                 onClick={() => handleNavigation("/dashboard/profile")}
-              >
-                <Profile />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Profile</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Events />}
+                label="Events"
+                path="/dashboard/events"
+                isActive={activePath === "/dashboard/events"}
                 onClick={() => handleNavigation("/dashboard/events")}
-              >
-                <Events />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Events</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Tournaments />}
+                label="Ads"
+                path="/dashboard/tournaments"
+                isActive={activePath === "/dashboard/tournaments"}
                 onClick={() => handleNavigation("/dashboard/tournaments")}
-              >
-                <Tournaments />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Ads</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Clock />}
+                label="Boost Token"
+                path="/dashboard/boost"
+                isActive={activePath === "/dashboard/boost"}
                 onClick={() => handleNavigation("/dashboard/boost")}
-              >
-                <Clock />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Boost Token</p>
-              </div>
-
-              <div
-                className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer"
+              />
+              <MenuItem
+                icon={<Referrals />}
+                label="Referrals"
+                path="/dashboard/referrals"
+                isActive={activePath === "/dashboard/referrals"}
                 onClick={() => handleNavigation("/dashboard/referrals")}
-              >
-                <Referrals />
-                <p className="font-medium text-[#ACB5BB] text-2xl">Referrals</p>
-              </div>
+              />
             </div>
           </div>
         </div>
 
-        <div className="w-full flex flex-col items-start justify-start gap-2">
-          <div className="w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-lg" onClick={() => handleNavigation("/dashboard/settings")}
-          >
-            <Settings />
-            <p className="font-medium text-[#ACB5BB] text-2xl">Settings</p>
-          </div>
-          <div className="w-full flex items-center justify-start gap-3 py-[8px] px-3 rounded-lg" onClick={() => handleNavigation("/dashboard/help")}
-          >
-            <Help />
-            <p className="font-medium text-[#ACB5BB] text-2xl">Help & Center</p>
-          </div>
+        <div className="w-full flex flex-col items-start gap-2">
+          <MenuItem
+            icon={<Settings />}
+            label="Settings"
+            path="/dashboard/settings"
+            isActive={activePath === "/dashboard/settings"}
+            onClick={() => handleNavigation("/dashboard/settings")}
+          />
+          <MenuItem
+            icon={<Help />}
+            label="Help & Center"
+            path="/dashboard/help"
+            isActive={activePath === "/dashboard/help"}
+            onClick={() => handleNavigation("/dashboard/help")}
+          />
           <div className="w-full bg-[#2C2C30] border-white border-opacity-30 flex items-center justify-between gap-3 py-[10px] px-3 rounded-lg">
             <div className="w-full flex items-start justify-start gap-2">
-              <Image src={Avatar} alt=""/>
+              <Image src={Avatar} alt="User Avatar" />
               <div className="flex flex-col items-start justify-center gap-1">
                 <h2 className="text-white font-medium text-[1.4rem]">Alex</h2>
                 <span className="text-[#6C7278] text-lg">alex@gmail.com</span>
