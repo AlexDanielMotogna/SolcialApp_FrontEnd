@@ -16,7 +16,7 @@ import ButtonBorder from "../../../components/ButtonBorder";
 import TwitterLg from "../../../../public/icons/TwitterLg";
 import ArrowRight from "../../../../public/icons/ArrowRight";
 import Button from "../../../components/ButtonBorder";
-import QuestModal from "@/components/modals/QuestModal";
+import CreateQuest from "@/components/modals/CreateQuest";
 
 const Quests = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -238,7 +238,7 @@ const Quests = () => {
         </div>
       </div>
 
-      {isModalOpen && <QuestModal isOpen={isModalOpen} onClose={closeModal} />}
+      {isModalOpen && <CreateQuest isOpen={isModalOpen} onClose={closeModal} />}
     </div>
   );
 };

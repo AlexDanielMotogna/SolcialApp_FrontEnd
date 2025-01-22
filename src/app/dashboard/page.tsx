@@ -1,5 +1,7 @@
-import Image from "next/image";
+"use client";
 
+import Image from "next/image";
+import React, { useState } from 'react';
 import Search from "../../../public/icons/Search";
 import ButtonLg from "../../components/ButtonLg";
 import CleanShot from "../../../public/imgs/CleanShot.png";
@@ -37,10 +39,23 @@ import Global from "../../../public/icons/Global";
 import WalletChart from "@/components/WalletChart";
 import Chat from "@/components/global/Chat";
 import WalletTabs from "./components/WalletTabs";
+import CreateQuest from "@/components/modals/CreateQuest";
+import CreateMatch from "@/components/modals/CreateMatch";
+import CreateLadder from "@/components/modals/CreateLadder";
+import CreateToken from "@/components/modals/CreateToken";
 
 const DashboardMain = () => {
 
-  
+  const [openModal, setOpenModal] = useState<string | null>(null);
+
+  const openModalHandler = (modalType: string) => {
+    setOpenModal(modalType);
+  };
+
+  const closeModalHandler = () => {
+    setOpenModal(null);
+  };
+
   return (
     <div className="w-full py-8 px-10 flex flex-col items-start justify-start gap-7 overflow-y-auto">
       <div className="w-full bg-[#1E1E20] p-5 border border-[#2C2C30] rounded-2xl flex flex-col md:flex-row items-center justify-center gap-5">
@@ -753,7 +768,7 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3]">
+                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('match')}>
                   Create Match
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -769,7 +784,7 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3]">
+                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"  onClick={() => openModalHandler('quest')}>
                   Create Quest
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -785,7 +800,7 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3]">
+                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('Ladder')}>
                   View Leaderboard
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -801,7 +816,7 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3]">
+                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('Token')}>
                   Create Advertising
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -1046,9 +1061,7 @@ const DashboardMain = () => {
               Wallet Balance History
             </h2>
 
-            <WalletTabs
-        options={['1 Day', '7 Days', '30 Days', 'Custom']}
-      />
+            <WalletTabs options={["1 Day", "7 Days", "30 Days", "Custom"]} />
           </div>
 
           {/* <Image src={Graph} className="w-full" alt="" /> */}
@@ -1106,7 +1119,18 @@ const DashboardMain = () => {
           </div>
         </div>
       </div>
-
+      {openModal === 'quest' && (
+        <CreateQuest isOpen={true} onClose={closeModalHandler} />
+      )}
+      {openModal === 'match' && (
+        <CreateMatch isOpen={true} onClose={closeModalHandler}/>
+      )}
+      {openModal === 'Ladder' && (
+        <CreateLadder isOpen={true} onClose={closeModalHandler}/>
+      )}
+      {openModal === 'Token' && (
+        <CreateToken isOpen={true} onClose={closeModalHandler}/>
+      )}
       <Chat />
     </div>
   );
