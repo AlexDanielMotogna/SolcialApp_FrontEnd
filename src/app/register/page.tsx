@@ -20,7 +20,7 @@ const Register = () => {
       <div className="w-screen h-[994px] md:h-screen bg-[#111113] ">
         <Image src={bg} className="relative md:h-auto lg:h-screen" alt=''/>
         <div className="w-full h-screen absolute top-0 left-0 grid grid-cols-1 md:grid-cols-2 justify-start md:justify-center items-start md:items-center">
-          <div className="w-full px-6 h-full pt-16 md:hidden">
+          <div className="w-full px-6 h-full pt-16 md:pt-0  md:hidden">
             <FilledLeftArrow />
           </div>
 
@@ -30,7 +30,7 @@ const Register = () => {
             <Image src={Headline} className="px-7" alt=''/>
           </div>
 
-          <div className="w-full max-h-max md:h-full px-4 pt-12 pb-4">
+          <div className="w-full max-h-max md:h-full px-4 pt-12 md:pt-4 pb-4">
             <div className="w-full h-full bg-[#161618] border border-[#2C2C30] rounded-[20px] flex justify-center items-center ">
               <div className="w-[343px] h-full flex justify-center items-center flex-col gap-10 p-9">
             
