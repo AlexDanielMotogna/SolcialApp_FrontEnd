@@ -19,7 +19,7 @@ const CreateLadder: React.FC<CreateLadderProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50">
       <div
         className="bg-[#161618] w-[470px]  max-h-[90vh] overflow-y-auto flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
         style={{

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import Search from "../../../public/icons/Search";
 import ButtonLg from "../../components/ButtonLg";
 import CleanShot from "../../../public/imgs/CleanShot.png";
@@ -20,7 +20,6 @@ import GameTrophy from "../../../public/imgs/GameTrophy.png";
 import GameCrown from "../../../public/imgs/GameCrown.png";
 import tCat from "../../../public/imgs/tCat.png";
 import tPONKEI from "../../../public/imgs/tPONKEI.png";
-import Graph from "../../../public/imgs/Graph.png";
 import bgGrid from "../../../public/imgs/bgGrid.png";
 import Game from "../../../public/imgs/Game.png";
 import CleanShot8 from "../../../public/imgs/CleanShot8.png";
@@ -45,7 +44,6 @@ import CreateLadder from "@/components/modals/CreateLadder";
 import CreateToken from "@/components/modals/CreateToken";
 
 const DashboardMain = () => {
-
   const [openModal, setOpenModal] = useState<string | null>(null);
 
   const openModalHandler = (modalType: string) => {
@@ -57,7 +55,7 @@ const DashboardMain = () => {
   };
 
   return (
-    <div className="w-full py-8 px-10 flex flex-col items-start justify-start gap-7 overflow-y-auto">
+    <div className="w-full p-[1.6rem] md:py-8 md:px-10 flex flex-col items-start justify-start gap-7 overflow-y-auto">
       <div className="w-full bg-[#1E1E20] p-5 border border-[#2C2C30] rounded-2xl flex flex-col md:flex-row items-center justify-center gap-5">
         <input
           placeholder="Enter Solana Wallet Address"
@@ -157,14 +155,14 @@ const DashboardMain = () => {
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_180px] gap-5">
-        <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl py-6 px-5 flex flex-col items-center justify-between gap-4">
-          <div className="w-full flex items-center justify-between">
+        <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl py-6 px-5 flex flex-col items-center justify-between gap-4 overflow-hidden">
+          <div className="w-full flex flex-col md:flex-row gap-5 items-center justify-between">
             <h2 className="w-full text-white font-semibold text-[1.8rem]">
               Analyzer
             </h2>
 
-            <div className="w-max flex items-center justify-center gap-2 ">
-              <div className="flex items-center justify-start gap-3 border border-[#2C2C30] py-[0.8rem] px-5 rounded-xl">
+            <div className="w-full md:w-max flex items-center justify-center gap-2 ">
+              <div className="w-full flex items-center justify-start gap-3 border border-[#2C2C30] py-[0.8rem] px-5 rounded-xl">
                 <Search />
                 <input
                   className="border-none outline-none bg-transparent text-[1.4rem] font-normal text-[#ACB5BB]"
@@ -178,573 +176,555 @@ const DashboardMain = () => {
             </div>
           </div>
 
-          <table className="w-full flex flex-col items-start justify-start gap-3">
-            <thead className="w-full flex items-center justify-between bg-[#2C2C30] rounded-xl">
-              <tr className="w-[25px] py-4 px-5">
-                <th className="text-[#ACB5BB] font-medium text-base">#</th>
-              </tr>
-
-              <tr className="w-[33px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">Icon</th>
-              </tr>
-
-              <tr className="w-[57px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">Token</th>
-              </tr>
-
-              <tr className="w-[60px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Firs Buy
-                </th>
-              </tr>
-
-              <tr className="w-[83px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Token Buy
-                </th>
-              </tr>
-
-              <tr className="w-[55px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  SOL Used
-                </th>
-              </tr>
-
-              <tr className="w-[61px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  USDT Used
-                </th>
-              </tr>
-
-              <tr className="w-[52px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Buy/Sell
-                </th>
-              </tr>
-
-              <tr className="w-[82px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Token Sold
-                </th>
-              </tr>
-
-              <tr className="w-[66px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  SOL Received
-                </th>
-              </tr>
-
-              <tr className="w-[75px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  USDT Received
-                </th>
-              </tr>
-
-              <tr className="w-[81px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  SOL Earned/Lost
-                </th>
-              </tr>
-
-              <tr className="w-[61px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Profit/Loss
-                </th>
-              </tr>
-
-              <tr className="w-[66px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">
-                  Last Sell
-                </th>
-              </tr>
-
-              <tr className="w-[71px] py-4">
-                <th className="text-[#ACB5BB] font-medium text-base">Link</th>
-              </tr>
-            </thead>
-
-            <tbody className="w-full flex flex-col items-center justify-start">
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  1
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot8} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  LUNO
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  418998.56
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  5.00
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1104.30
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  8/5
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  418998.56
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  0.86
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $189.89
-                </td>
-
-                <td className="w-[81px] py-4 text-[#C65468] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  -4.14
-                </td>
-
-                <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem]">
-                  -82.89%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  2
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot4} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  RELIQ
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  1630933.34
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  5.00
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1090.55
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  1/1
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  1630933.34
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  0.10
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $21.10
-                </td>
-
-                <td className="w-[81px] py-4 text-[#C65468] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  -4.90
-                </td>
-
-                <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem]">
-                  -98.07%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  3
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  GenBeta
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  2156176.51{" "}
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  10.00
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1093.95
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  1/0
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  0.00
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  0.00{" "}
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $0.00
-                </td>
-
-                <td className="w-[81px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  N/A
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  0.00%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  N/A
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  4
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot8} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  F(ART)
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  12029029.88
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  3.50
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $431.98
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  5/6
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  12029029....
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  3.50
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $431.98
-                </td>
-
-                <td className="w-[81px] py-4 text-[#C65468] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  -1.51
-                </td>
-
-                <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem]">
-                  -75.37%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  5
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot3} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  RHEA
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  936844.80
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  10.00
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1079.80
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  4/7
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  936844.80
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  10.00
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1079.80
-                </td>
-
-                <td className="w-[81px] py-4 text-[#12B3A8] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  +6.87
-                </td>
-
-                <td className="w-[61px] py-4 text-[#33A34C] font-medium text-[1.2rem]">
-                  +68.70%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot5} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  МАІ
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  10868702.26
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  5.50
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $961.69
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  3/8
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  10868702...
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  5.50
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $961.69
-                </td>
-
-                <td className="w-[81px] py-4 text-[#C65468] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  -4.98
-                </td>
-
-                <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem]">
-                  -99.55%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-
-              <tr className="w-full flex items-center justify-between">
-                <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  7
-                </td>
-
-                <td className="w-[33px] py-4">
-                  <Image src={CleanShot} alt="" />
-                </td>
-
-                <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  Cverse
-                </td>
-
-                <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  2156176.51
-                </td>
-
-                <td className="w-[55px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  10.00
-                </td>
-
-                <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1093.95
-                </td>
-
-                <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  9/2
-                </td>
-
-                <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  2156176.51
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  10.00
-                </td>
-
-                <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  $1093.95
-                </td>
-
-                <td className="w-[81px] py-4 text-[#C65468] font-medium text-[1.2rem] flex items-center justify-start gap-2">
-                  <Image src={Sol} alt="" />
-                  -37.83
-                </td>
-
-                <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem]">
-                  -36.03%
-                </td>
-
-                <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  6/1/2025 17:56:30
-                </td>
-
-                <td className="w-[71px] py-4 text-[#ACB5BB] font-medium text-[1.2rem]">
-                  <Image src={Deexscreener} alt="" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          <div className="w-full flex items-start justify-between">
+          <div className="w-full flex items-start justify-start overflow-x-auto sm:w-calc-100vw-4rem">
+            <table className="w-full table-auto">
+              <thead className="w-full bg-[#2C2C30] rounded-xl">
+                <tr>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[25px] py-4 px-5">
+                    #
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[33px] py-4">
+                    Icon
+                  </th>
+
+                  <th className="text-[#ACB5BB] font-medium text-base w-[57px] py-4">
+                    Token
+                  </th>
+
+                  <th className="text-[#ACB5BB] font-medium text-base w-[60px] py-4">
+                    Firs Buy
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[83px] py-4">
+                    Token Buy
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[55px] py-4">
+                    SOL Used
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4">
+                    USDT Used
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[52px] py-4">
+                    Buy/Sell
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[82px] py-4">
+                    Token Sold
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4">
+                    SOL Received
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[75px] py-4">
+                    USDT Received
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[81px] py-4">
+                    SOL Earned/Lost
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4">
+                    Profit/Loss
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4">
+                    Last Sell
+                  </th>
+                  <th className="text-[#ACB5BB] font-medium text-base w-[71px] py-4">
+                    Link
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="w-full">
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot8} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    LUNO
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    418998.56
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        5.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1104.30
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    8/5
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    418998.56
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.86
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $189.89
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#C65468] font-medium text-[1.2rem]">
+                        -4.14
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem] text-center">
+                    -82.89%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    2
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot4} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    RELIQ
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1630933.34
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        5.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1090.55
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1/1
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1630933.34
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.10
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $21.10
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#C65468] font-medium text-[1.2rem]">
+                        -4.90
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem] text-center">
+                    -98.07%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    3
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    GenBeta
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    2156176.51
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        10.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1093.95
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1/0
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    0.00
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $0.00
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        N/A
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    0.00%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    N/A
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    4
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot8} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    F(ART)
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    12029029.88
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        3.50
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $431.98
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    5/6
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    0.00
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.49
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $431.98
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#C65468] font-medium text-[1.2rem]">
+                        -1.51
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem] text-center">
+                    -75.37%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    5
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot8} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    LUNO
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    418998.56
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        5.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1104.30
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    8/5
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    418998.56
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.86
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $189.89
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#C65468] font-medium text-[1.2rem]">
+                        -4.14
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem] text-center">
+                    -82.89%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot4} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    RELIQ
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1630933.34
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        5.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1090.55
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1/1
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1630933.34
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.10
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $21.10
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#C65468] font-medium text-[1.2rem]">
+                        -4.90
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#EA3030] font-medium text-[1.2rem] text-center">
+                    -98.07%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="w-[25px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    7
+                  </td>
+                  <td className="w-[33px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={CleanShot} alt="" />
+                    </div>
+                  </td>
+                  <td className="w-[57px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    GenBeta
+                  </td>
+                  <td className="w-[60px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    6/1/2025 17:56:30
+                  </td>
+                  <td className="w-[83px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    2156176.51
+                  </td>
+                  <td className="w-[55px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        10.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $1093.95
+                  </td>
+                  <td className="w-[52px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    1/0
+                  </td>
+                  <td className="w-[82px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    0.00
+                  </td>
+                  <td className="w-[66px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        0.00
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[75px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    $0.00
+                  </td>
+                  <td className="w-[81px] py-4">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <Image src={Sol} alt="" />
+                      <h6 className="text-[#ACB5BB] font-medium text-[1.2rem]">
+                        N/A
+                      </h6>
+                    </div>
+                  </td>
+                  <td className="w-[61px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    0.00%
+                  </td>
+                  <td className="w-[66px] py-4 text-[#ACB5BB] font-medium text-[1.2rem] text-center">
+                    N/A
+                  </td>
+                  <td className="w-[71px] py-4">
+                    <div className="w-full flex items-center justify-center">
+                      <Image src={Deexscreener} alt="" />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="w-full flex flex-col md:flex-row gap-5 items-start justify-between">
             <div className="flex items-center justify-center gap-10">
-              <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl">
+              <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl cursor-pointer">
                 <ArrowLeft />
               </div>
               <div className="flex items-center justify-center">
-                <span className="h-[32px] rounded-xl bg-[#44444A] text-white px-6 flex items-center font-bold text-[1.2rem]">
+                <span className="h-[32px] rounded-xl bg-[#44444A] text-white px-6 flex items-center font-bold text-[1.2rem] cursor-pointer">
                   1
                 </span>
-                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem]">
+                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem] cursor-pointer">
                   2
                 </span>
-                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem]">
+                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem] cursor-pointer">
                   3
                 </span>
-                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem]">
+                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem] cursor-pointer">
                   ...
                 </span>
-                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem]">
+                <span className="h-[32px] rounded-xl text-[#6C7278] px-6 flex items-center font-bold text-[1.2rem] cursor-pointer">
                   10
                 </span>
               </div>
-              <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl">
+              <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl cursor-pointer">
                 <NextArrow />
               </div>
             </div>
@@ -753,7 +733,7 @@ const DashboardMain = () => {
               <span className="text-[#6C7278] text-[1.2rem]">
                 Showing 1 to 10 of 50 entries
               </span>
-              <div className="flex items-center justify-center gap-4 bg-[#2C2C30] border border-[#44444A] rounded-xl p-4 text-white font-medium text-[1.2rem] cursor-pointer">
+              <div className="hidden md:flex items-center justify-center gap-4 bg-[#2C2C30] border border-[#44444A] rounded-xl p-4 text-white font-medium text-[1.2rem] cursor-pointer">
                 <p>Show 10</p>
                 <ArrowUp />
               </div>
@@ -768,7 +748,10 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('match')}>
+                <h2
+                  className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
+                  onClick={() => openModalHandler("match")}
+                >
                   Create Match
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -784,7 +767,10 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"  onClick={() => openModalHandler('quest')}>
+                <h2
+                  className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
+                  onClick={() => openModalHandler("quest")}
+                >
                   Create Quest
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -800,7 +786,10 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('Ladder')}>
+                <h2
+                  className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
+                  onClick={() => openModalHandler("Ladder")}
+                >
                   View Leaderboard
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -816,7 +805,10 @@ const DashboardMain = () => {
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
-                <h2 className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer" onClick={() => openModalHandler('Token')}>
+                <h2
+                  className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
+                  onClick={() => openModalHandler("Token")}
+                >
                   Create Advertising
                 </h2>
                 <p className="text-[#ACB5BB] text-[1rem] font-normal">
@@ -836,37 +828,27 @@ const DashboardMain = () => {
           </h2>
 
           <div className="w-full overflow-x-auto">
-            <table className="w-full flex flex-col items-start justify-start gap-3">
-              {/* Table Header */}
-              <thead className="w-full flex items-center justify-start bg-[#2C2C30] rounded-xl py-3 px-4 md:py-4 md:px-5">
-                <tr className="w-[50px] md:w-[57px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+            <table className="w-full">
+              <thead className="w-full flex items-center justify-start bg-[#2C2C30] rounded-xl py-4 px-5">
+                <tr>
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[50px] md:w-[57px] text-left">
                     Тор
                   </th>
-                </tr>
-                <tr className="w-[140px] md:w-[240px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[140px] md:w-[240px] text-left">
                     Token
                   </th>
-                </tr>
-                <tr className="w-[100px] md:w-auto">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[100px] md:w-auto text-left">
                     $Gained
                   </th>
                 </tr>
               </thead>
 
-              {/* Table Body */}
               <tbody className="w-full flex flex-col items-center justify-start">
-                {/* Row 1 */}
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #1
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={tCat}
                         className="h-[20px] w-[20px] md:h-auto md:w-auto"
@@ -874,23 +856,16 @@ const DashboardMain = () => {
                       />
                       CATS
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-auto">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
                       $6.8K
                     </td>
-                  </tr>
                 </tr>
 
-                {/* Row 2 */}
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #2
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={tPONKEI}
                         className="h-[20px] w-[20px] md:h-auto md:w-auto"
@@ -898,23 +873,16 @@ const DashboardMain = () => {
                       />
                       PONKEI
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-auto">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
                       $1.7K
                     </td>
-                  </tr>
                 </tr>
 
-                {/* Row 3 */}
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #3
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={CleanShot5}
                         className="h-[20px] w-[20px] md:h-auto md:w-auto"
@@ -922,12 +890,9 @@ const DashboardMain = () => {
                       />
                       DOLPHINWIF
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-auto">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
                       $0.6K
                     </td>
-                  </tr>
                 </tr>
               </tbody>
             </table>
@@ -942,37 +907,28 @@ const DashboardMain = () => {
           <div className="w-full overflow-x-auto">
             <table className="w-full flex flex-col items-start justify-start gap-3">
               <thead className="w-full flex items-center justify-start bg-[#2C2C30] rounded-xl py-4 px-5">
-                <tr className="w-[50px] md:w-[57px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                <tr>
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[50px] md:w-[57px] text-left">
                     Тор
                   </th>
-                </tr>
-                <tr className="w-[140px] md:w-[240px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[140px] md:w-[240px] text-left">
                     Token
                   </th>
-                </tr>
-                <tr className="w-[100px] md:w-[160px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[100px] md:w-[160px] text-left">
                     Token amount
                   </th>
-                </tr>
-                <tr className="w-[80px] md:w-[160px]">
-                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem]">
+                  <th className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.2rem] w-[80px] md:w-[160px] text-left">
                     $Price
                   </th>
                 </tr>
               </thead>
 
-              <tbody className="w-full flex flex-col items-center justify-start relative">
+              <tbody className="w-full">
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #1
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={CleanShot6}
                         className="h-[24px] w-[24px] md:h-auto md:w-auto"
@@ -980,27 +936,19 @@ const DashboardMain = () => {
                       />
                       GOAT
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
                       9,101.256
                     </td>
-                  </tr>
-                  <tr className="w-[80px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
                       $6.8K
                     </td>
-                  </tr>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #2
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={CleanShot3}
                         className="h-[24px] w-[24px] md:h-auto md:w-auto"
@@ -1008,27 +956,19 @@ const DashboardMain = () => {
                       />
                       RHEA
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
                       5,678.432
                     </td>
-                  </tr>
-                  <tr className="w-[80px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
                       $1.7K
                     </td>
-                  </tr>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5 relative">
-                  <tr className="w-[50px] md:w-[57px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
                       #3
                     </td>
-                  </tr>
-                  <tr className="w-[140px] md:w-[240px]">
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3">
+                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
                       <Image
                         src={CleanShot}
                         className="h-[24px] w-[24px] md:h-auto md:w-auto"
@@ -1036,17 +976,12 @@ const DashboardMain = () => {
                       />
                       GenBeta
                     </td>
-                  </tr>
-                  <tr className="w-[100px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
                       2,345.678
                     </td>
-                  </tr>
-                  <tr className="w-[80px] md:w-[160px]">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem]">
+                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
                       $0.6K
                     </td>
-                  </tr>
                 </tr>
               </tbody>
             </table>
@@ -1119,17 +1054,17 @@ const DashboardMain = () => {
           </div>
         </div>
       </div>
-      {openModal === 'quest' && (
+      {openModal === "quest" && (
         <CreateQuest isOpen={true} onClose={closeModalHandler} />
       )}
-      {openModal === 'match' && (
-        <CreateMatch isOpen={true} onClose={closeModalHandler}/>
+      {openModal === "match" && (
+        <CreateMatch isOpen={true} onClose={closeModalHandler} />
       )}
-      {openModal === 'Ladder' && (
-        <CreateLadder isOpen={true} onClose={closeModalHandler}/>
+      {openModal === "Ladder" && (
+        <CreateLadder isOpen={true} onClose={closeModalHandler} />
       )}
-      {openModal === 'Token' && (
-        <CreateToken isOpen={true} onClose={closeModalHandler}/>
+      {openModal === "Token" && (
+        <CreateToken isOpen={true} onClose={closeModalHandler} />
       )}
       <Chat />
     </div>

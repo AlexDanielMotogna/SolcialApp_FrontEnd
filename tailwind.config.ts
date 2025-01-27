@@ -12,6 +12,9 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      table: {
+        'calc-100vw-4rem': 'calc(100vw - 4rem)',
+      }
     },
   },
   plugins: [],

@@ -1,3 +1,4 @@
+import Marquee from "react-fast-marquee";
 import CryptoCard from "./CryptoCard";
 
 import CleanShot from "../../../../public/imgs/CleanShot.png";
@@ -20,19 +21,34 @@ const cryptoData = [
 
 const CryptoRow = () => {
   return (
-    <div className="w-full px-7 py-5 border-b border-b-[#2C2C30] flex items-center justify-start gap-4 overflow-hidden flex-nowrap">
-      {cryptoData.map((crypto, index) => (
-        <CryptoCard
-          key={index}
-          image={crypto.image}
-          price={crypto.price}
-          name={crypto.name}
-          priceColor={crypto.priceColor}
-        />
-      ))}
+    <div className="w-full px-7 py-5 border-b border-b-[#2C2C30]">
+      <Marquee gradient={false} speed={50} loop={0} pauseOnHover={true}>
+        <div className="flex items-center gap-4 flex-nowrap">
+          {cryptoData.map((crypto, index) => (
+            <CryptoCard
+              key={index}
+              image={crypto.image}
+              price={crypto.price}
+              name={crypto.name}
+              priceColor={crypto.priceColor}
+            />
+          ))}
+
+          <div className="mx-4 flex items-center gap-4 flex-nowrap"> 
+            {cryptoData.map((crypto, index) => (
+              <CryptoCard
+                key={`repeat-${index}`}
+                image={crypto.image}
+                price={crypto.price}
+                name={crypto.name}
+                priceColor={crypto.priceColor}
+              />
+            ))}
+          </div>
+        </div>
+      </Marquee>
     </div>
   );
 };
-
 
 export default CryptoRow;

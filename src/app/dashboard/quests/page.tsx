@@ -16,7 +16,7 @@ import ButtonBorder from "../../../components/ButtonBorder";
 import TwitterLg from "../../../../public/icons/TwitterLg";
 import ArrowRight from "../../../../public/icons/ArrowRight";
 import Button from "../../../components/ButtonBorder";
-import CreateQuest from "@/components/modals/CreateQuest";
+import QuestModal from "@/components/modals/QuestModal";
 
 const Quests = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,20 +25,20 @@ const Quests = () => {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="w-full py-[1.8rem] px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
-      <div className="w-full flex flex-col md:flex-row md:gap-8 items-center justify-between">
+    <div className="w-full p-[1.6rem] md:py-[1.8rem] md:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
+      <div className="w-full flex flex-col md:flex-row md:gap-8 items-center gap-5 justify-between">
         <div className="w-full flex flex-col items-start justify-start gap-1">
-          <h2 className="text-white font-semibold text-[2.4rem]">
+          <h2 className="text-white font-semibold text-[2rem] md:text-[2.4rem]">
             Explore Exciting Quests!
           </h2>
-          <p className="text-[#ACB5BB] text-[1.8rem]">
+          <p className="text-[#ACB5BB] text-[1.6rem] md:text-[1.8rem]">
             Earn rewards by completing tasks and engaging with our platform.
           </p>
         </div>
 
         <div className="flex items-center justify-center gap-5">
-          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-[1.6rem] px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={PowerShield} alt=""/>
+          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-5 md:py-[1.6rem] px-3 md:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+            <Image src={PowerShield} alt="" className="w-[32px] h-[32px] md:w-[48px] md:h-[48px]"/>
 
             <div className="flex flex-col items-start justify-start gap-1">
               <h3 className="text-white font-semibold text-[1.8rem]">75</h3>
@@ -47,8 +47,8 @@ const Quests = () => {
               </span>
             </div>
           </div>
-          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-[1.6rem] px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={Moneybag} alt=""/>
+          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-5 md:py-[1.6rem] px-3 md:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+            <Image src={Moneybag} alt="" className="w-[32px] h-[32px] md:w-[48px] md:h-[48px]"/>
 
             <div className="flex flex-col items-start justify-start gap-1">
               <h3 className="text-white font-semibold text-[1.8rem]">
@@ -238,7 +238,7 @@ const Quests = () => {
         </div>
       </div>
 
-      {isModalOpen && <CreateQuest isOpen={isModalOpen} onClose={closeModal} />}
+      {isModalOpen && <QuestModal isOpen={isModalOpen} onClose={closeModal} />}
     </div>
   );
 };

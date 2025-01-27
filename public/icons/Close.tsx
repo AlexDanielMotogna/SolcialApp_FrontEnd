@@ -1,8 +1,8 @@
-const Close = ({ onClick }: { onClick: () => void }) => {
+const Close = ({ onClick }: { onClick?: () => void }) => {
   return (
     <svg
-      onClick={onClick} 
-      className="cursor-pointer" 
+      onClick={onClick}
+      className="cursor-pointer"
       width="20"
       height="21"
       viewBox="0 0 20 21"

@@ -17,11 +17,12 @@ import ShadowButton from "@/components/ShadowButton";
 import Twitter from "../../../../public/icons/Twitter";
 import Telegram from "../../../../public/icons/Telegram";
 import Discord from "../../../../public/icons/Discord";
+import Chat from "@/components/global/Chat";
 
 const profile = () => {
   return (
-    <div className="w-full py-[1.8rem] px-[2.4rem] grid grid-cols-3 gap-[1.6rem]">
-      <div className="w-full max-h-[900px] bg-[#161618] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start">
+    <div className="w-full p-[1.6rem] md:py-[1.8rem] md:px-[2.4rem] grid grid-cols-1 md:grid-cols-3 gap-[1.6rem]">
+      <div className="w-full max-h-[900px] order-3 md:order-1 bg-[#161618] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start">
         <div className="w-full py-[1.3rem] px-5 flex items-center border-b border-[#2C2C30]">
           <h4 className="text-white text-[1.6rem] font-semibold">
             Match History
@@ -59,14 +60,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -111,14 +112,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -163,14 +164,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -215,14 +216,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -267,14 +268,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -319,14 +320,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -371,14 +372,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -423,14 +424,14 @@ const profile = () => {
               <div className="flex flex-col items-center justify-center gap-3">
                 <Image src={ShieldDoubleSword} alt="Shield double sword" />
 
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Bet: <span className="text-[#EDF1F3]">1 SOL</span> - Min Cap:{" "}
                   <span className="text-[#EDF1F3]">100k</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-end justify-start gap-3">
-                <p className="text-base text-[#ACB5BB] font-normal">
+                <p className="text-base text-[#ACB5BB] font-normal whitespace-nowrap">
                   Starting Balance:{" "}
                   <span className="text-[#EDF1F3]">2 SOL</span>
                 </p>
@@ -453,7 +454,7 @@ const profile = () => {
         </div>
       </div>
 
-      <div className="w-full bg-[#161618] grid grid-rows-[max-content_max-content] gap-4">
+      <div className="w-full order-1 md:order-2 bg-[#161618] grid grid-rows-[max-content_max-content] gap-4">
         <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start gap-[1.4rem]">
           <div className="w-full py-[1.3rem] px-5 flex items-center border-b border-[#2C2C30]">
             <h4 className="text-white text-[1.6rem] font-semibold">
@@ -471,7 +472,7 @@ const profile = () => {
               </h6>
             </div>
 
-            <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-[1.2rem]">
+            <div className="w-full grid grid-cols-4 md:grid-cols-2  gap-[1.2rem]">
               <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-[0.8rem] flex items-start justify-start gap-[0.8rem] flex-col">
                 <Image src={Shrimp} alt="" width={24} height={24} />
 
@@ -538,7 +539,7 @@ const profile = () => {
         </div>
       </div>
 
-      <div className="w-full grid grid-rows-[1fr_max-content_max-content] gap-4">
+      <div className="w-full order-2 md:order-3 grid grid-rows-[1fr_max-content_max-content] gap-4">
         <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start">
           <div className="w-full py-[1.3rem] px-5 flex items-center border-b border-[#2C2C30]">
             <h4 className="text-white text-[1.6rem] font-semibold">
@@ -677,6 +678,9 @@ const profile = () => {
           </div>
         </div>
       </div>
+
+      <Chat />
+
     </div>
   );
 };

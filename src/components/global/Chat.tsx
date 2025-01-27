@@ -85,10 +85,10 @@ const Chat: React.FC = () => {
   const [isChatVisible, setIsChatVisible] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-16 flex items-end justify-end">
+    <div className={`fixed ${isChatVisible ? 'bottom-0 right-0' : 'bottom-6 right-16'} z-50 md:bottom-6 md:right-16 flex flex-col md:flex-row items-end justify-end`}>
       {isChatVisible && (
         <div
-          className="bg-[#161618]/80 border border-[#44444A] rounded-2xl p-[1.8rem] flex flex-col items-start justify-start gap-8 transition-opacity duration-300 mb-5 mr-2 max-h-[720px]"
+          className="bg-[#161618]/80 border border-[#44444A] rounded-2xl p-5 md:p-[1.8rem] flex flex-col items-start justify-start gap-8 transition-opacity duration-300 mb-5 mr-2 max-h-[720px]"
           style={{
             boxShadow:
               "0px 16px 20px -6px #000000A6, 0px 14px 22px -9px #FFFFFF0F inset",
@@ -122,7 +122,7 @@ const Chat: React.FC = () => {
                 <h6 className="text-[1.2rem] text-white font-medium">
                   {chat.username}
                 </h6>
-                <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal">
+                <h5 className="text-[1.4rem] text-[#ACB5BB] font-normal whitespace-nowrap">
                   {chat.message}
                 </h5>
               </div>
@@ -143,7 +143,7 @@ const Chat: React.FC = () => {
 
       <Image
         src={ChatIcon}
-        className="w-[40px] h-[40px] md:w-auto md:h-auto cursor-pointer"
+        className="md:w-auto md:h-auto cursor-pointer"
         alt="chat icon"
         onClick={() => setIsChatVisible((prev) => !prev)}
       />
