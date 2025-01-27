@@ -236,10 +236,11 @@ const Matches = () => {
               </div>
 
               <div className="flex items-center justify-center">
-                <input
-                  className="w-[75px] md:w-[92.67px] py-4 px-[0.8rem] border border-[#2C2C30] bg-[#1E1E20] rounded-tl-2xl rounded-bl-2xl text-[#6C7278] font-normal text-base outline-none"
-                  placeholder="Enter Code"
-                />
+              <input
+  className="w-[75px] md:w-[92.67px] py-4 px-[0.8rem] border border-[#2C2C30] bg-[#1E1E20] rounded-tl-2xl rounded-bl-2xl text-[#6C7278] font-normal text-base outline-none focus:border-opacity-90 focus:ring-1 focus:ring-[#2C2C30] transition duration-300 ease-in-out"
+  placeholder="Enter Code"
+/>
+
 
                 <button className="py-[0.85rem] px-7 border border-white border-opacity-15 rounded-tr-2xl rounded-br-2xl text-[1.2rem] text-white font-semibold gradient overflow-hidden outline-none">
                   Join
@@ -730,12 +731,12 @@ const Matches = () => {
           }}>
           <div className="w-full grid grid-cols-2">
             <div className="w-full flex items-center justify-center border-b-2 border-b-[#7D52F4] p-5">
-              <h5 className="text-white text-[1.4rem] font-semibold">
+              <h5 className="text-white text-[1.4rem] font-semibold cursor-pointer">
                 Ladder Leaderboard
               </h5>
             </div>
             <div className="w-full flex items-center justify-center p-5">
-              <h5 className="text-[#ACB5BB] text-[1.4rem] font-medium">
+              <h5 className="text-[#ACB5BB] text-[1.4rem] font-medium cursor-pointer">
                 All Time Best Traders
               </h5>
             </div>

@@ -59,7 +59,7 @@ const DashboardMain = () => {
       <div className="w-full bg-[#1E1E20] p-5 border border-[#2C2C30] rounded-2xl flex flex-col md:flex-row items-center justify-center gap-5">
         <input
           placeholder="Enter Solana Wallet Address"
-          className="w-full border border-[#2C2C30] rounded-2xl h-[52px] bg-transparent px-9 text-[#6C7278] font-normal text-[1.6rem]"
+          className="w-full border border-[#2C2C30] outline-none rounded-2xl h-[52px] bg-transparent px-9 text-[#6C7278] font-normal text-[1.6rem] focus:border-opacity-90 focus:ring-1 focus:ring-[#2C2C30] transition duration-300 ease-in-out"
         />
         <div className="w-full md:w-[232px]">
           <ButtonLg text="Analyze" />
@@ -111,14 +111,6 @@ const DashboardMain = () => {
         </div>
 
         <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-5">
-          {/* <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-7 flex items-start justify-between flex-col">
-              <Image src={Treasure} />
-
-              <div className="w-full flex flex-col items-start justify-start gap-1">
-                <span className="text-xl text-[#ACB5BB]">Wallet Balance</span>
-                <h2 className="text-white text-3xl font-semibold">$0.00</h2>
-              </div>
-            </div> */}
           <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-7 flex items-start justify-between flex-col">
             <Image src={Shrimp} alt="" />
 
@@ -162,7 +154,7 @@ const DashboardMain = () => {
             </h2>
 
             <div className="w-full md:w-max flex items-center justify-center gap-2 ">
-              <div className="w-full flex items-center justify-start gap-3 border border-[#2C2C30] py-[0.8rem] px-5 rounded-xl">
+              <div className="w-full flex items-center justify-start gap-3 border border-[#2C2C30] py-[0.8rem] px-5 rounded-xl focus-within:border-opacity-90 focus-within:ring-1 focus-within:ring-[#2C2C30] transition duration-300 ease-in-out">
                 <Search />
                 <input
                   className="border-none outline-none bg-transparent text-[1.4rem] font-normal text-[#ACB5BB]"
@@ -170,61 +162,61 @@ const DashboardMain = () => {
                 />
               </div>
 
-              <div className="w-[36px] h-[36px] flex items-center justify-center bg-[#2C2C30] rounded-xl">
+              <div className="w-[36px] h-[36px] flex items-center justify-center bg-[#2C2C30] rounded-xl cursor-pointer">
                 <Filter />
               </div>
             </div>
           </div>
 
           <div className="w-full flex items-start justify-start overflow-x-auto sm:w-calc-100vw-4rem">
-            <table className="w-full table-auto">
+            <table className="w-full table-auto border-collapse border-spacing-0">
               <thead className="w-full bg-[#2C2C30] rounded-xl">
                 <tr>
                   <th className="text-[#ACB5BB] font-medium text-base w-[25px] py-4 px-5">
                     #
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[33px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[33px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Icon
                   </th>
 
-                  <th className="text-[#ACB5BB] font-medium text-base w-[57px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[57px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Token
                   </th>
 
-                  <th className="text-[#ACB5BB] font-medium text-base w-[60px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[60px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Firs Buy
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[83px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[83px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Token Buy
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[55px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[55px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     SOL Used
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     USDT Used
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[52px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[52px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Buy/Sell
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[82px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[82px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Token Sold
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     SOL Received
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[75px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[75px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     USDT Received
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[81px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[81px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     SOL Earned/Lost
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[61px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Profit/Loss
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[66px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Last Sell
                   </th>
-                  <th className="text-[#ACB5BB] font-medium text-base w-[71px] py-4">
+                  <th className="text-[#ACB5BB] font-medium text-base w-[71px] py-4 px-5 md:px-0 whitespace-nowrap md:whitespace-normal">
                     Link
                   </th>
                 </tr>
@@ -845,54 +837,54 @@ const DashboardMain = () => {
 
               <tbody className="w-full flex flex-col items-center justify-start">
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #1
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={tCat}
-                        className="h-[20px] w-[20px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      CATS
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
-                      $6.8K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #1
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={tCat}
+                      className="h-[20px] w-[20px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    CATS
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
+                    $6.8K
+                  </td>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #2
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={tPONKEI}
-                        className="h-[20px] w-[20px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      PONKEI
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
-                      $1.7K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #2
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={tPONKEI}
+                      className="h-[20px] w-[20px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    PONKEI
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
+                    $1.7K
+                  </td>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #3
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={CleanShot5}
-                        className="h-[20px] w-[20px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      DOLPHINWIF
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
-                      $0.6K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #3
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={CleanShot5}
+                      className="h-[20px] w-[20px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    DOLPHINWIF
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-auto">
+                    $0.6K
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -925,63 +917,63 @@ const DashboardMain = () => {
 
               <tbody className="w-full">
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #1
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={CleanShot6}
-                        className="h-[24px] w-[24px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      GOAT
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
-                      9,101.256
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
-                      $6.8K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #1
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={CleanShot6}
+                      className="h-[24px] w-[24px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    GOAT
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
+                    9,101.256
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
+                    $6.8K
+                  </td>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #2
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={CleanShot3}
-                        className="h-[24px] w-[24px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      RHEA
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
-                      5,678.432
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
-                      $1.7K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #2
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={CleanShot3}
+                      className="h-[24px] w-[24px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    RHEA
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
+                    5,678.432
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
+                    $1.7K
+                  </td>
                 </tr>
 
                 <tr className="w-full flex items-center py-2 px-3 md:py-3 md:px-5 relative">
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
-                      #3
-                    </td>
-                    <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
-                      <Image
-                        src={CleanShot}
-                        className="h-[24px] w-[24px] md:h-auto md:w-auto"
-                        alt=""
-                      />
-                      GenBeta
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
-                      2,345.678
-                    </td>
-                    <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
-                      $0.6K
-                    </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[50px] md:w-[57px]">
+                    #3
+                  </td>
+                  <td className="text-white font-medium text-[1rem] md:text-[1.6rem] flex items-center justify-start gap-2 md:gap-3 w-[140px] md:w-[240px]">
+                    <Image
+                      src={CleanShot}
+                      className="h-[24px] w-[24px] md:h-auto md:w-auto"
+                      alt=""
+                    />
+                    GenBeta
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[100px] md:w-[160px]">
+                    2,345.678
+                  </td>
+                  <td className="text-[#ACB5BB] font-medium text-[1rem] md:text-[1.4rem] w-[80px] md:w-[160px]">
+                    $0.6K
+                  </td>
                 </tr>
               </tbody>
             </table>

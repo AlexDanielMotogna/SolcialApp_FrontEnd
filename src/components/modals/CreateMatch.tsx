@@ -36,7 +36,7 @@ const CreateMatch: React.FC<CreateMatchProps> = ({ isOpen, onClose }) => {
           <Close onClick={onClose} />
         </div>
 
-        <div className="w-full flex flex-col items-start justify-start gap-6 px-8  overflow-y-auto" style={{
+        <div className="w-full flex flex-col items-start justify-start gap-6 px-8 overflow-y-auto" style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}>

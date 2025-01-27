@@ -108,221 +108,182 @@ const Referrals = () => {
           </div>
         </div>
 
-<div className="w-full flex items-start justify-start overflow-x-auto sm:w-calc-100vw-4rem">
-        <table className="w-full flex flex-col items-start justify-start gap-3">
-          <thead className="w-full flex items-center justify-between bg-[#2C2C30] rounded-xl">
-            <tr className="w-[634px] py-4 px-5">
-              <th className="text-[#ACB5BB] font-medium text-[1.2rem]">
-                Address
-              </th>
-            </tr>
+        <div className="w-full flex items-start justify-start overflow-x-auto sm:w-calc-100vw-4rem">
+          <table className="w-full table-auto">
+            <thead className="w-full bg-[#2C2C30] rounded-xl">
+              <tr>
+                <th className="text-[#ACB5BB] font-medium text-[1.2rem] w-[100px] truncate md:w-[634px]  py-4 px-5 text-left">
+                  Address
+                </th>
+                <th className="text-[#ACB5BB] font-medium text-[1.2rem] w-[120px] py-4 px-5 text-left whitespace-nowrap">
+                  Date Joined
+                </th>
+                <th className="text-[#ACB5BB] font-medium text-[1.2rem] w-[120px] py-4 px-5 text-center whitespace-nowrap">
+                  Total Volume
+                </th>
+                <th className="text-[#ACB5BB] font-medium text-[1.2rem] w-[120px] py-4 px-5 text-left whitespace-nowrap">
+                  Fees Paid
+                </th>
+                <th className="text-[#ACB5BB] font-medium text-[1.2rem] w-[120px] py-4 px-5 text-left whitespace-nowrap">
+                  Your Rewards
+                </th>
+              </tr>
+            </thead>
 
-            <tr className="w-[120px] py-4">
-              <th className="text-[#ACB5BB] font-medium text-[1.2rem]">
-                Date Joined
-              </th>
-            </tr>
+            <tbody className="w-full">
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-            <tr className="w-[120px] py-4">
-              <th className="text-[#ACB5BB] font-medium text-[1.2rem]">
-                Total Volume
-              </th>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-            <tr className="w-[120px] py-4">
-              <th className="text-[#ACB5BB] font-medium text-[1.2rem]">
-                Fees Paid
-              </th>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-            <tr className="w-[120px] py-4">
-              <th className="text-[#ACB5BB] font-medium text-[1.2rem]">
-                Your Rewards
-              </th>
-            </tr>
-          </thead>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-          <tbody className="w-full flex flex-col items-center justify-start">
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
+              <tr className="w-full">
+                <td className="w-[100px] truncate md:w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  0xB2C3D4E5F67890A1B2C3D4E5F6
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] whitespace-nowrap">
+                  March 15, 2026
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-center whitespace-nowrap">
+                  $12,345.67
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $250.00
+                </td>
 
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
+                <td className="w-[120px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem] text-left whitespace-nowrap">
+                  $175.00
+                </td>
+              </tr>
 
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
-
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
-
-            <tr className="w-full flex items-center justify-between">
-              <td className="w-[634px] py-4 px-5 text-[#ACB5BB] font-medium text-[1.4rem]">
-                0xB2C3D4E5F67890A1B2C3D4E5F6
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                March 15, 2026
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $12,345.67
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $250.00
-              </td>
-
-              <td className="w-[120px] py-4 text-[#ACB5BB] font-medium text-[1.4rem]">
-                $175.00
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          
+            </tbody>
+          </table>
         </div>
 
-        {/* Pagination */}
         <div className="w-full flex flex-col md:flex-row gap-5 items-start justify-between">
           <div className="flex items-center justify-center gap-10">
             <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl cursor-pointer">

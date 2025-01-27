@@ -10,12 +10,12 @@ import Button from "../../components/ButtonBorder";
 import Image from "next/image";
 
 interface QuestModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-  }
-  
-  const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50">
