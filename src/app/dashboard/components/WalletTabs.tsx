@@ -10,7 +10,7 @@ interface WalletTabsProps {
 
 const WalletTabs: React.FC<WalletTabsProps> = ({
   options,
-  defaultSelected = options[1],
+  defaultSelected = options[0],
   onTabSelect,
 }) => {
   const [selectedTab, setSelectedTab] = useState(defaultSelected);

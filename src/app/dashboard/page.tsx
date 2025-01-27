@@ -54,6 +54,12 @@ const DashboardMain = () => {
     setOpenModal(null);
   };
 
+  const [selectedTab, setSelectedTab] = useState("1 Day");
+
+  const handleTabSelect = (selectedTab: string) => {
+    setSelectedTab(selectedTab);
+  };
+
   return (
     <div className="w-full p-[1.6rem] md:py-8 md:px-10 flex flex-col items-start justify-start gap-7 overflow-y-auto">
       <div className="w-full bg-[#1E1E20] p-5 border border-[#2C2C30] rounded-2xl flex flex-col md:flex-row items-center justify-center gap-5">
@@ -988,11 +994,13 @@ const DashboardMain = () => {
               Wallet Balance History
             </h2>
 
-            <WalletTabs options={["1 Day", "7 Days", "30 Days", "Custom"]} />
-          </div>
+            <WalletTabs
+          options={["1 Day", "7 Days", "30 Days", "Custom"]}
+          onTabSelect={handleTabSelect} 
+        />
+      </div>
 
-          {/* <Image src={Graph} className="w-full" alt="" /> */}
-          <WalletChart />
+      <WalletChart selectedTab={selectedTab} />
         </div>
 
         <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl overflow-hidden relative">
