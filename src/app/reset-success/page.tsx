@@ -14,7 +14,7 @@ const ResetSuccess = () => {
   return (
     <div className="container">
       <div className="w-screen h-screen bg-[#111113] ">
-        <Image src={bg} className="relative md:h-auto lg:h-screen" alt='' />
+        <Image src={bg} className="relative" alt='' />
         <div className="w-full h-screen absolute top-0 left-0 grid grid-cols-1 md:grid-cols-2 justify-start md:justify-center items-start md:items-center">
           <div className="w-full px-6 h-full pt-16 md:hidden">
             <FilledLeftArrow />

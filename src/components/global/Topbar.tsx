@@ -66,7 +66,7 @@ const Topbar = ({ activePath, toggleSidebar }: { activePath: string, toggleSideb
       
 
       <div className="flex items-center gap-5">
-      <div className='flex items-center justify-center mr-2 md:hidden'>
+      <div className='flex items-center justify-center mr-2 lg:hidden'>
           <button onClick={toggleSidebar} aria-label="Toggle Sidebar">
             <Menu />
           </button>

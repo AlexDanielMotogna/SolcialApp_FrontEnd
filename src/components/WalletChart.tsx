@@ -43,7 +43,12 @@ const getDataForSelectedTab = (selectedTab: string): ChartData<"line"> => {
 
               if (!chartArea) return "rgba(187, 185, 253, 0.1)";
 
-              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              const gradient = ctx.createLinearGradient(
+                0,
+                chartArea.top,
+                0,
+                chartArea.bottom
+              );
               gradient.addColorStop(0, "rgba(187, 185, 253, 0.1)");
               gradient.addColorStop(1, "rgba(187, 185, 253, 0.1)");
               return gradient;
@@ -59,10 +64,10 @@ const getDataForSelectedTab = (selectedTab: string): ChartData<"line"> => {
       };
     case "30 Days":
       return {
-        labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"],
+        labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString()),
         datasets: [
           {
-            data: [35, 45, 60, 70, 50, 55, 65, 85, 95, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280],
+            data: Array.from({ length: 30 }, (_, i) => Math.floor(30 + i * 5)),
             fill: true,
             borderColor: "#CAC0FF",
             pointBackgroundColor: "#CAC0FF",
@@ -74,14 +79,19 @@ const getDataForSelectedTab = (selectedTab: string): ChartData<"line"> => {
 
               if (!chartArea) return "rgba(187, 185, 253, 0.1)";
 
-              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              const gradient = ctx.createLinearGradient(
+                0,
+                chartArea.top,
+                0,
+                chartArea.bottom
+              );
               gradient.addColorStop(0, "rgba(187, 185, 253, 0.1)");
               gradient.addColorStop(1, "rgba(187, 185, 253, 0.1)");
               return gradient;
             },
           },
           {
-            data: [40, 55, 60, 80, 75, 85, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330],
+            data: Array.from({ length: 30 }, (_, i) => Math.floor(50 + i * 6)),
             fill: false,
             borderColor: "#ECAC31",
             tension: 0.3,
@@ -105,7 +115,12 @@ const getDataForSelectedTab = (selectedTab: string): ChartData<"line"> => {
 
               if (!chartArea) return "rgba(187, 185, 253, 0.1)";
 
-              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              const gradient = ctx.createLinearGradient(
+                0,
+                chartArea.top,
+                0,
+                chartArea.bottom
+              );
               gradient.addColorStop(0, "rgba(187, 185, 253, 0.1)");
               gradient.addColorStop(1, "rgba(187, 185, 253, 0.1)");
               return gradient;
@@ -127,6 +142,7 @@ const WalletChart: React.FC<{ selectedTab: string }> = ({ selectedTab }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
@@ -135,19 +151,30 @@ const WalletChart: React.FC<{ selectedTab: string }> = ({ selectedTab }) => {
     scales: {
       x: {
         grid: {
-          display: false, 
+          display: false,
         },
       },
       y: {
-        display: false, 
+        display: false,
         grid: {
-          display: false, 
+          display: false,
         },
       },
     },
   };
 
-  return <Line data={chartData} options={options} />;
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "800px", 
+        height: "300px", 
+        margin: "0 auto", 
+      }}
+    >
+      <Line data={chartData} options={options} />
+    </div>
+  );
 };
 
 export default WalletChart;

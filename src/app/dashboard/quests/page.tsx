@@ -25,20 +25,20 @@ const Quests = () => {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="w-full p-[1.6rem] md:py-[1.8rem] md:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
-      <div className="w-full flex flex-col md:flex-row md:gap-8 items-center gap-5 justify-between">
+    <div className="w-full p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
+      <div className="w-full flex flex-col md:flex-row xl:gap-8 items-center gap-5 justify-between">
         <div className="w-full flex flex-col items-start justify-start gap-1">
-          <h2 className="text-white font-semibold text-[2rem] md:text-[2.4rem]">
+          <h2 className="text-white font-semibold text-[2rem] xl:text-[2.4rem]">
             Explore Exciting Quests!
           </h2>
-          <p className="text-[#ACB5BB] text-[1.6rem] md:text-[1.8rem]">
+          <p className="text-[#ACB5BB] text-[1.6rem] xl:text-[1.8rem]">
             Earn rewards by completing tasks and engaging with our platform.
           </p>
         </div>
 
         <div className="flex items-center justify-center gap-5">
-          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-5 md:py-[1.6rem] px-3 md:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={PowerShield} alt="" className="w-[32px] h-[32px] md:w-[48px] md:h-[48px]"/>
+          <div className="w-[160px] xl:w-[196px] flex items-center justify-start gap-3 py-5 xl:py-[1.6rem] px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+            <Image src={PowerShield} alt="" className="w-[32px] h-[32px] xl:w-[48px] xl:h-[48px]"/>
 
             <div className="flex flex-col items-start justify-start gap-1">
               <h3 className="text-white font-semibold text-[1.8rem]">75</h3>
@@ -47,8 +47,8 @@ const Quests = () => {
               </span>
             </div>
           </div>
-          <div className="w-[160px] md:w-[196px] flex items-center justify-start gap-3 py-5 md:py-[1.6rem] px-3 md:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={Moneybag} alt="" className="w-[32px] h-[32px] md:w-[48px] md:h-[48px]"/>
+          <div className="w-[160px] xl:w-[196px] flex items-center justify-start gap-3 py-5 xl:py-[1.6rem] px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+            <Image src={Moneybag} alt="" className="w-[32px] h-[32px] xl:w-[48px] xl:h-[48px]"/>
 
             <div className="flex flex-col items-start justify-start gap-1">
               <h3 className="text-white font-semibold text-[1.8rem]">
@@ -62,8 +62,8 @@ const Quests = () => {
         </div>
       </div>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-9">
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-3 gap-9">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={SocialMedia} className="w-full" alt=""/>
             <div
@@ -92,7 +92,7 @@ const Quests = () => {
           </div>
         </div>
 
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={Shiba} className="w-full" alt=""/>
             <div
@@ -121,7 +121,7 @@ const Quests = () => {
           </div>
         </div>
 
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={Viral} className="w-full" alt=""/>
             <div
@@ -150,7 +150,7 @@ const Quests = () => {
           </div>
         </div>
 
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={Hype} className="w-full" alt=""/>
             <div
@@ -179,7 +179,7 @@ const Quests = () => {
           </div>
         </div>
 
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={DogeWifHat} className="w-full" alt=""/>
             <div
@@ -208,7 +208,7 @@ const Quests = () => {
           </div>
         </div>
 
-        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-full p-[1.6rem] flex flex-col items-start justify-start xl:justify-between gap-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
           <div className="w-full relative">
             <Image src={Pepe} className="w-full" alt=""/>
             <div

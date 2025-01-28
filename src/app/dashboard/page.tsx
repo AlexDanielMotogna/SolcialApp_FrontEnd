@@ -72,17 +72,17 @@ const DashboardMain = () => {
         </div>
       </div>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-[464px_1fr] gap-9">
-        <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl px-10 py-7 flex flex-col md:flex-row items-center justify-center gap-6">
-          <div className="w-full h-full flex flex-col items-center justify-between md:border-r md:border-r-[#2C2C30]">
-            <div className="w-full flex items-center justify-center md:justify-start gap-4">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-[464px_1fr] gap-9">
+        <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl px-10 py-7 flex flex-col xl:flex-row items-center justify-center gap-6">
+          <div className="w-full h-full flex flex-col items-center justify-between xl:border-r xl:border-r-[#2C2C30]">
+            <div className="w-full flex items-center justify-center xl:justify-start gap-4">
               <Image src={Sol} alt="" />
               <p className="text-[#ACB5BB] text-[1.4rem] font-normal">
                 SOL Balance
               </p>
             </div>
 
-            <div className="w-full flex flex-col items-center md:items-start md:justify-start gap-2">
+            <div className="w-full flex flex-col items-center xl:items-start xl:justify-start gap-2">
               <h3 className="text-white font-medium text-[3.2rem]">
                 12.45 SOL
               </h3>
@@ -116,7 +116,7 @@ const DashboardMain = () => {
           </div>
         </div>
 
-        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="w-full grid grid-cols-2 xl:grid-cols-4 gap-5">
           <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-7 flex items-start justify-between flex-col">
             <Image src={Shrimp} alt="" />
 
@@ -152,7 +152,7 @@ const DashboardMain = () => {
         </div>
       </div>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_180px] gap-5">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-[1fr_180px] gap-5">
         <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl py-6 px-5 flex flex-col items-center justify-between gap-4 overflow-hidden">
           <div className="w-full flex flex-col md:flex-row gap-5 items-center justify-between">
             <h2 className="w-full text-white font-semibold text-[1.8rem]">
@@ -741,7 +741,7 @@ const DashboardMain = () => {
         </div>
 
         <div className="w-full grid grid-rows-4 gap-4">
-          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between">
+          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between gap-4">
             <Image src={MatchSword} alt="" />
 
             <div className="w-full flex items-end justify-end">
@@ -987,7 +987,7 @@ const DashboardMain = () => {
         </div>
       </div>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_302px] gap-8">
+      <div className="w-full h-full grid grid-cols-1 2xl:grid-cols-[1fr_302px] gap-8 pb-28">
         <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-8 px-10 flex flex-col items-start justify-start gap-8">
           <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <h2 className="w-full text-white font-semibold text-[1.8rem]">
@@ -1003,10 +1003,10 @@ const DashboardMain = () => {
       <WalletChart selectedTab={selectedTab} />
         </div>
 
-        <div className="w-full bg-[#161618] border border-[#2C2C30] rounded-2xl overflow-hidden relative">
+        <div className="w-full 2xl:max-h-max bg-[#161618] border border-[#2C2C30] rounded-2xl overflow-hidden relative">
           <Image src={bgGrid} className="w-full relative" alt="" />
 
-          <div className="w-full h-full flex flex-col items-center justify-between gap-6 p-6 absolute top-0 left-0">
+          <div className="w-full h-full 2xl:max-h-max xl:h-auto flex flex-col items-center justify-between gap-6 p-6 absolute top-0 left-0">
             <div className="w-full flex flex-col items-center justify-center gap-5 relative overflow-hidden rounded-[12px]">
               <Image
                 src={Game}

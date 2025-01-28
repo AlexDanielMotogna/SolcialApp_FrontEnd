@@ -7,7 +7,7 @@ import EventModal from "@/components/modals/EventModal";
 
 const Events: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'events' | 'tournaments'>('events'); // Track active tab for mobile
+  const [activeTab, setActiveTab] = useState<'events' | 'tournaments'>('events');
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -139,7 +139,7 @@ const Events: React.FC = () => {
           <h3 className="text-[#ACB5BB] text-[1.8rem]">
             Play in custom Events.
           </h3>
-          <div className="w-full grid grid-cols-4 gap-5 mt-5">
+          <div className="w-full grid md:grid-cols-2 xl:grid-cols-4 gap-5 mt-5">
             {eventData.map((event, index) => (
               <EventCard key={index} {...event} onJoin={openModal} />
             ))}
@@ -153,7 +153,7 @@ const Events: React.FC = () => {
           <h3 className="text-[#ACB5BB] text-[1.8rem]">
             Play in custom tournaments.
           </h3>
-          <div className="w-full grid grid-cols-3 gap-5 mt-5">
+          <div className="w-full grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-5">
             {TournamentData.map((event, index) => (
               <TournamentsCard key={index} {...event} onJoin={openModal} />
             ))}

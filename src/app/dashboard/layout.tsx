@@ -15,13 +15,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="w-full h-screen bg-[#111113] grid grid-cols-1 md:grid-cols-[250px_1fr]">
+    <div className="w-full h-screen bg-[#111113] grid grid-cols-1 lg:grid-cols-[250px_1fr]">
       <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} activePath={activePath} setActivePath={setActivePath} />
       
-      <div className="w-full h-full bg-[#161618] border border-[#2C2C30] rounded-tl-2xl rounded-bl-2xl overflow-x-hidden">
+      <div className="w-full h-full bg-[#161618] border border-[#2C2C30] rounded-tl-2xl rounded-bl-2xl overflow-hidden">
         <Topbar activePath={activePath} toggleSidebar={toggleSidebar} />
+        <div className="w-full h-full overflow-y-auto">
         <CryptoRow />
         <div>{children}</div>
+        </div>
       </div>
     </div>
   );

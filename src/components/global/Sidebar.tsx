@@ -77,14 +77,14 @@ const Sidebar: FC<{
       <div
         className={`fixed top-0 left-0 h-screen w-[100vw] bg-[#111113] p-[2.4rem] z-20 transform transition-transform duration-300 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:w-[250px] md:translate-x-0 md:relative`}
+        } lg:w-[250px] lg:translate-x-0 lg:relative`}
       >
         <div className="w-full h-full flex flex-col justify-between items-start gap-[2.4rem]">
          <div className="w-full flex flex-col justify-start items-start gap-[2.4rem]">
 
           <div className="w-full flex items-center justify-between">
             <Image src={Logo} className="w-56" alt="Logo" />
-            <button onClick={toggleSidebar} className="md:hidden">
+            <button onClick={toggleSidebar} className="lg:hidden">
               {isSidebarOpen ? <Close /> : <Menu />}
             </button>
           </div>
