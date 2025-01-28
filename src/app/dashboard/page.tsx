@@ -1006,7 +1006,7 @@ const DashboardMain = () => {
         <div className="w-full 2xl:max-h-max bg-[#161618] border border-[#2C2C30] rounded-2xl overflow-hidden relative">
           <Image src={bgGrid} className="w-full relative" alt="" />
 
-          <div className="w-full h-full 2xl:max-h-max xl:h-auto flex flex-col items-center justify-between gap-6 p-6 absolute top-0 left-0">
+          <div className="w-full h-full 2xl:max-h-max lg:h-auto flex flex-col items-center justify-between gap-6 p-6 absolute top-0 left-0">
             <div className="w-full flex flex-col items-center justify-center gap-5 relative overflow-hidden rounded-[12px]">
               <Image
                 src={Game}
