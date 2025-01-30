@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+
+import React, { useState, useEffect } from "react";
 
 import HeroHelmet from "../../../../public/imgs/HeroHelmet.png";
 import Moneybag from "../../../../public/imgs/Moneybag.png";
@@ -31,9 +35,23 @@ import CleanShotCircle4 from "../../../../public/imgs/CleanShotCircle4.png";
 import fourthBadge from "../../../../public/imgs/fourthBadge.png";
 import fifthBadge from "../../../../public/imgs/fifthBadge.png";
 import sixthBadge from "../../../../public/imgs/sixthBadge.png";
+import CreateQuest from "@/components/modals/CreateQuest";
+import CreateMatch from "@/components/modals/CreateMatch";
+import CreateLadder from "@/components/modals/CreateLadder";
 import Chat from "@/components/global/Chat";
 
-const Matches = () => {
+const Matches: React.FC = () => {
+
+  const [openModal, setOpenModal] = useState<string | null>(null);
+  
+    const openModalHandler = (modalType: string) => {
+      setOpenModal(modalType);
+    };
+  
+    const closeModalHandler = () => {
+      setOpenModal(null);
+    };
+
   return (
     <div className="w-full p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] grid grid-cols-1 xl:grid-cols-3 gap-[1.6rem]">
       <div className="w-full max-h-[790px] bg-[#161618] border border-[#2C2C30] rounded-2xl flex flex-col items-start justify-start overflow-x-hidden">
@@ -151,7 +169,7 @@ const Matches = () => {
                 <div className="w-full h-[1px] bg-[#44444A]"></div>
               </div>
 
-              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between">
+              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between cursor-pointer"  onClick={() => openModalHandler("Ladder")}>
                 <div className="w-full flex items-center justify-start gap-4">
                   <Image
                     src={Sword}
@@ -161,10 +179,10 @@ const Matches = () => {
                     unoptimized
                   />
                   <div className="w-full flex flex-col items-start justify-start gap-1">
-                    <h6 className="text-[#EDF1F3] text-[1.2rem] md:text-[1.6rem] font-semibold">
+                    <h6 className="text-[#EDF1F3] text-[1.2rem] md:text-[1.6rem] font-semibold cursor-pointer">
                       Create a Ladder Match
                     </h6>
-                    <p className="text-[#ACB5BB] text-base font-regular">
+                    <p className="text-[#ACB5BB] text-base font-regular cursor-pointer">
                       Create a Ladder Match
                     </p>
                   </div>
@@ -173,7 +191,7 @@ const Matches = () => {
                 <ArrowRight />
               </div>
 
-              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between">
+              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between cursor-pointer" onClick={() => openModalHandler("match")}>
                 <div className="w-full flex items-center justify-start gap-4">
                   <Image
                     src={GameTrophy}
@@ -183,7 +201,7 @@ const Matches = () => {
                     unoptimized
                   />
                   <div className="w-full flex flex-col items-start justify-start gap-1">
-                    <h6 className="text-[#EDF1F3] text-[1.2rem] md:text-[1.6rem] font-semibold">
+                    <h6 className="text-[#EDF1F3] text-[1.2rem] md:text-[1.6rem] font-semibold cursor-pointer">
                       Create a Private Match
                     </h6>
                     <p className="text-[#ACB5BB] text-base font-regular">
@@ -195,7 +213,7 @@ const Matches = () => {
                 <ArrowRight />
               </div>
 
-              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between">
+              <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl p-4 md:py-5 md:pl-5 md:pr-[1.4rem] flex items-center justify-between cursor-pointer" onClick={() => openModalHandler("Ladder")}>
                 <div className="w-full flex items-center justify-start gap-4">
                   <Image
                     src={GameCrown}
@@ -204,7 +222,7 @@ const Matches = () => {
                     height={32}
                     unoptimized
                   />
-                  <div className="w-full flex flex-col items-start justify-start gap-1">
+                  <div className="w-full flex flex-col items-start justify-start gap-1" >
                     <h6 className="text-[#EDF1F3] text-[1.2rem] md:text-[1.6rem] font-semibold">
                       Create Tournament
                     </h6>
@@ -952,6 +970,16 @@ const Matches = () => {
           </div>
         </div>
       </div>
+
+      {openModal === "quest" && (
+        <CreateQuest isOpen={true} onClose={closeModalHandler} />
+      )}
+      {openModal === "match" && (
+        <CreateMatch isOpen={true} onClose={closeModalHandler} />
+      )}
+      {openModal === "Ladder" && (
+        <CreateLadder isOpen={true} onClose={closeModalHandler} />
+      )}
 
       <Chat />
     </div>

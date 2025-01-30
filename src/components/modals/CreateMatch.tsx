@@ -130,7 +130,7 @@ const CreateMatch: React.FC<CreateMatchProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
         <div className="w-full border-t border-[#44444A] p-8">
-          <Button text="Create Quest" />
+          <Button text="Create Private Match" />
         </div>
       </div>
     </div>

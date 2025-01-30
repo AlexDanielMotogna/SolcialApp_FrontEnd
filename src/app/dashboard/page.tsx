@@ -745,14 +745,14 @@ const DashboardMain: React.FC = () => {
           </div>
 
         <div className="w-full grid grid-rows-4 gap-4">
-          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between gap-4">
+          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between gap-4 cursor-pointer" onClick={() => openModalHandler("match")}>
             <Image src={MatchSword} alt="" />
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
                 <h2
                   className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
-                  onClick={() => openModalHandler("match")}
+                  
                 >
                   Create Match
                 </h2>
@@ -764,14 +764,14 @@ const DashboardMain: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between">
+          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between cursor-pointer" onClick={() => openModalHandler("quest")}>
             <Image src={GameTrophy} alt="" />
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
                 <h2
                   className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
-                  onClick={() => openModalHandler("quest")}
+                  
                 >
                   Create Quest
                 </h2>
@@ -783,14 +783,14 @@ const DashboardMain: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between">
+          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between cursor-pointer" onClick={() => openModalHandler("Ladder")}>
             <Image src={GameCrown} alt="" />
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
                 <h2
                   className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
-                  onClick={() => openModalHandler("Ladder")}
+                  
                 >
                   View Leaderboard
                 </h2>
@@ -802,14 +802,14 @@ const DashboardMain: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between">
+          <div className="w-full bg-[#1E1E20] border border-[#2C2C30] rounded-2xl py-5 pl-4 pr-5 flex flex-col items-start justify-between cursor-pointer" onClick={() => openModalHandler("Token")}>
             <Image src={CoinGame} alt="" />
 
             <div className="w-full flex items-end justify-end">
               <div className="w-full flex flex-col items-start justify-start gap-1">
                 <h2
                   className="font-semibold text-[1.4rem] text-[#EDF1F3] cursor-pointer"
-                  onClick={() => openModalHandler("Token")}
+                  
                 >
                   Create Advertising
                 </h2>
@@ -1049,7 +1049,7 @@ const DashboardMain: React.FC = () => {
               </div>
 
               <div className="w-full flex flex-col items-center justify-center gap-6">
-                <Button text="Create Advertisement" size="sm" />
+                <Button text="Create Advertisement" size="sm" onClick={() => openModalHandler("Token")} />
                 <a className="cursor-pointer text-white font-semibold text-[1.2rem]">
                   Learn more
                 </a>
