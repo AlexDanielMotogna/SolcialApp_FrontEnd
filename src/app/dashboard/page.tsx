@@ -42,6 +42,7 @@ import CreateQuest from "@/components/modals/CreateQuest";
 import CreateMatch from "@/components/modals/CreateMatch";
 import CreateLadder from "@/components/modals/CreateLadder";
 import CreateToken from "@/components/modals/CreateToken";
+import ReactLoading from 'react-loading';
 
 const DashboardMain = () => {
   const [openModal, setOpenModal] = useState<string | null>(null);
@@ -174,7 +175,8 @@ const DashboardMain = () => {
             </div>
           </div>
 
-          <div className="w-full flex items-start justify-start overflow-x-auto sm:w-calc-100vw-4rem">
+<div className="w-full overflow-x-auto">
+          <div className="w-full min-w-[1210px] flex items-start justify-start overflow-x-auto 2xl:w-calc-100vw-4rem">
             <table className="w-full table-auto border-collapse border-spacing-0">
               <thead className="w-full bg-[#2C2C30] rounded-xl">
                 <tr>
@@ -700,6 +702,7 @@ const DashboardMain = () => {
             </table>
           </div>
 
+          </div>
           <div className="w-full flex flex-col md:flex-row gap-5 items-start justify-between">
             <div className="flex items-center justify-center gap-10">
               <div className="w-[32px] h-[32px] flex items-center justify-center border border-[#44444A] rounded-xl cursor-pointer">
