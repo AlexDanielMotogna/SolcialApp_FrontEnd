@@ -177,7 +177,7 @@ const DashboardMain: React.FC = () => {
             </div>
 
             <div className="w-full overflow-x-auto">
-            <div className="min-w-[1210px] 2xl:min-w-0 flex items-start justify-start overflow-x-auto">
+            <div className="min-w-[1400px] 2xl:min-w-0 flex items-start justify-start overflow-x-auto">
 
                 <table className="w-full table-auto border-collapse border-spacing-0">
                   <thead className="w-full bg-[#2C2C30] rounded-xl">
