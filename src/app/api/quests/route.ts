@@ -15,11 +15,15 @@ export async function POST(request: Request) {
         ? (rewardPool / maxParticipants).toFixed(6)
         : "0";
 
-    delete data.rewardPerTask; // <-- elimina cualquier valor que venga del frontend
+    delete data.rewardPerTask; // eliminate any value that comes from the frontend
+
+    // Extract userId from data or set it explicitly
+    const userId = data.userId; // Adjust this line if userId comes from elsewhere (e.g., session)
 
     const quest = await Quest.create({
       ...data,
-      rewardPerTask, // <-- aquí lo agregas calculado
+      rewardPerTask,
+      userId, // <-- aquí lo agregas calculado
     });
 
     return NextResponse.json({ quest }, { status: 201 });
@@ -28,10 +32,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Error creating quest", error }, { status: 500 });
   }
 }
-
+// Fetch all quests
 export async function GET() {
   try {
     await connectDB();
+    // Fetch all quests sorted by createdAt in descending order
     const quests = await Quest.find().sort({ createdAt: -1 });
     return NextResponse.json({ quests });
   } catch (error) {

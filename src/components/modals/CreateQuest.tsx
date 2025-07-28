@@ -1,19 +1,22 @@
 "use client";
+import { questAPI } from "@/app/clientAPI/questAPI";
+import { useMockUser } from "@/context/MockUserContext";
+import { useCreateQuest } from "@/hooks/useCreateQuest";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
-import ButtonBorder from "../../components/ButtonBorder";
 import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
-import { useCreateQuest } from "./useCreateQuest";
-import { useState } from "react";
+import ButtonBorder from "../../components/ButtonBorder";
+import { toUTCISOString } from "../../utils/dateUtils";
 
-interface CreateQuestProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const initialForm = {
+// Initial form state for the CreateQuest component
+// This includes fields for quest details, tasks, and dates
+export const initialForm = {
   questName: "",
   description: "",
+  tweetLink: "",
+  authorId: "",
   maxParticipants: "",
   rewardPool: "",
   rewardPerTask: "",
@@ -30,13 +33,24 @@ const initialForm = {
   },
 };
 
-interface CreateQuestProps {
+// CreateQuestProps interface defines the props for the CreateQuest component
+export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
-  refreshQuests: () => void; // <--- agrega esto
+  refreshQuests: () => void;
+  initialData?: Partial<typeof initialForm> & { _id?: string };
+  isEdit?: boolean;
 }
+// Extend CreateQuestProps to include refreshQuests
+// This allows the component to refresh the quest list after creation
 
-const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuests }) => {
+// CreateQuest component now accepts refreshQuests as a prop
+const CreateQuest: React.FC<CreateQuestProps> = ({
+  isOpen,
+  onClose,
+  refreshQuests,
+}) => {
+  const { id: userId } = useMockUser();
   const {
     form,
     setForm,
@@ -45,19 +59,68 @@ const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuest
     calculateRewardPerTask,
     loading,
     error,
-  } = useCreateQuest(initialForm, onClose);
+  } = useCreateQuest(initialForm, onClose, userId);
 
   const [showSuccess, setShowSuccess] = useState(false);
 
+  useEffect(() => {
+    async function fetchAuthorId() {
+      if (form.tweetLink && form.tweetLink.startsWith("http")) {
+        const res = await fetch("/api/quests/testAuthId", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tweetLink: form.tweetLink }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setForm((prev: typeof initialForm) => ({
+            ...prev,
+            authorId: data.authorId,
+          }));
+        }
+      }
+    }
+    fetchAuthorId();
+  }, [form.tweetLink]);
+
   const handleSubmitWithPopup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await handleSubmit(e);
-    if (result === "success") {
+
+    // Convert dates and times to UTC ISO string
+    const startDateTimeUTC = toUTCISOString(form.startDate, form.startTime);
+    const endDateTimeUTC = toUTCISOString(form.endDate, form.endTime);
+
+    // Filtra solo los tasks seleccionados (true)
+    const filteredTasks = Object.fromEntries(
+      Object.entries(form.tasks).filter(([_, value]) => value === true)
+    );
+
+    // Prepara el quest data para enviar al backend
+    const questData = {
+      ...form,
+      tasks: filteredTasks, // Solo los seleccionados
+      startDateTime: startDateTimeUTC,
+      endDateTime: endDateTimeUTC,
+      userId,
+    };
+
+    // Remove the original date and time fields
+    delete questData.startDate;
+    delete questData.startTime;
+    delete questData.endDate;
+    delete questData.endTime;
+
+    // Send the data to the backend
+    try {
+      await questAPI.createQuest(questData);
       setShowSuccess(true);
-      refreshQuests(); // <--- refresh quests after successful creation
+      refreshQuests();
+    } catch (error) {
+      toast.error("Error creating quest: " + (error as Error).message);
+      // Handle error (e.g., show an error message)
     }
   };
-
+  // If the modal is not open, return null to avoid rendering
   if (!isOpen) return null;
 
   return (
@@ -66,8 +129,12 @@ const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuest
       {showSuccess && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
           <div className="bg-[#18181b] p-8 rounded-2xl shadow-xl flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-green-400 mb-4">Quest Created!</h2>
-            <p className="text-white mb-6">Your quest was created successfully.</p>
+            <h2 className="text-2xl font-bold text-green-400 mb-4">
+              Quest Created!
+            </h2>
+            <p className="text-white mb-6">
+              Your quest was created successfully.
+            </p>
             <button
               className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold"
               onClick={() => {
@@ -143,15 +210,31 @@ const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuest
                 required
               />
             </div>
+            {/* Tweet/Post Link */}
+            <div className="w-full flex flex-col items-start justify-start gap-2">
+              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
+                Tweet/Post Link
+              </h6>
+              <input
+                name="tweetLink"
+                value={form.tweetLink}
+                onChange={handleChange}
+                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
+                placeholder="https://twitter.com/..."
+                required
+              />
+            </div>
 
             {/* Banner */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
-              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">Banner Image</h6>
+              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
+                Banner Image
+              </h6>
               <input
                 type="file"
                 accept="image/*"
                 name="banner"
-                onChange={e => {
+                onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
                     const url = URL.createObjectURL(file);
@@ -247,7 +330,9 @@ const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuest
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Start Date & Time */}
               <div className="w-full flex flex-col gap-2">
-                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">Start Date & Time</h6>
+                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
+                  Start Date & Time
+                </h6>
                 <div className="flex flex-col gap-2">
                   <label className="text-[1.1rem] text-[#ACB5BB]">Date</label>
                   <input
@@ -272,7 +357,9 @@ const CreateQuest: React.FC<CreateQuestProps> = ({ isOpen, onClose, refreshQuest
               </div>
               {/* End Date & Time */}
               <div className="w-full flex flex-col gap-2">
-                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">End Date & Time</h6>
+                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
+                  End Date & Time
+                </h6>
                 <div className="flex flex-col gap-2">
                   <label className="text-[1.1rem] text-[#ACB5BB]">Date</label>
                   <input

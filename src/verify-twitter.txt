@@ -1,0 +1,127 @@
+import { NextRequest } from "next/server";
+import Quest from "@/models/Quest";
+import UserQuest from "@/models/UserQuest";
+import AuthUser from "@/models/AuthUser";
+import { TwitterApi } from "twitter-api-v2";
+import { Types } from "mongoose";
+
+export async function POST(req: NextRequest) {
+  const { userQuestId, userId } = await req.json();
+  console.log("POST /verify-twitter", { userQuestId, userId });
+
+  const userQuest = await UserQuest.findById(userQuestId);
+  console.log("userQuest:", userQuest);
+  if (!userQuest) {
+    console.log("Session not found");
+    return new Response(JSON.stringify({ success: false, error: "Session not found" }), { status: 404 });
+  }
+
+  const quest = await Quest.findById(userQuest.questId);
+  console.log("quest:", quest);
+  if (!quest) {
+    console.log("Quest not found");
+    return new Response(JSON.stringify({ success: false, error: "Quest not found" }), { status: 404 });
+  }
+
+  const tweetId = quest.tweetLink.split("/").pop();
+  console.log("tweetId:", tweetId);
+
+  const requiredTasks = Object.keys(quest.tasks).filter(task => quest.tasks[task]);
+  console.log("requiredTasks:", requiredTasks);
+
+  const user = await AuthUser.findById(new Types.ObjectId(userId));
+  console.log("user:", user);
+  if (!user || !user.twitterAccessToken || !user.twitterAccessSecret || !user.twitterUserId) {
+    console.log("User not connected to Twitter");
+    return new Response(JSON.stringify({ success: false, error: "User not connected to Twitter" }), { status: 400 });
+  }
+
+  const client = new TwitterApi({
+    appKey: process.env.TWITTER_API_KEY!,
+    appSecret: process.env.TWITTER_API_SECRET!,
+    accessToken: user.twitterAccessToken,
+    accessSecret: user.twitterAccessSecret,
+  });
+
+  const tweetAuthorId = quest.authorId;
+  const completedTasks: Record<string, boolean> = {};
+
+  try {
+
+       if (requiredTasks.includes("like")) {
+          // Fetch liked tweets for the user
+          const likedTweetsResponse = await client.v2.userLikedTweets(user.twitterUserId, { max_results: 100 });
+          // likedTweetsResponse.data es un objeto { data: [...] }
+          const likedData = Array.isArray(likedTweetsResponse.data.data)
+            ? likedTweetsResponse.data.data
+            : [];
+          const tweetIds = likedData.map((t: any) => t.id);
+          console.log("✅ liked tweet IDs:", tweetIds);
+          console.log("🔍 Buscando tweetId:", tweetId);
+
+          completedTasks.like = tweetIds.includes(String(tweetId));
+          console.log("✅ Resultado like:", completedTasks.like);
+        }
+
+
+    // RETWEET & COMMENT
+    const userTimeline = await client.v2.userTimeline(user.twitterUserId, { max_results: 100 });
+    console.log("userTimeline:", userTimeline);
+
+    if (requiredTasks.includes("retweet")) {
+      completedTasks.retweet = Array.isArray(userTimeline.data) && userTimeline.data.some(tweet =>
+        tweet.referenced_tweets?.some((ref: { type: string; id: any; }) => ref.type === "retweeted" && ref.id === tweetId)
+      );
+      console.log("completedTasks.retweet:", completedTasks.retweet);
+    }
+
+    if (requiredTasks.includes("comment")) {
+      completedTasks.comment = Array.isArray(userTimeline.data) && userTimeline.data.some(tweet =>
+        tweet.in_reply_to_status_id === tweetId && tweet.in_reply_to_user_id === tweetAuthorId
+      );
+      console.log("completedTasks.comment:", completedTasks.comment);
+    }
+
+    // FOLLOW
+    if (requiredTasks.includes("follow")) {
+      const following = await client.v2.following(user.twitterUserId, { max_results: 1000 });
+      console.log("following:", following);
+      completedTasks.follow = Array.isArray(following.data) && following.data.some(userObj => userObj.id === tweetAuthorId);
+      console.log("completedTasks.follow:", completedTasks.follow);
+    }
+
+    userQuest.completedTasks = Object.fromEntries(
+      requiredTasks.map(task => [task, completedTasks[task] || false])
+    );
+    console.log("userQuest.completedTasks:", userQuest.completedTasks);
+
+    const allRequiredCompleted = requiredTasks.every(task => userQuest.completedTasks[task] === true);
+    console.log("allRequiredCompleted:", allRequiredCompleted);
+
+    if (allRequiredCompleted) {
+      userQuest.status = "completed";
+      console.log("Quest status set to completed");
+    }
+
+    await userQuest.save();
+    console.log("userQuest saved");
+
+  return new Response(JSON.stringify({
+    success: true,
+    completedTasks: userQuest.completedTasks,
+    status: userQuest.status,
+  }), { status: 200 });
+} // <-- Close the try block here
+
+  catch (error) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as any).code === 429) {
+      console.error("Twitter API rate limit exceeded:", error);
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Has alcanzado el límite de verificaciones automáticas de Twitter. Intenta de nuevo en unos minutos."
+      }), { status: 429 });
+    }
+    console.error("Error verifying tasks:", error);
+    return new Response(JSON.stringify({ success: false, error: "Error verifying tasks" }), { status: 500 });
+  }
+}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function useCreateQuest(initialForm: any, onClose: () => void) {
+export function useCreateQuest(initialForm: any, onClose: () => void, userId: string) {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,35 +36,16 @@ export function useCreateQuest(initialForm: any, onClose: () => void) {
     return "";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // now accepts questData as an argument
+  // This allows for more flexibility in handling the quest creation logic
+  const handleSubmit = async (questData: any) => {
     setLoading(true);
     setError(null);
     try {
-      // Prepara los datos correctamente antes de enviar
-      const dataToSend = {
-      questName: form.questName,
-      description: form.description,
-      banner: "", // o form.banner si luego implementas imágenes
-      maxParticipants: Number(form.maxParticipants),
-      rewardPool: Number(form.rewardPool),
-      startDate: form.startDate,
-      startTime: form.startTime,
-      endDate: form.endDate,
-      endTime: form.endTime,
-      tasks: {
-        like: form.tasks.like,
-        retweet: form.tasks.retweet,
-        comment: form.tasks.comment,
-        follow: form.tasks.follow,
-        quote: form.tasks.quote,
-      },
-    };
-
       const res = await fetch("/api/quests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),
+        body: JSON.stringify(questData),
       });
       if (res.ok) {
         return "success";
@@ -82,7 +63,7 @@ export function useCreateQuest(initialForm: any, onClose: () => void) {
     form,
     setForm,
     handleChange,
-    handleSubmit,
+    handleSubmit, // ahora acepta questData
     calculateRewardPerTask,
     loading,
     error,
