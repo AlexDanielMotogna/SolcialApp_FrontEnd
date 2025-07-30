@@ -2,117 +2,302 @@ import InfoRow from "@/components/global/InfoRow";
 import Notification from "@/components/global/Notification";
 import TaskList from "@/components/global/TaskList";
 import RewardClaim from "@/components/modals/RewardClaim";
-import { MockUserContext } from "@/context/MockUserContext";
 import { useNotificaciones } from "@/context/NotificacionesContext";
-import { useSessionManager } from "@/context/SessionManagerContext";
-import { fetchQuest } from "@/utils/questApi";
 import {
   getIncompleteRequiredTasks,
   getQuestStatus,
   getRequiredTasks,
-  getRewardPerUser,
-  UserQuest,
 } from "@/utils/questHelpers";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import useSWR from "swr";
 import Close from "../../../public/icons/Close";
 import Button from "../../components/ButtonBorder";
+import { parseDecimal128ToNumber, formatDecimalForDisplay } from "@/utils/decimal";
+
 
 interface QuestModalProps {
   isOpen: boolean;
-  questId: string | null;
+  quest: any;
+  user: any;
+  userQuest: any;
+  loading?: boolean;
   onClose: () => void;
   onSessionExpired?: () => void;
+  mutateUserQuest?: () => void;
+  onExpiredInModal?: (questName: string) => void;
+  onQuestCompleted?: (questName: string) => void;
 }
 
 const QuestModal: React.FC<QuestModalProps> = ({
   isOpen,
-  questId,
+  quest,
+  user,
+  userQuest,
+  loading = false,
   onClose,
   onSessionExpired,
+  mutateUserQuest,
+  onExpiredInModal,
+  onQuestCompleted,
 }) => {
-  const { mensaje, setMensaje } = useNotificaciones();
-  const sessionManager = useSessionManager();
-  const addSession = sessionManager?.addSession;
-  const removeSession = sessionManager?.removeSession;
-  const context = useContext(MockUserContext);
-  const user = context?.user;
-  const [quest, setQuest] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const { setMensaje } = useNotificaciones();
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false);
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  const questIsInactive = getQuestStatus(quest);
+  const sessionCompleted = userQuest && userQuest.status === "finished";
+  const rewardClaimed = userQuest && userQuest.rewardClaimed;
+  const allUserTasksCompleted =
+    userQuest && Object.values(userQuest.completedTasks).every(Boolean);
+  const isSessionExpired = userQuest && userQuest.status === "expired";
+  const hasActiveSession = userQuest && userQuest.status === "active";
+  const requiredTasks = getRequiredTasks(quest);
+  const incompleteRequiredTasks = getIncompleteRequiredTasks(quest, userQuest);
+  const tasksToShow = userQuest ? userQuest.completedTasks : quest.tasks;
+  const rewardPerUser = parseDecimal128ToNumber(quest.rewardPerTask);
+  const formattedRewardPerUser = formatDecimalForDisplay(rewardPerUser, 6);
+  const rewardPool = parseDecimal128ToNumber(quest.rewardPool);
+  const formattedRewardPool = formatDecimalForDisplay(rewardPool, 6);
+
+  const canVerifyAgain =
+    userQuest &&
+    userQuest.status === "active" &&
+    incompleteRequiredTasks.length > 0 &&
+    !rewardClaimed &&
+    !isSessionExpired;
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
 
   useEffect(() => {
-    if (isOpen) {
-      setLoading(true);
-      fetchQuest(questId!)
-        .then((data) => {
-          setQuest(data.quest);
-          setLoading(false);
-        })
-        .catch(() => {
-          setQuest(null);
-          setLoading(false);
-        });
+    console.log(
+      "🔍 QuestModal useEffect - checking userQuest:",
+      userQuest?.status
+    );
+
+    // ✅ Verificar expiración usando el endpoint existente
+    const checkExpiration = async () => {
+      if (userQuest && userQuest.questId && userQuest.status === "active") {
+        try {
+          const response = await fetch("/api/user-quests/expire", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              questId: userQuest.questId,
+              userId: user.id,
+              walletaddress: user.walletaddress,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.expired && data.found) {
+            console.log("⏰ Session expired detected by backend in modal");
+            onExpiredInModal?.(quest.questName);
+            onClose();
+          }
+        } catch (error) {
+          console.error("Error checking expiration in modal:", error);
+        }
+      }
+    };
+
+    checkExpiration();
+  }, [
+    userQuest,
+    quest.questName,
+    onExpiredInModal,
+    onClose,
+    user.id,
+    user.walletaddress,
+  ]);
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  const handleTweetLinkClick = () => {
+    if (quest.tweetLink) {
+      window.open(quest.tweetLink, "_blank", "noopener,noreferrer");
     }
-  }, [isOpen, questId]);
+  };
 
-  // SWR para la sesión del usuario
-  //
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const userQuestUrl =
-    isOpen && user?.id && user?.walletAdress && questId
-      ? `/api/user-quests/by-user?userId=${user.id}&walletAdress=${user.walletAdress}&questId=${questId}`
-      : null;
+  const handleClaimReward = async () => {
+    if (!userQuest) return;
 
-  const {
-    data: userQuestData,
-    isLoading: userQuestLoading,
-    mutate,
-  } = useSWR(userQuestUrl, fetcher, { refreshInterval: 5000 });
+    try {
+      const res = await fetch("/api/user-quests/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userQuestId: userQuest._id,
+        }),
+      });
 
-  const userQuest = userQuestData?.userQuest || null;
+      if (res.ok) {
+        setRewardModalOpen(true);
+        mutateUserQuest?.();
+      } else {
+        toast.error("Error claiming reward. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Error claiming reward. Please try again.");
+    }
+  };
 
-  // Registrar sesión activa en el contexto global
-  useEffect(() => {
+  const handleVerifyTasks = async () => {
+    try {
+      const verifyRes = await fetch("/api/user-quests/verify-twitter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userQuestId: userQuest._id,
+          userId: user.id,
+        }),
+      });
+
+      const verifyData = await verifyRes.json();
+
+      // ✅ Manejar diferentes códigos de estado
+      if (verifyRes.status === 429) {
+        toast.error(
+          "Twitter servers are busy. Please try again in a few minutes.",
+          {
+            duration: 6000,
+            style: {
+              background: "#FEF2F2",
+              color: "#DC2626",
+              border: "1px solid #FECACA",
+            },
+          }
+        );
+        return;
+      }
+      if (
+        verifyRes.status === 500 &&
+        verifyData.error &&
+        verifyData.error.includes("rate limit")
+      ) {
+        toast.error(
+          "Twitter API rate limit exceeded. Please wait a few minutes and try again.",
+          {
+            duration: 6000,
+            style: {
+              background: "#FEF2F2",
+              color: "#DC2626",
+              border: "1px solid #FECACA",
+            },
+          }
+        );
+        return;
+      }
+      if (verifyData.success) {
+        mutateUserQuest?.();
+        toast.success("Tasks verified successfully!");
+        onQuestCompleted?.(quest._id);
+      } else {
+        toast.error("Complete all the tasks on Twitter before verifying.");
+      }
+    } catch (error) {
+      toast.error("Error verifying tasks. Please try again.");
+    }
+  };
+
+  // ============================================================================
+  // BUTTON LOGIC
+  // ============================================================================
+
+  const getFooterButton = () => {
+    // Session expired - close modal to restart
+    if (isSessionExpired) {
+      return <Button text="Session Expired - Close" onClick={onClose} />;
+    }
+
+    // Quest inactive (but allow claim if user completed and quest finished)
+    if (
+      questIsInactive &&
+      !(
+        quest.status === "finished" &&
+        userQuest &&
+        userQuest.status === "finished"
+      )
+    ) {
+      return <Button text={`Quest ${quest.status}`} disabled />;
+    }
+
+    // Reward ready to claim (highest priority)
     if (
       userQuest &&
-      userQuest.status === "active" &&
-      userQuest.sessionExpiresAt &&
-      user?.id &&
-      user?.walletAdress
+      userQuest.status === "finished" &&
+      allUserTasksCompleted &&
+      !rewardClaimed
     ) {
-      addSession?.({
-        questId: questId!,
-        sessionExpiresAt: userQuest.sessionExpiresAt,
-        status: userQuest.status,
-        userId: user.id,
-        walletAdress: user.walletAdress,
-      });
-    } else if (questId) {
-      removeSession?.(questId);
+      return <Button text="Claim Reward" onClick={handleClaimReward} />;
     }
-  }, [userQuest, questId, user]);
 
-  // Si la sesión expiró, muestra mensaje y deshabilita acciones
-  useEffect(() => {
-    if (userQuest && userQuest.status === "expired") {
-      setSessionExpired(true);
-      setMensaje("Your session has expired. Please restart the quest.");
-      onSessionExpired?.();
+    // Tasks verification available (only if quest not finished)
+    if (canVerifyAgain && quest.status !== "finished") {
+      return (
+        <Button
+          text="Verify Tasks"
+          className="bg-yellow-500 hover:bg-yellow-600 text-black"
+          disabled={!user?.hasTwitterAccess}
+          onClick={handleVerifyTasks}
+        />
+      );
     }
-  }, [userQuest, setMensaje, onSessionExpired]);
-  // Limpia el timeout al cerrar el modal
-  /*  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []); */
 
-  if (!isOpen || !questId) return null;
+    // Quest finished but tasks not completed
+    if (quest.status === "finished" && userQuest && !allUserTasksCompleted) {
+      return <Button text="Quest ended - Tasks not completed" disabled />;
+    }
+
+    // Session completed, reward available (alternative path)
+    if (sessionCompleted && !rewardClaimed) {
+      const canClaim =
+        userQuest && Object.values(userQuest.completedTasks).every(Boolean);
+      return (
+        <Button
+          text="Claim Reward"
+          disabled={!canClaim}
+          onClick={canClaim ? handleClaimReward : undefined}
+        />
+      );
+    }
+
+    // All tasks completed (final verification)
+    if (allUserTasksCompleted && !rewardClaimed) {
+      return <Button text="Claim Reward" onClick={handleClaimReward} />;
+    }
+
+    // Active session but pending tasks (only if quest not finished)
+    if (hasActiveSession && quest.status !== "finished") {
+      return <Button text="Complete all tasks to claim reward" disabled />;
+    }
+
+    // Reward already claimed
+    if (rewardClaimed) {
+      return <Button text="Reward already claimed" disabled />;
+    }
+
+    // No userQuest - modal shouldn't be open
+    if (!userQuest) {
+      return <Button text="Close" onClick={onClose} />;
+    }
+
+    // Default state
+    return <Button text="Close" onClick={onClose} />;
+  };
+
+  // ============================================================================
+  // RENDER CONDITIONS
+  // ============================================================================
+
+  if (!isOpen) return null;
 
   if (loading) {
     return (
@@ -130,161 +315,16 @@ const QuestModal: React.FC<QuestModalProps> = ({
         <div className="bg-[#161618] w-[420px] flex items-center justify-center rounded-2xl p-10">
           <span className="text-white text-xl">Quest not found</span>
           <button className="ml-4 text-white underline" onClick={onClose}>
-            Cerrar
+            Close
           </button>
         </div>
       </div>
     );
   }
 
-  // State logic
-  const questIsInactive = getQuestStatus(quest);
-  const sessionCompleted = userQuest && userQuest.status === "completed";
-  const rewardClaimed = userQuest && userQuest.rewardClaimed;
-  const allUserTasksCompleted =
-    userQuest && Object.values(userQuest.completedTasks).every(Boolean);
-  const hasActiveSession = userQuest && userQuest.status === "active";
-  const alreadyStarted = !!userQuest;
-  const noCupo = quest.participants >= quest.maxParticipants;
-
-  const requiredTasks = getRequiredTasks(quest);
-  const incompleteRequiredTasks = getIncompleteRequiredTasks(quest, userQuest);
-  const canVerifyAgain =
-    alreadyStarted && incompleteRequiredTasks.length > 0 && !rewardClaimed;
-
-  const tasksToShow = userQuest ? userQuest.completedTasks : quest.tasks;
-  const rewardPerUser = getRewardPerUser(quest);
-
-  // Footer button logic adaptado para SWR
-  function getFooterButton() {
-    if (questIsInactive) {
-      return <Button text={`Quest ${quest.status}`} disabled />;
-    }
-    if (userQuestLoading) {
-      return <Button text="Checking session..." disabled />;
-    }
-    if (!alreadyStarted) {
-      return (
-        <Button
-          text={noCupo ? "No spots available" : "Start Quest"}
-          disabled={noCupo}
-          onClick={async () => {
-            if (!user) return;
-            const res = await fetch("/api/user-quests", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: user.id,
-                walletAdress: user.walletAdress,
-                questId: quest._id,
-                tasks: quest.tasks,
-              }),
-            });
-            const result = (await res.json()) as UserQuest;
-            console.log("Quest started:", result);
-
-            if (result.sessionExpiresAt) {
-              let timeUntilExpiration =
-                new Date(result.sessionExpiresAt).getTime() - Date.now();
-              if (timeUntilExpiration <= 0) {
-                timeUntilExpiration = 0;
-              }
-              timeoutRef.current = setTimeout(() => {
-                setSessionExpired(true);
-                toast.error(
-                  "Your Quest session has expired: " + result.quest?.questName
-                );
-                onSessionExpired?.();
-              }, timeUntilExpiration);
-            }
-
-            if (!res.ok) {
-              setMensaje("Could not start quest.");
-              return;
-            }
-            await mutate();
-            // Redirige al login de Twitter
-            if (!user?.hasTwitterAccess) {
-              window.location.href = "/api/auth/twitter";
-            }
-          }}
-        />
-      );
-    }
-    if (canVerifyAgain) {
-      return (
-        <Button
-          text="Verify Tasks"
-          disabled={!user?.hasTwitterAccess}
-          onClick={async () => {
-            const verifyRes = await fetch("/api/user-quests/verify-twitter", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userQuestId: userQuest._id,
-                userId: user.id,
-              }),
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              if (timeoutRef.current) clearTimeout(timeoutRef.current);
-              mutate();
-              toast.success("Tasks verified successfully!");
-            }
-          }}
-        />
-      );
-    }
-    if (sessionCompleted && !rewardClaimed) {
-      const canClaim =
-        userQuest && Object.values(userQuest.completedTasks).every(Boolean);
-      return (
-        <Button
-          text="Claim Reward"
-          disabled={!canClaim}
-          onClick={async () => {
-            if (!userQuest || !canClaim) return;
-            const res = await fetch("/api/user-quests/claim", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userQuestId: userQuest._id,
-              }),
-            });
-            if (res.ok) {
-              setRewardModalOpen(true);
-              mutate();
-            }
-          }}
-        />
-      );
-    }
-    if (allUserTasksCompleted && !rewardClaimed) {
-      return (
-        <Button
-          text="Claim Reward"
-          onClick={async () => {
-            if (!userQuest) return;
-            const res = await fetch("/api/user-quests/claim", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userQuestId: userQuest._id,
-              }),
-            });
-            if (res.ok) {
-              setRewardModalOpen(true);
-              mutate();
-            }
-          }}
-        />
-      );
-    }
-    if (hasActiveSession) {
-      return <Button text="Complete all tasks to claim reward" disabled />;
-    }
-    return null;
-  }
+  // ============================================================================
+  // MAIN RENDER
+  // ============================================================================
 
   return (
     <>
@@ -305,7 +345,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
             <Close onClick={onClose} />
           </div>
 
-          {/* Content */}
+          {/* Quest Information */}
           <div className="w-full flex flex-col items-start justify-start gap-6 px-8">
             <div className="w-full flex flex-col items-start justify-start gap-1">
               <h4 className="text-white font-semibold text-[1.8rem]">
@@ -315,11 +355,13 @@ const QuestModal: React.FC<QuestModalProps> = ({
                 {quest.description}
               </p>
             </div>
+
+            {/* Quest Details */}
             <div className="w-full flex flex-col gap-[0.8rem]">
-              <InfoRow label="Total Reward" value={`${quest.rewardPool} SOL`} />
+              <InfoRow label="Total Reward" value={`${formattedRewardPool} SOL`} />
               <InfoRow
                 label="Reward per User"
-                value={`${rewardPerUser.toFixed(6)} SOL`}
+                value={`${formattedRewardPerUser} SOL`}
               />
               <InfoRow
                 label="Start Date"
@@ -331,26 +373,64 @@ const QuestModal: React.FC<QuestModalProps> = ({
               />
               <InfoRow
                 label="Participants"
-                value={`${quest.participants ?? 0} / ${quest.maxParticipants}`}
+                value={`${quest.actualParticipants ?? 0} / ${
+                  quest.maxParticipants
+                }`}
               />
             </div>
           </div>
 
-          {/* Tasks */}
-          <div className="w-full flex flex-col items-start justify-start px-8 gap-6">
+          {/* Tasks Section */}
+          <div className="w-full flex flex-col items-start justify-start px-8 gap-4">
             <h5 className="text-white text-[1.6rem] font-semibold">Tasks</h5>
+
+            {/* Tweet Link Button */}
+            {quest.tweetLink && (
+              <div className="w-full">
+                <p className="text-[#ACB5BB] text-[1.2rem] mb-3">
+                  Complete all required tasks on this tweet:
+                </p>
+                <button
+                  onClick={handleTweetLinkClick}
+                  className="w-full p-4 bg-[#1DA1F2] hover:bg-[#1A94DA] transition-colors duration-200 rounded-lg border border-[#1DA1F2] text-white font-medium text-[1.4rem] flex items-center justify-center gap-2"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                  </svg>
+                  Open Tweet on Twitter
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+
             <TaskList tasks={tasksToShow} userQuest={userQuest} />
           </div>
-          {sessionExpired && (
-            <Notification type="error">
-              Your session has expired. Please restart the quest.
-            </Notification>
+
+          {/* Notifications */}
+          {isSessionExpired && (
+            <div className="w-full px-8">
+              <Notification type="error">
+                Your session has expired. Please restart the quest.
+              </Notification>
+            </div>
           )}
-          {rewardClaimed && (
-            <Notification type="success">
-              You have claimed the reward!
-            </Notification>
-          )}
+
           {/* Footer */}
           <div className="w-full border-t border-[#44444A] p-8">
             {getFooterButton()}
@@ -358,7 +438,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
         </div>
       </div>
 
-      {/* Reward Modal */}
+      {/* Reward Claim Modal */}
       <RewardClaim
         isOpen={rewardModalOpen}
         onClose={() => setRewardModalOpen(false)}

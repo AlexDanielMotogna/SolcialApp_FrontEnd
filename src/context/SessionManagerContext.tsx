@@ -4,9 +4,9 @@ import { createContext, useContext, useRef } from "react";
 type Session = {
   questId: string;
   sessionExpiresAt: string;
-  status: "active" | "expired" | "completed";
+  status: "active" | "expired" | "finished";
   userId: string;
-  walletAdress: string;
+  walletaddress: string;
 };
 
 type SessionManagerContextType = {
@@ -47,7 +47,7 @@ export function SessionManagerProvider({ children }: { children: React.ReactNode
             body: JSON.stringify({
                 questId: session.questId,
                 userId: session.userId,
-                walletAdress: session.walletAdress
+                walletaddress: session.walletaddress
             }),
             });
             // Mark as expired in memory
@@ -61,7 +61,7 @@ export function SessionManagerProvider({ children }: { children: React.ReactNode
             body: JSON.stringify({
             questId: session.questId,
             userId: session.userId,
-            walletAdress: session.walletAdress
+            walletaddress: session.walletaddress
             }),
         });
         sessionsRef.current[session.questId].status = "expired";

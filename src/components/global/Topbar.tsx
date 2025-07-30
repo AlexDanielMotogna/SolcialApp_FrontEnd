@@ -17,6 +17,11 @@ import Alert3 from "../../../public/imgs/Alert3.png";
 import Alert4 from "../../../public/imgs/Alert4.png";
 import Menu from '../../../public/icons/Menu';
 import NotificationCard from "./NotificationCard";
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useState, useEffect } from 'react';
+import Wallet from '../../../public/icons/Wallet';
+import { SolanaWalletProvider } from '@/providers/WalletProvider';
 
 const notifications = [
   {
@@ -43,6 +48,7 @@ const notifications = [
 
 const Topbar = ({ activePath, toggleSidebar }: { activePath: string, toggleSidebar: () => void }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
+  
 
   let topbarLabel = "";
   let topbarIcon = null;

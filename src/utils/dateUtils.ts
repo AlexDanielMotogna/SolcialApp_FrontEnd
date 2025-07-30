@@ -39,12 +39,12 @@ export function parseISOToFormFields(isoString?: string) {
 }
 
 export function getEndInColor(endDateTime: string, now: Date) {
-  if (!endDateTime) return "text-white text-xl";
+  if (!endDateTime) return "text-white";
   const end = new Date(endDateTime);
   const diffMs = end.getTime() - now.getTime();
-  if (diffMs <= 0) return "text-white text-xl";
+  if (diffMs <= 0) return "text-white";
   const mins = Math.floor(diffMs / 60000);
-  if (mins < 10) return "text-red-500";
-  if (mins < 60) return "text-yellow-400";
+  if (mins < 10) return "text-red";
+  if (mins < 60) return "text-yellow";
   return "text-green-400";
 }

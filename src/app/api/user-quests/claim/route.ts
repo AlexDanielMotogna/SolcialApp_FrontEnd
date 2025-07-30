@@ -1,10 +1,8 @@
-import { NextRequest } from "next/server";
-import { connectDB } from "@/lib/mongodb";
 import UserQuest from "@/models/UserQuest";
+import { NextRequest } from "next/server";
 
 // Handles the claim reward request for a user quest
 export async function POST(req: NextRequest) {
-  //await connectDB();
   const { userQuestId } = await req.json();
 
   // Find the user quest session by ID
@@ -28,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   // Mark the reward as claimed
   userQuest.rewardClaimed = true;
-  userQuest.status = "completed";
+  userQuest.status = "finished";
   await userQuest.save();
 
   // Return success response

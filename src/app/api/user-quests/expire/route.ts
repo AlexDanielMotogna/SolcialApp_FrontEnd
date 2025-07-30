@@ -6,64 +6,103 @@ import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   console.log("Expire endpoint called");
-  //await connectDB();
-  const { questId, userId, walletAdress } = await req.json();
+  
+  const { questId, userId, walletaddress } = await req.json();
   console.log("questId recibido:", questId);
-
-  console.log("Filtro usado:", {
-  questId,
-  $or: [
-    { userId },
-    { walletAdress }
-  ]
-});
 
   const session = await mongoose.startSession();
   session.startTransaction();
+  
   try {
-    // Busca todas las sesiones activas de ese quest para ese usuario
-    const userQuests = await UserQuest.find({
+    const now = new Date();
+    console.log("Current time:", now);
+
+    // ✅ BUSCAR sesiones activas que REALMENTE expiraron por tiempo
+    const expiredUserQuests = await UserQuest.find({
       questId,
       status: "active",
+      sessionExpiresAt: { $lt: now }, // ✅ Solo sesiones que expiraron
       $or: [
         { userId },
-        { walletAdress }
+        { walletaddress }
       ]
     }).session(session);
-    console.log("userQuests encontrados:", userQuests.length);
 
-    if (!userQuests.length) {
+    console.log("Expired userQuests found:", expiredUserQuests.length);
+    console.log("Sessions to delete:", expiredUserQuests.map(uq => ({
+      id: uq._id,
+      expiresAt: uq.sessionExpiresAt,
+      isExpired: uq.sessionExpiresAt < now
+    })));
+
+    if (!expiredUserQuests.length) {
       await session.abortTransaction();
       session.endSession();
-      return new Response(JSON.stringify({ expired: false, error: "No sessions found" }), { status: 404 });
+      
+      // ✅ Verificar si hay sesiones activas que AÚN NO expiraron
+      const activeUserQuests = await UserQuest.find({
+        questId,
+        status: "active",
+        $or: [{ userId }, { walletaddress }]
+      });
+
+      if (activeUserQuests.length > 0) {
+        const stillActive = activeUserQuests.filter(uq => uq.sessionExpiresAt > now);
+        if (stillActive.length > 0) {
+          console.log("Session still active, expires at:", stillActive[0].sessionExpiresAt);
+          return new Response(JSON.stringify({ 
+            expired: false, 
+            found: false,
+            message: "Session is still active",
+            expiresAt: stillActive[0].sessionExpiresAt
+          }), { status: 200 });
+        }
+      }
+
+      console.log("No expired sessions found for user");
+      return new Response(JSON.stringify({ 
+        expired: false, 
+        found: false,
+        error: "No expired sessions found" 
+      }), { status: 200 });
     }
 
-    // Elimina la(s) sesión(es) de ese quest para ese usuario
+    // ✅ ELIMINAR solo las sesiones que realmente expiraron
     const deleteResult = await UserQuest.deleteMany({
-      questId,
-      status: "active",
-      $or: [
-        { userId },
-        { walletAdress }
-      ]
+      _id: { $in: expiredUserQuests.map(uq => uq._id) }
     }, { session });
 
-    // Libera los cupos (resta tantos como sesiones eliminadas)
+    console.log("Sessions deleted:", deleteResult.deletedCount);
+
+    // ✅ Liberar cupos solo de las sesiones eliminadas
     await Quest.updateOne(
-      { _id: questId, reservedParticipants: { $gte: userQuests.length } },
-      { $inc: { reservedParticipants: -userQuests.length } },
+      { _id: questId, reservedParticipants: { $gte: deleteResult.deletedCount } },
+      { $inc: { reservedParticipants: -deleteResult.deletedCount } },
       { session }
     );
 
     await session.commitTransaction();
     session.endSession();
 
-    // Si se borró al menos una sesión, expired = true
-    return new Response(JSON.stringify({ expired: deleteResult.deletedCount > 0 }), { status: 200 });
+    console.log("Expire completed successfully:", {
+      deleted: deleteResult.deletedCount,
+      expired: deleteResult.deletedCount > 0
+    });
+
+    return new Response(JSON.stringify({ 
+      expired: deleteResult.deletedCount > 0,
+      found: deleteResult.deletedCount > 0,
+      deletedCount: deleteResult.deletedCount
+    }), { status: 200 });
+
   } catch (err) {
     console.error("Error expiring session:", err);
     await session.abortTransaction();
     session.endSession();
-    return new Response(JSON.stringify({ expired: false, error: "Error expiring session" }), { status: 500 });
+    return new Response(JSON.stringify({ 
+      expired: false, 
+      found: false,
+      error: "Error expiring session" 
+    }), { status: 500 });
   }
 }

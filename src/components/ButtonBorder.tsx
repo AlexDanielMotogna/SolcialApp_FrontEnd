@@ -3,11 +3,15 @@ interface ButtonProps {
   disabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   type?: "button" | "submit" | "reset";
+  className?: string; // <-- añadido
 }
 
-
-
-const ButtonBorder: React.FC<ButtonProps> = ({ text, disabled = false, onClick }) => {
+const ButtonBorder: React.FC<ButtonProps> = ({
+  text,
+  disabled = false,
+  onClick,
+  className, // <-- añadido
+}) => {
   return (
     <button
       onClick={onClick}
@@ -16,7 +20,7 @@ const ButtonBorder: React.FC<ButtonProps> = ({ text, disabled = false, onClick }
         disabled
           ? "opacity-50 cursor-not-allowed"
           : "hover:text-opacity-85"
-      }`}
+      } ${className || ""}`} // <-- añadido
     >
       {text}
     </button>
