@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useQuests.ts
+
+import { useState, useEffect, useCallback } from "react"; // ✅ AGREGAR useCallback
 import toast from "react-hot-toast";
 
 interface QuestFilters {
@@ -16,9 +18,22 @@ export const useQuests = () => {
   const [filter, setFilter] = useState<string>("");
   const questsPerPage = 6;
 
-  const fetchQuests = async (page = 1, filterParam = filter) => {
+  // ✅ FUNCIÓN PARA ACTUALIZAR ESTADOS DE QUESTS
+  const updateQuestStatuses = useCallback(async () => {
+    try {
+      await fetch("/api/quests/update-status", { method: "POST" });
+    } catch (error) {
+      console.error("Error updating quest statuses:", error);
+    }
+  }, []);
+
+  // ✅ FUNCIÓN FETCHQUESTS ACTUALIZADA
+  const fetchQuests = useCallback(async (page = 1, filterParam = filter) => {
     try {
       setLoading(true);
+
+      // ✅ ACTUALIZAR ESTADOS ANTES DE OBTENER QUESTS
+      await updateQuestStatuses();
 
       const params = new URLSearchParams({
         page: page.toString(),
@@ -52,7 +67,7 @@ export const useQuests = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, questsPerPage, updateQuestStatuses]); // ✅ AGREGAR DEPENDENCIAS
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -67,9 +82,9 @@ export const useQuests = () => {
     fetchQuests(1, newFilter);
   };
 
-  const refreshQuests = async () => {
+  const refreshQuests = useCallback(async () => {
     await fetchQuests(currentPage, filter);
-  };
+  }, [fetchQuests, currentPage, filter]); // ✅ USAR useCallback
 
   useEffect(() => {
     fetchQuests(1, "");

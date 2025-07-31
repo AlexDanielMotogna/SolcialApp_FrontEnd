@@ -78,7 +78,6 @@ const Quests = () => {
   const [showExpirationModal, setShowExpirationModal] = useState(false);
   const [expiredQuestName, setExpiredQuestName] = useState<string>("");
   const [now, setNow] = useState(new Date());
-
   // ============================================================================
   // MEMOIZED VALUES
   // ============================================================================
@@ -269,7 +268,7 @@ const Quests = () => {
         itemsPerPage={questsPerPage}
       />
 
-      {modalType && (
+       
         <QuestModals
           modalType={modalType}
           selectedQuest={selectedQuest}
@@ -294,7 +293,7 @@ const Quests = () => {
           onRefreshData={refreshAllData}
           onRefreshQuests={refreshQuests}
         />
-      )}
+
     </div>
   );
 };

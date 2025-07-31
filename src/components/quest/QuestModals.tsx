@@ -99,7 +99,15 @@ const QuestModals = ({
               <button
                 className="flex-1 bg-[#1DA1F2] hover:bg-[#1A94DA] text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
                 onClick={() => {
-                  window.location.href = "/api/auth/twitter";
+                  // ✅ AGREGAR USER ID A LA URL
+                  const twitterAuthUrl = `/api/auth/twitter${
+                    user?.id ? `?userId=${user.id}` : ""
+                  }`;
+                  console.log(
+                    "🐦 Redirecting to Twitter OAuth:",
+                    twitterAuthUrl
+                  );
+                  window.location.href = twitterAuthUrl;
                 }}
               >
                 <FaTwitter /> Connect Twitter

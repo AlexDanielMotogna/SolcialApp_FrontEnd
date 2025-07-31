@@ -4,7 +4,12 @@ export interface QuestButtonProps {
 }
 
 export const questUtils = {
-  getQuestButtonProps(quest: any, userQuest: any, user: any, isLoading: boolean): QuestButtonProps {
+  getQuestButtonProps(
+    quest: any,
+    userQuest: any,
+    user: any,
+    isLoading: boolean
+  ): QuestButtonProps {
     const isConnectedToTwitter = !!user?.hasTwitterAccess;
     const questStartTime = new Date(quest.startDateTime);
     const currentTime = new Date();
@@ -12,6 +17,11 @@ export const questUtils = {
     // Loading state
     if (isLoading) {
       return { text: "Joining quest...", disabled: true };
+    }
+
+    // ✅ NO USER - PERMITIR CLICK
+    if (!user) {
+      return { text: "Login Required", disabled: false }; // ✅ FALSE para permitir click
     }
 
     // Quest hasn't started yet
@@ -34,30 +44,26 @@ export const questUtils = {
       return { text: "Quest Canceled", disabled: true };
     }
 
-    // ✅ QUEST FINISHED - NUEVA LÓGICA
+    // Quest finished
     if (quest.status === "finished") {
-      // Si el usuario participó
       if (userQuest) {
         if (userQuest.status === "finished") {
-          // Verificar si todas las tareas están completas
-          const allTasksCompleted = Object.values(userQuest.completedTasks || {}).every(Boolean);
-          
+          const allTasksCompleted = Object.values(
+            userQuest.completedTasks || {}
+          ).every(Boolean);
+
           if (allTasksCompleted && !userQuest.rewardClaimed) {
-            return { text: "Complete", disabled: false }; // ✅ Permite entrar para claim
+            return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
           }
-          
+
           if (userQuest.rewardClaimed) {
-            return { text: "Reward Claimed", disabled: false }; // ✅ Permite ver detalles
+            return { text: "Reward Claimed", disabled: false }; // ✅ Siempre clickeable
           }
-          
-          return { text: "Complete", disabled: false }; // ✅ Permite ver detalles
+
+          return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
         }
-        
-        // Si tiene userQuest pero no está finished
-        return { text: "Complete", disabled: false };
+        return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
       }
-      
-      // Si no participó
       return { text: "Quest Ended", disabled: true };
     }
 
@@ -66,34 +72,35 @@ export const questUtils = {
       return { text: "No spots available", disabled: true };
     }
 
-    // Twitter access check
+    // ✅ SIN TWITTER - BOTÓN CLICKEABLE PARA CONECTAR
     if (!isConnectedToTwitter) {
-      return { text: "Connect to Twitter", disabled: false };
+      return { text: "Connect to Twitter", disabled: false }; // ✅ FALSE para permitir click
     }
 
-    // ✅ USUARIO CON QUEST ACTIVO/TERMINADO
+    // Usuario con quest
     if (userQuest) {
       if (userQuest.status === "expired") {
         return { text: "Join Quest", disabled: false };
       }
-      
+
       if (userQuest.status === "active") {
-        return { text: "Continue Quest", disabled: false };
+        return { text: "Continue Quest", disabled: false }; // ✅ Siempre clickeable
       }
-      
+
       if (userQuest.status === "finished") {
-        // Verificar si todas las tareas están completas
-        const allTasksCompleted = Object.values(userQuest.completedTasks || {}).every(Boolean);
-        
+        const allTasksCompleted = Object.values(
+          userQuest.completedTasks || {}
+        ).every(Boolean);
+
         if (allTasksCompleted && !userQuest.rewardClaimed) {
-          return { text: "Complete", disabled: false }; // ✅ Permite claim
+          return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
         }
-        
+
         if (userQuest.rewardClaimed) {
-          return { text: "Reward Claimed", disabled: false }; // ✅ Permite ver detalles
+          return { text: "Reward Claimed", disabled: false }; // ✅ Siempre clickeable
         }
-        
-        return { text: "Complete", disabled: false };
+
+        return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
       }
     }
 
@@ -125,10 +132,11 @@ export const questUtils = {
       const hoursUntilStart = Math.ceil(timeUntilStart / (1000 * 60 * 60));
       const minutesUntilStart = Math.ceil(timeUntilStart / (1000 * 60));
 
-      const message = hoursUntilStart > 1 
-        ? `Quest starts in ${hoursUntilStart} hours`
-        : `Quest starts in ${minutesUntilStart} minutes`;
-        
+      const message =
+        hoursUntilStart > 1
+          ? `Quest starts in ${hoursUntilStart} hours`
+          : `Quest starts in ${minutesUntilStart} minutes`;
+
       return { valid: false, message };
     }
 
@@ -151,7 +159,7 @@ export const questUtils = {
     const questStartTime = new Date(startDateTime);
     const currentTime = new Date();
     const timeUntilStart = questStartTime.getTime() - currentTime.getTime();
-    
+
     if (timeUntilStart <= 0) {
       return null;
     }
@@ -166,5 +174,5 @@ export const questUtils = {
     } else {
       return "Starting soon...";
     }
-  }
+  },
 };

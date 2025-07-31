@@ -189,7 +189,7 @@ const QuestAction: React.FC<{
   <div className="w-full">
     <ButtonBorder
       text={buttonText}
-      disabled={buttonDisabled}
+      disabled={buttonDisabled} // ✅ USAR EL VALOR TAL COMO VIENE
       onClick={onOpenModal}
     />
   </div>
