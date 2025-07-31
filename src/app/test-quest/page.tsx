@@ -28,14 +28,16 @@ export default function TestQuestPage() {
         <h2>Test Quest Modal</h2>
         {quests.map((quest) => (
           <button key={quest._id} onClick={() => handleOpenModal(quest._id)}>
-            View Quest {quest.questName}
+            Join Quest {quest.questName}
           </button>
         ))}
 
         <QuestModal
           isOpen={isModalOpen}
-          questId={selectedQuestId}
+          quest={quests.find((q) => q._id === selectedQuestId) || null}
           onClose={handleCloseModal}
+          user={MOCK_USER}
+          userQuest={null}
         />
       </div>
     </MockUserContext.Provider>

@@ -5,6 +5,7 @@ import Sidebar from "../../components/global/Sidebar";
 import Topbar from "../../components/global/Topbar";
 import CryptoRow from "../../components/global/CryptoRow/CryptoRow";
 import { Toaster } from "react-hot-toast";
+import { SolanaWalletProvider } from "@/providers/WalletProvider";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [activePath, setActivePath] = useState<string>("/dashboard");
@@ -15,6 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
   // Add auth guard for user authentication
   return (
+    <SolanaWalletProvider>
     <div className="w-full h-screen bg-[#111113] grid grid-cols-1 lg:grid-cols-[250px_1fr]">
       <Toaster position="top-center" />
       <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} activePath={activePath} setActivePath={setActivePath} />
@@ -26,5 +28,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
     </div>
+    </SolanaWalletProvider>
   );
 }

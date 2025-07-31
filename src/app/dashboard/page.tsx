@@ -1059,7 +1059,7 @@ const DashboardMain: React.FC = () => {
         </div>
       </div>
       {openModal === "quest" && (
-        <CreateQuest isOpen={true} onClose={closeModalHandler} />
+        <CreateQuest isOpen={true} onClose={closeModalHandler} refreshQuests={() => {}} />
       )}
       {openModal === "match" && (
         <CreateMatch isOpen={true} onClose={closeModalHandler} />

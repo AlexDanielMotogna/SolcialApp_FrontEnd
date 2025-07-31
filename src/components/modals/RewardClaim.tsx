@@ -1,9 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
 import Close from "../../../public/icons/Close";
-import Image from "next/image";
-import Checkmark from "../../../public/imgs/SolanaIconReward.png"; // Usa tu ícono, o reemplaza por texto
 import RewardIcon from "../../../public/imgs/Moneybag.png"; // o el ícono de recompensa
 
 interface RewardClaimProps {
@@ -13,17 +12,25 @@ interface RewardClaimProps {
   token: string;
 }
 
-const RewardClaim: React.FC<RewardClaimProps> = ({ isOpen, onClose, amount, token }) => {
+const RewardClaim: React.FC<RewardClaimProps> = ({
+  isOpen,
+  onClose,
+  amount,
+  token,
+}) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-[#000000] bg-opacity-60 z-50 flex justify-center items-end md:items-center">
-      <div className="bg-[#161618] w-[90vw] md:w-[420px] flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl overflow-hidden shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
+      <div
+        className="bg-[#161618] w-[90vw] md:w-[420px] flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl overflow-hidden shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
         style={{ boxShadow: "0px -5px 10px 0px #FFFFFF1A inset" }}
       >
         {/* Header */}
         <div className="w-full p-6 border-b border-[#44444A] flex items-center justify-between">
-          <h3 className="text-[1.8rem] text-white font-semibold">Reward Claimed!</h3>
+          <h3 className="text-[1.8rem] text-white font-semibold">
+            Reward Claimed!
+          </h3>
           <Close onClick={onClose} />
         </div>
 

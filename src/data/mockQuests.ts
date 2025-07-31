@@ -21,7 +21,7 @@ export const QUESTS = [
     rewardToken: "SOL",
     totalTasks: 3000,
     tasksCompleted: 500,
-    status: "completed",
+    status: "finished",
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ export const QUESTS = [
     rewardToken: "SOL",
     totalTasks: 30000,
     tasksCompleted: 30000,
-    status: "completed",
+    status: "finished",
   },
   {
     id: 6,

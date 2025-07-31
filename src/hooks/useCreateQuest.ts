@@ -1,11 +1,18 @@
 import { useState } from "react";
 
-export function useCreateQuest(initialForm: any, onClose: () => void, userId: string) {
+export function useCreateQuest(
+  initialForm: any,
+  onClose: () => void,
+  userId: string,
+  authorId: string // <-- Añade authorId como argumento
+) {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-//
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     if (
       name === "like" ||
@@ -36,8 +43,7 @@ export function useCreateQuest(initialForm: any, onClose: () => void, userId: st
     return "";
   };
 
-  // now accepts questData as an argument
-  // This allows for more flexibility in handling the quest creation logic
+  // handleSubmit ahora añade userId y authorId automáticamente
   const handleSubmit = async (questData: any) => {
     setLoading(true);
     setError(null);
@@ -45,7 +51,11 @@ export function useCreateQuest(initialForm: any, onClose: () => void, userId: st
       const res = await fetch("/api/quests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(questData),
+        body: JSON.stringify({
+          ...questData,
+          userId,    // ID interno de tu app
+          authorId,  // ID de Twitter
+        }),
       });
       if (res.ok) {
         return "success";
@@ -63,7 +73,7 @@ export function useCreateQuest(initialForm: any, onClose: () => void, userId: st
     form,
     setForm,
     handleChange,
-    handleSubmit, // ahora acepta questData
+    handleSubmit, // ahora añade userId y authorId automáticamente
     calculateRewardPerTask,
     loading,
     error,
