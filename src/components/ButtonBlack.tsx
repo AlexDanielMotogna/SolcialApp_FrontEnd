@@ -1,12 +1,14 @@
 interface ButtonProps {
   text: string;
-  onClick?: () => void; // Add onClick to the props
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
-const ButtonBlack: React.FC<ButtonProps> = ({ text, onClick }) => {
+const ButtonBlack: React.FC<ButtonProps> = ({ text, onClick, disabled }) => {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         boxShadow: "inset 0px -5px 10px 0px rgba(255, 255, 255, 0.1)",
       }}

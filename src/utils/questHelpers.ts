@@ -22,7 +22,7 @@ export interface UserQuest {
 }
 
 export function getQuestStatus(quest: Quest) {
-  return quest.status === "completed" || quest.status === "canceled";
+  return quest.status === "finished" || quest.status === "canceled";
 }
 
 export function getRewardPerUser(quest: Quest) {

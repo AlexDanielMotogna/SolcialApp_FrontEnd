@@ -1,15 +1,13 @@
-import { NextRequest } from "next/server";
-import { connectDB } from "@/lib/mongodb";
 import UserQuest from "@/models/UserQuest";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  //await connectDB();
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
-  const walletAdress = searchParams.get("walletAdress");
+  const walletaddress = searchParams.get("walletaddress");
   const questId = searchParams.get("questId");
 
-  if (!questId || (!userId && !walletAdress)) {
+  if (!questId || (!userId && !walletaddress)) {
     return new Response(JSON.stringify({ error: "Missing params" }), { status: 400 });
   }
 
@@ -18,7 +16,7 @@ export async function GET(req: NextRequest) {
     questId,
     $or: [
       { userId },
-      { walletAdress }
+      { walletaddress }
     ]
   });
 

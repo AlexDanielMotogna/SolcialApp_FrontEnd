@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     accessSecret: user.twitterAccessSecret,
   });
 
-  const tweetAuthorId = quest.authorId;
+  const tweetuserId = quest.userId;
   const completedTasks: Record<string, boolean> = {};
 
   try {
@@ -112,7 +112,7 @@ console.log("allRequiredCompleted:", allRequiredCompleted);
 
 // Actualiza el estado del userQuest
 if (allRequiredCompleted) {
-  userQuest.status = "completed";
+  userQuest.status = "finished";
   console.log("Quest status set to completed");
 
   // Actualiza los participantes
@@ -129,7 +129,7 @@ if (allRequiredCompleted) {
 
   // Si ya se alcanzó el máximo, marca el quest como finalizado
   if (updatedQuest.actualParticipants >= updatedQuest.maxParticipants) {
-    updatedQuest.status = "completed";
+    updatedQuest.status = "finished";
     await updatedQuest.save();
     console.log("Quest status set to completed");
   }

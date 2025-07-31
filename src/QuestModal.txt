@@ -1,21 +1,23 @@
-import { useEffect, useState, useContext } from "react";
-import useSWR from "swr";
-import Close from "../../../public/icons/Close";
-import Button from "../../components/ButtonBorder";
+import InfoRow from "@/components/global/InfoRow";
+import Notification from "@/components/global/Notification";
+import TaskList from "@/components/global/TaskList";
 import RewardClaim from "@/components/modals/RewardClaim";
 import { MockUserContext } from "@/context/MockUserContext";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import { useSessionManager } from "@/context/SessionManagerContext";
-import InfoRow from "@/components/global/InfoRow";
-import TaskList from "@/components/global/TaskList";
-import Notification from "@/components/global/Notification";
 import { fetchQuest } from "@/utils/questApi";
 import {
+  getIncompleteRequiredTasks,
   getQuestStatus,
-  getRewardPerUser,
   getRequiredTasks,
-  getIncompleteRequiredTasks
+  getRewardPerUser,
+  UserQuest,
 } from "@/utils/questHelpers";
+import { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import useSWR from "swr";
+import Close from "../../../public/icons/Close";
+import Button from "../../components/ButtonBorder";
 
 interface QuestModalProps {
   isOpen: boolean;
@@ -24,7 +26,12 @@ interface QuestModalProps {
   onSessionExpired?: () => void;
 }
 
-const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSessionExpired }) => {
+const QuestModal: React.FC<QuestModalProps> = ({
+  isOpen,
+  questId,
+  onClose,
+  onSessionExpired,
+}) => {
   const { mensaje, setMensaje } = useNotificaciones();
   const sessionManager = useSessionManager();
   const addSession = sessionManager?.addSession;
@@ -36,11 +43,13 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
       fetchQuest(questId!)
-        .then(data => {
+        .then((data) => {
           setQuest(data.quest);
           setLoading(false);
         })
@@ -52,17 +61,18 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
   }, [isOpen, questId]);
 
   // SWR para la sesión del usuario
-  const fetcher = (url: string) => fetch(url).then(res => res.json());
+  
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const userQuestUrl =
-    isOpen && user?.id && user?.walletAdress && questId
-      ? `/api/user-quests/by-user?userId=${user.id}&walletAdress=${user.walletAdress}&questId=${questId}`
+    isOpen && user?.id && user?.walletaddress && questId
+      ? `/api/user-quests/by-user?userId=${user.id}&walletaddress=${user.walletaddress}&questId=${questId}`
       : null;
 
-  const { data: userQuestData, isLoading: userQuestLoading, mutate } = useSWR(
-    userQuestUrl,
-    fetcher,
-    { refreshInterval: 5000 }
-  );
+  const {
+    data: userQuestData,
+    isLoading: userQuestLoading,
+    mutate,
+  } = useSWR(userQuestUrl, fetcher, { refreshInterval: 5000 });
 
   const userQuest = userQuestData?.userQuest || null;
 
@@ -73,14 +83,14 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
       userQuest.status === "active" &&
       userQuest.sessionExpiresAt &&
       user?.id &&
-      user?.walletAdress
+      user?.walletaddress
     ) {
       addSession?.({
         questId: questId!,
         sessionExpiresAt: userQuest.sessionExpiresAt,
         status: userQuest.status,
         userId: user.id,
-        walletAdress: user.walletAdress
+        walletaddress: user.walletaddress,
       });
     } else if (questId) {
       removeSession?.(questId);
@@ -95,6 +105,12 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
       onSessionExpired?.();
     }
   }, [userQuest, setMensaje, onSessionExpired]);
+  // Limpia el timeout al cerrar el modal
+  /*  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []); */
 
   if (!isOpen || !questId) return null;
 
@@ -113,7 +129,9 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
       <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
         <div className="bg-[#161618] w-[420px] flex items-center justify-center rounded-2xl p-10">
           <span className="text-white text-xl">Quest not found</span>
-          <button className="ml-4 text-white underline" onClick={onClose}>Cerrar</button>
+          <button className="ml-4 text-white underline" onClick={onClose}>
+            Cerrar
+          </button>
         </div>
       </div>
     );
@@ -121,22 +139,50 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
 
   // State logic
   const questIsInactive = getQuestStatus(quest);
-  const sessionCompleted = userQuest && userQuest.status === "completed";
+  const sessionCompleted = userQuest && userQuest.status === "finished";
   const rewardClaimed = userQuest && userQuest.rewardClaimed;
-  const allUserTasksCompleted = userQuest && Object.values(userQuest.completedTasks).every(Boolean);
+  const allUserTasksCompleted =
+    userQuest && Object.values(userQuest.completedTasks).every(Boolean);
   const hasActiveSession = userQuest && userQuest.status === "active";
   const alreadyStarted = !!userQuest;
-  const noCupo = quest.participants >= quest.maxParticipants;
+  const noCupo = quest.actualParticipants >= quest.maxParticipants;
 
   const requiredTasks = getRequiredTasks(quest);
   const incompleteRequiredTasks = getIncompleteRequiredTasks(quest, userQuest);
-  const canVerifyAgain = alreadyStarted && incompleteRequiredTasks.length > 0 && !rewardClaimed;
+  const canVerifyAgain =
+    alreadyStarted && incompleteRequiredTasks.length > 0 && !rewardClaimed;
 
   const tasksToShow = userQuest ? userQuest.completedTasks : quest.tasks;
   const rewardPerUser = getRewardPerUser(quest);
 
   // Footer button logic adaptado para SWR
   function getFooterButton() {
+    // Show "Claim Reward" button if quest is finished and all tasks are completed
+    if (
+      userQuest &&
+      userQuest.status === "finished" &&
+      Object.values(userQuest.completedTasks).every(Boolean) &&
+      !userQuest.rewardClaimed
+    ) {
+      return (
+        <Button
+          text="Claim Reward"
+          onClick={async () => {
+            const res = await fetch("/api/user-quests/claim", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userQuestId: userQuest._id,
+              }),
+            });
+            if (res.ok) {
+              setRewardModalOpen(true);
+              mutate();
+            }
+          }}
+        />
+      );
+    }
     if (questIsInactive) {
       return <Button text={`Quest ${quest.status}`} disabled />;
     }
@@ -155,31 +201,37 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userId: user.id,
-                walletAdress: user.walletAdress,
+                walletaddress: user.walletaddress,
                 questId: quest._id,
                 tasks: quest.tasks,
               }),
             });
+            const result = (await res.json()) as UserQuest;
+            console.log("Quest started:", result);
+
+            if (result.sessionExpiresAt) {
+              let timeUntilExpiration =
+                new Date(result.sessionExpiresAt).getTime() - Date.now();
+              if (timeUntilExpiration <= 0) {
+                timeUntilExpiration = 0;
+              }
+              timeoutRef.current = setTimeout(() => {
+                setSessionExpired(true);
+                toast.error(
+                  "Your Quest session has expired: " + result.quest?.questName
+                );
+                onSessionExpired?.();
+              }, timeUntilExpiration);
+            }
+
             if (!res.ok) {
               setMensaje("Could not start quest.");
               return;
             }
-            // No setUserQuest, solo refresca con mutate
             await mutate();
-            const data = await res.json();
-            const verifyRes = await fetch("/api/user-quests/verify-twitter", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ userQuestId: data._id }),
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              mutate();
-              if (verifyData.extraTasks && verifyData.extraTasks.length > 0) {
-                setMensaje(
-                  `Extra tasks you performed: ${verifyData.extraTasks.join(", ")}. Thanks for that!`
-                );
-              }
+            // Redirige al login de Twitter
+            if (!user?.hasTwitterAccess) {
+              window.location.href = "/api/auth/twitter";
             }
           }}
         />
@@ -188,28 +240,30 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
     if (canVerifyAgain) {
       return (
         <Button
-          text="Verify Tasks Again"
+          text="Verify Tasks"
+          disabled={!user?.hasTwitterAccess}
           onClick={async () => {
             const verifyRes = await fetch("/api/user-quests/verify-twitter", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ userQuestId: userQuest._id }),
+              body: JSON.stringify({
+                userQuestId: userQuest._id,
+                userId: user.id,
+              }),
             });
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
+              if (timeoutRef.current) clearTimeout(timeoutRef.current);
               mutate();
-              if (verifyData.extraTasks && verifyData.extraTasks.length > 0) {
-                setMensaje(
-                  `Extra tasks you performed: ${verifyData.extraTasks.join(", ")}. Thanks for that!`
-                );
-              }
+              toast.success("Tasks verified successfully!");
             }
           }}
         />
       );
     }
     if (sessionCompleted && !rewardClaimed) {
-      const canClaim = userQuest && Object.values(userQuest.completedTasks).every(Boolean);
+      const canClaim =
+        userQuest && Object.values(userQuest.completedTasks).every(Boolean);
       return (
         <Button
           text="Claim Reward"
@@ -271,22 +325,40 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
         >
           {/* Header */}
           <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
-            <h3 className="text-[1.8rem] text-white font-semibold">{quest.questName}</h3>
+            <h3 className="text-[1.8rem] text-white font-semibold">
+              {quest.questName}
+            </h3>
             <Close onClick={onClose} />
           </div>
 
           {/* Content */}
           <div className="w-full flex flex-col items-start justify-start gap-6 px-8">
             <div className="w-full flex flex-col items-start justify-start gap-1">
-              <h4 className="text-white font-semibold text-[1.8rem]">{quest.questName}</h4>
-              <p className="text-[#ACB5BB] text-[1.4rem]">{quest.description}</p>
+              <h4 className="text-white font-semibold text-[1.8rem]">
+                {quest.questName}
+              </h4>
+              <p className="text-[#ACB5BB] text-[1.4rem]">
+                {quest.description}
+              </p>
             </div>
             <div className="w-full flex flex-col gap-[0.8rem]">
               <InfoRow label="Total Reward" value={`${quest.rewardPool} SOL`} />
-              <InfoRow label="Reward per User" value={`${rewardPerUser.toFixed(6)} SOL`} />
-              <InfoRow label="Start Date" value={new Date(quest.startDateTime).toLocaleString()} />
-              <InfoRow label="End Date" value={new Date(quest.endDateTime).toLocaleString()} />
-              <InfoRow label="Participants" value={`${quest.participants ?? 0} / ${quest.maxParticipants}`} />
+              <InfoRow
+                label="Reward per User"
+                value={`${rewardPerUser.toFixed(6)} SOL`}
+              />
+              <InfoRow
+                label="Start Date"
+                value={new Date(quest.startDateTime).toLocaleString()}
+              />
+              <InfoRow
+                label="End Date"
+                value={new Date(quest.endDateTime).toLocaleString()}
+              />
+              <InfoRow
+                label="Participants"
+                value={`${quest.actualParticipants ?? 0} / ${quest.maxParticipants}`}
+              />
             </div>
           </div>
 
@@ -296,10 +368,14 @@ const QuestModal: React.FC<QuestModalProps> = ({ isOpen, questId, onClose, onSes
             <TaskList tasks={tasksToShow} userQuest={userQuest} />
           </div>
           {sessionExpired && (
-            <Notification type="error">Your session has expired. Please restart the quest.</Notification>
+            <Notification type="error">
+              Your session has expired. Please restart the quest.
+            </Notification>
           )}
           {rewardClaimed && (
-            <Notification type="success">You have claimed the reward!</Notification>
+            <Notification type="success">
+              You have claimed the reward!
+            </Notification>
           )}
           {/* Footer */}
           <div className="w-full border-t border-[#44444A] p-8">

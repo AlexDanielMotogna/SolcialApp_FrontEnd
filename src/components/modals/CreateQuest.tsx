@@ -7,16 +7,15 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
 import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
-import ButtonBorder from "../../components/ButtonBorder";
+import ButtonBorder from "../ButtonBorder";
 import { toUTCISOString } from "../../utils/dateUtils";
+import BannerUpload from "../BannerUpload";
 
-// Initial form state for the CreateQuest component
-// This includes fields for quest details, tasks, and dates
 export const initialForm = {
   questName: "",
   description: "",
   tweetLink: "",
-  authorId: "",
+  authorId: "", // <-- aquí el campo correcto
   maxParticipants: "",
   rewardPool: "",
   rewardPerTask: "",
@@ -33,18 +32,14 @@ export const initialForm = {
   },
 };
 
-// CreateQuestProps interface defines the props for the CreateQuest component
 export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
   refreshQuests: () => void;
-  initialData?: Partial<typeof initialForm> & { _id?: string };
+  initialData?: Partial<typeof initialForm> & {  _id?: string; banner?: string; bannerPublicId?: string  };
   isEdit?: boolean;
 }
-// Extend CreateQuestProps to include refreshQuests
-// This allows the component to refresh the quest list after creation
 
-// CreateQuest component now accepts refreshQuests as a prop
 const CreateQuest: React.FC<CreateQuestProps> = ({
   isOpen,
   onClose,
@@ -59,9 +54,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     calculateRewardPerTask,
     loading,
     error,
-  } = useCreateQuest(initialForm, onClose, userId);
+  } = useCreateQuest(initialForm, onClose, userId, initialForm.authorId);
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [bannerData, setBannerData] = useState<{
+    publicId: string;
+    url: string;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchAuthorId() {
@@ -75,12 +74,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
         if (data.success) {
           setForm((prev: typeof initialForm) => ({
             ...prev,
-            authorId: data.authorId,
+            authorId: data.userId, // <-- guarda el authorId de Twitter aquí
           }));
         }
       }
     }
     fetchAuthorId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.tweetLink]);
 
   const handleSubmitWithPopup = async (e: React.FormEvent) => {
@@ -98,10 +98,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     // Prepara el quest data para enviar al backend
     const questData = {
       ...form,
-      tasks: filteredTasks, // Solo los seleccionados
+      tasks: filteredTasks,
+      banner: bannerData?.url || "",
+      bannerPublicId: bannerData?.publicId || "",
       startDateTime: startDateTimeUTC,
       endDateTime: endDateTimeUTC,
       userId,
+      authorId: form.authorId, // <-- asegúrate de incluirlo aquí
     };
 
     // Remove the original date and time fields
@@ -110,17 +113,15 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     delete questData.endDate;
     delete questData.endTime;
 
-    // Send the data to the backend
     try {
       await questAPI.createQuest(questData);
       setShowSuccess(true);
       refreshQuests();
     } catch (error) {
       toast.error("Error creating quest: " + (error as Error).message);
-      // Handle error (e.g., show an error message)
     }
   };
-  // If the modal is not open, return null to avoid rendering
+
   if (!isOpen) return null;
 
   return (
@@ -209,6 +210,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 placeholder="Engage with our social media"
                 required
               />
+              <BannerUpload onImageUpload={setBannerData} disabled={loading} />
             </div>
             {/* Tweet/Post Link */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
@@ -223,39 +225,6 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 placeholder="https://twitter.com/..."
                 required
               />
-            </div>
-
-            {/* Banner */}
-            <div className="w-full flex flex-col items-start justify-start gap-2">
-              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Banner Image
-              </h6>
-              <input
-                type="file"
-                accept="image/*"
-                name="banner"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    setForm((prev: any) => ({
-                      ...prev,
-                      banner: url,
-                      bannerFile: file,
-                    }));
-                  }
-                }}
-                className="w-full py-2 px-2 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal"
-                required
-              />
-              {/* Preview */}
-              {form.banner && (
-                <img
-                  src={form.banner}
-                  alt="Banner Preview"
-                  className="w-full h-32 object-cover rounded-xl mt-2"
-                />
-              )}
             </div>
 
             {/* Max Participants */}

@@ -19,6 +19,12 @@ export interface IAuthUser extends Document {
   verificationTokenExpire?: Date;
   twoFactorEnabled?: boolean;
   twoFactorSecret?: string;
+  walletaddress: string;
+  twitterAccessToken?: string;
+  twitterAccessSecret?: string;
+  twitterScreenName?: string; // <-- usa este nombre para el handle
+  twitterUserId?: string;
+  hasTwitterAccess?: boolean;
   friends?: mongoose.Types.ObjectId[];
   pendingRequests?: {
     senderId: mongoose.Types.ObjectId;
@@ -85,6 +91,12 @@ const UserSchema = new Schema<IAuthUser>({
   verificationTokenExpire: { type: Date },
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorSecret: { type: String },
+  walletaddress: String,
+  twitterAccessToken: { type: String, default: null },
+  twitterAccessSecret: { type: String, default: null },
+  twitterScreenName: { type: String, default: null }, // <-- usa este nombre
+  twitterUserId: { type: String, default: null },
+  hasTwitterAccess: { type: Boolean, default: false },
   friends: [{ type: Schema.Types.ObjectId, ref: "AuthUser" }],
   pendingRequests: [
     {

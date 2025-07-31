@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     accessSecret: user.twitterAccessSecret,
   });
 
-  const tweetAuthorId = quest.authorId;
+  const tweetuserId = quest.userId;
   const completedTasks: Record<string, boolean> = {};
 
   try {
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     if (requiredTasks.includes("comment")) {
       completedTasks.comment = Array.isArray(userTimeline.data) && userTimeline.data.some(tweet =>
-        tweet.in_reply_to_status_id === tweetId && tweet.in_reply_to_user_id === tweetAuthorId
+        tweet.in_reply_to_status_id === tweetId && tweet.in_reply_to_user_id === tweetuserId
       );
       console.log("completedTasks.comment:", completedTasks.comment);
     }
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     if (requiredTasks.includes("follow")) {
       const following = await client.v2.following(user.twitterUserId, { max_results: 1000 });
       console.log("following:", following);
-      completedTasks.follow = Array.isArray(following.data) && following.data.some(userObj => userObj.id === tweetAuthorId);
+      completedTasks.follow = Array.isArray(following.data) && following.data.some(userObj => userObj.id === tweetuserId);
       console.log("completedTasks.follow:", completedTasks.follow);
     }
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     console.log("allRequiredCompleted:", allRequiredCompleted);
 
     if (allRequiredCompleted) {
-      userQuest.status = "completed";
+      userQuest.status = "finished";
       console.log("Quest status set to completed");
     }
 

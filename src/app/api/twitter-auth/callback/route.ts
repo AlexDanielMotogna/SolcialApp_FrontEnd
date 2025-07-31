@@ -2,9 +2,10 @@ import { NextRequest } from "next/server";
 import { Types } from "mongoose";
 import { TwitterApi } from "twitter-api-v2";
 import AuthUser from "@/models/AuthUser";
-import { MOCK_USER } from "@/context/MockUserContext";
+import { connectDB } from "@/lib/mongodb";
 
-console.log("id en mockUserDespues:", MOCK_USER.id);
+// Usa el ID del usuario de pruebas directamente (solo para desarrollo)
+const MOCK_USER_ID = "6883f941a7f69d335b0d2184";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -21,13 +22,9 @@ export async function GET(req: NextRequest) {
     .find((row) => row.startsWith("oauth_token="))
     ?.split("=")[1];
 
-  console.log("id en mockUser:", MOCK_USER.id);
-
   if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
-    return new Response(
-      "Missing oauth_token, oauth_verifier or oauth_token_secret",
-      { status: 400 }
-    );
+    // ✅ REDIRIGIR CON ERROR
+    return Response.redirect(new URL('/dashboard/quests?twitter=error', req.url));
   }
 
   // Crea el cliente temporal con los tokens
@@ -39,11 +36,11 @@ export async function GET(req: NextRequest) {
   });
 
   try {
+    await connectDB();
+    
     const { accessToken, accessSecret, screenName, userId } =
       await tempClient.login(oauth_verifier);
 
-    console.log("id en mockUser2:", MOCK_USER.id);
-    // Log tokens obtenidos
     console.log("Tokens obtenidos:", {
       accessToken,
       accessSecret,
@@ -51,25 +48,33 @@ export async function GET(req: NextRequest) {
       userId,
     });
 
+    // Busca el usuario de pruebas directamente por ID
     const user = await AuthUser.findOne({
-      _id: new Types.ObjectId(MOCK_USER.id),
+      _id: new Types.ObjectId(MOCK_USER_ID),
     });
+    
     console.log("Usuario encontrado:", user);
-
+    
     if (user) {
       user.twitterAccessToken = accessToken;
       user.twitterAccessSecret = accessSecret;
       user.twitterScreenName = screenName;
       user.twitterUserId = userId;
+      user.hasTwitterAccess = true;
       await user.save();
       console.log("Tokens guardados en el usuario.");
+      
+      // ✅ REDIRIGIR CON ÉXITO
+      return Response.redirect(new URL('/dashboard/quests?twitter=success', req.url));
     } else {
       console.log("Usuario mock NO encontrado en la base de datos.");
+      // ✅ REDIRIGIR CON ERROR DE USUARIO
+      return Response.redirect(new URL('/dashboard/quests?twitter=user_not_found', req.url));
     }
 
-    return new Response("Twitter account connected!", { status: 200 });
   } catch (error) {
     console.error("Error durante el proceso OAuth:", error);
-    return new Response("Error during Twitter OAuth", { status: 500 });
+    // ✅ REDIRIGIR CON ERROR DE OAUTH
+    return Response.redirect(new URL('/dashboard/quests?twitter=oauth_error', req.url));
   }
 }

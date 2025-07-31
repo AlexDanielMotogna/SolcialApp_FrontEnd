@@ -3,26 +3,33 @@ import mongoose, { Schema, Document, models } from "mongoose";
 export interface IUserQuest extends Document {
   userId: string;
   questId: string;
-  walletAdress: string;
+  questName?: string;
+  walletaddress: string;
   completedTasks: { [key: string]: boolean };
   rewardClaimed: boolean;
   enrolledAt: Date;
-  sessionExpiresAt?: Date; // Opcional, para manejo de sesión
-  status: "active" | "expired" | "completed";
+  rewardAmount: mongoose.Types.Decimal128;
+  sessionExpiresAt?: Date;
+  status: "active" | "finished";
 }
 
 const UserQuestSchema = new Schema<IUserQuest>(
   {
     userId: { type: String, required: true },
     questId: { type: String, required: true },
-    walletAdress: { type: String, required: true },
+    questName: { type: String, required: true },
+    walletaddress: { type: String, required: true },
     completedTasks: { type: Object, required: true },
     rewardClaimed: { type: Boolean, default: false },
     enrolledAt: { type: Date, default: Date.now },
-    sessionExpiresAt: { type: Date }, // Opcional
+    rewardAmount: {
+      type: Schema.Types.Decimal128,
+      default: () => mongoose.Types.Decimal128.fromString("0"), // ✅ Usar fromString
+    },
+    sessionExpiresAt: { type: Date },
     status: {
       type: String,
-      enum: ["active", "expired", "completed"],
+      enum: ["active", "finished"],
       default: "active",
     },
   },
@@ -30,6 +37,13 @@ const UserQuestSchema = new Schema<IUserQuest>(
     toJSON: {
       virtuals: true,
       versionKey: false,
+      transform: function (doc, ret) {
+        // ✅ Convertir Decimal128 a string en JSON
+        if (ret.rewardAmount && ret.rewardAmount.toString) {
+          (ret as any).rewardAmount = ret.rewardAmount.toString();
+        }
+        return ret;
+      },
     },
   }
 );

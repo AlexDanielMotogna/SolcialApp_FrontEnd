@@ -1,179 +1,299 @@
+// OPTIMIZAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\app\dashboard\quests\page.tsx
+
 "use client";
-import Link from "next/link";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import PowerShield from "../../../../public/imgs/PowerShield.png";
-import Moneybag from "../../../../public/imgs/Moneybag.png";
-import ButtonBorder from "../../../components/ButtonBorder";
-import QuestModal from "@/components/modals/QuestModal";
-import CreateQuest from "@/components/modals/CreateQuest";
-import ButtonBlack from "@/components/ButtonBlack";
-import QuestCard from "@/components/QuestCard";
+import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
 
+// Context & Hooks
+import { MockUserContext } from "@/context/MockUserContext";
+import { useGlobalWallet } from "@/context/WalletContext";
+import { useQuests } from "@/hooks/useQuests";
+import { useUserQuests } from "@/hooks/useUserQuests";
+import { useSessionTimers } from "@/hooks/useSessionTimers";
+import { useQuestActions } from "@/hooks/useQuestActions";
 
-const FILTERS = [
-  { label: "Active", value: "active" },
-  { label: "Completed", value: "completed" },
-  { label: "Canceled", value: "canceled" },
-  { label: "Oldest", value: "oldest" },
-  { label: "Newest", value: "newest" },
-  { label: "Biggest Reward", value: "biggest" },
-  { label: "Lowest Reward", value: "lowest" },
-];
+// Services
+import { questService } from "@/services/questService";
+import { userService } from "@/services/userService";
+
+// Utils & Constants
+import { questUtils } from "@/utils/questUtils";
+import {
+  QUEST_FILTERS,
+  TWITTER_AUTH_MESSAGES,
+  QUEST_MESSAGES,
+} from "@/constants/questConstants";
+
+// Types
+import type { Quest, UserQuest, User } from "@/types/quest";
+
+// Components
+import QuestHeader from "@/components/quest/QuestHeader";
+import QuestGrid from "@/components/quest/QuestGrid";
+import QuestFooter from "@/components/quest/QuestFooter";
+
+// Lazy loaded components
+const QuestModals = dynamic(() => import("@/components/quest/QuestModals"), {
+  ssr: false,
+});
 
 const Quests = () => {
-  const [showSessionExpiredModal, setShowSessionExpiredModal] = useState(false);
-  const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>("");
-  const [modalType, setModalType] = useState<"CreateQuest" | "QuestModal" | null>(null);
-  const [quests, setQuests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ============================================================================
+  // CONTEXT & HOOKS
+  // ============================================================================
+  const { isConnected, walletAddress } = useGlobalWallet();
+  const context = useContext(MockUserContext);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Handle quest card click to open modal
+  const {
+    quests,
+    loading,
+    currentPage,
+    totalPages,
+    totalCount,
+    filter,
+    questsPerPage,
+    handlePageChange,
+    handleFilterChange,
+    refreshQuests,
+  } = useQuests();
+
+  // ============================================================================
+  // LOCAL STATE
+  // ============================================================================
+  const [user, setUser] = useState<User | null>(context?.user || null);
+  const { userQuests, loadingUserQuests, refreshUserQuests } = useUserQuests(
+    user?.id
+  );
+  const { startSessionTimer, stopSessionTimer } = useSessionTimers();
+
+  const [modalType, setModalType] = useState<
+    "CreateQuest" | "QuestModal" | null
+  >(null);
+  const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
+  const [showConnectTwitterModal, setShowConnectTwitterModal] = useState(false);
+  const [showExpirationModal, setShowExpirationModal] = useState(false);
+  const [expiredQuestName, setExpiredQuestName] = useState<string>("");
   const [now, setNow] = useState(new Date());
+  // ============================================================================
+  // MEMOIZED VALUES
+  // ============================================================================
+  const selectedQuest = useMemo(
+    () => quests.find((q: Quest) => q._id === selectedQuestId),
+    [quests, selectedQuestId]
+  );
+
+  const selectedUserQuest = useMemo(
+    () => userQuests.find((uq) => uq.questId === selectedQuestId),
+    [userQuests, selectedQuestId]
+  );
+
+  const { questsCompleted, rewardEarned } = useMemo(
+    () => questUtils.calculateQuestStats(userQuests),
+    [userQuests]
+  );
+
+  // ============================================================================
+  // CALLBACKS
+  // ============================================================================
+  const refreshAllData = useCallback(async () => {
+    await Promise.all([refreshQuests(), refreshUserQuests()]);
+  }, [refreshQuests, refreshUserQuests]);
+
+  const openModal = useCallback((type: "CreateQuest" | "QuestModal") => {
+    setModalType(type);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalType(null);
+    setSelectedQuestId(null);
+  }, []);
+
+  const handleSessionExpiration = useCallback(
+    async (questId: string, questName: string) => {
+      try {
+        const result = await questService.checkQuestExpiration(
+          questId,
+          user?.id || "",
+          walletAddress || ""
+        );
+
+        if (result.success && (result.data?.expired || result.data?.found)) {
+          setExpiredQuestName(questName);
+          setShowExpirationModal(true);
+          toast.error(`${QUEST_MESSAGES.SESSION_EXPIRED} ${questName}`);
+
+          if (modalType === "QuestModal" && selectedQuestId === questId) {
+            closeModal();
+          }
+
+          await refreshAllData();
+        }
+
+        stopSessionTimer(questId);
+      } catch (error) {
+        console.error("Error handling session expiration:", error);
+      }
+    },
+    [
+      user?.id,
+      walletAddress,
+      modalType,
+      selectedQuestId,
+      closeModal,
+      refreshAllData,
+      stopSessionTimer,
+    ]
+  );
+
+  // ✅ USAR EL CUSTOM HOOK CON TIPOS CORRECTOS
+  const { handleQuestCardClick, isExecutingQuest, loadingQuestId } =
+    useQuestActions({
+      user,
+      walletAddress,
+      isConnected,
+      refreshAllData,
+      startSessionTimer,
+      openModal,
+      setSelectedQuestId,
+      setShowConnectTwitterModal,
+      setShowExpirationModal,
+      setExpiredQuestName,
+      handleSessionExpiration, // ✅ PASAR EL HANDLER
+    });
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchUserData = async () => {
+      const result = await userService.fetchUser(user.id);
+      if (result.success) {
+        setUser(result.data);
+      }
+    };
+
+    fetchUserData();
+  }, [user?.id]);
+
+  // Twitter auth effect
+  useEffect(() => {
+    const twitterStatus = searchParams.get("twitter");
+    if (!twitterStatus) return;
+
+    const handleTwitterAuth = async () => {
+      switch (twitterStatus) {
+        case "success":
+          toast.success(TWITTER_AUTH_MESSAGES.SUCCESS);
+          if (user?.id) {
+            const userResult = await userService.fetchUser(user.id);
+            if (userResult.success) setUser(userResult.data);
+          }
+          await refreshAllData();
+          break;
+        case "error":
+          toast.error(TWITTER_AUTH_MESSAGES.ERROR);
+          break;
+        case "user_not_found":
+          toast.error(TWITTER_AUTH_MESSAGES.USER_NOT_FOUND);
+          break;
+        case "oauth_error":
+          toast.error(TWITTER_AUTH_MESSAGES.OAUTH_ERROR);
+          break;
+      }
+      router.replace("/dashboard/quests", { scroll: false });
+    };
+
+    handleTwitterAuth();
+  }, [searchParams, router, user?.id, refreshAllData]);
+
+  // Clock effect
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch quests from the API
-  const fetchQuests = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/quests");
-      const data = await res.json();
-      setQuests(data.quests || []);
-    } catch (err) {
-      setQuests([]);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchQuests();
-  }, []);
-
-  // Filter quests based on the selected filter
-  let filteredQuests = [...quests];
-  if (filter === "active") filteredQuests = filteredQuests.filter(q => q.status === "active");
-  if (filter === "completed") filteredQuests = filteredQuests.filter(q => q.status === "completed");
-  if (filter === "canceled") filteredQuests = filteredQuests.filter(q => q.status === "canceled");
-  if (filter === "oldest") filteredQuests = filteredQuests.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  if (filter === "newest") filteredQuests = filteredQuests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  if (filter === "biggest") filteredQuests = filteredQuests.sort((a, b) => b.rewardPool - a.rewardPool);
-  if (filter === "lowest") filteredQuests = filteredQuests.sort((a, b) => a.rewardPool - b.rewardPool);
-
-  // Stats (example)
-  const questsCompleted = quests.length;
-  const rewardEarned = quests.reduce((acc, q) => acc + (q.rewardPool || 0), 0);
-
-  // Modal handlers
-  const openModal = (type: "CreateQuest" | "QuestModal") => setModalType(type);
-  const closeModal = () => setModalType(null);
-
+  // ============================================================================
+  // RENDER
+  // ============================================================================
   return (
-    <div className="w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
-      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        {/* Left: My Quest Account */}
-        <div className="flex-shrink-0 w-full md:w-auto flex items-center gap-3 justify-start">
-          <Link href="/dashboard/quests/account">
-            <ButtonBlack text="My Account" />
-          </Link>
-          <ButtonBorder text="Create Quest" onClick={() => openModal("CreateQuest")} />
-        </div>
-        {/* Center: Filters */}
-        <div className="flex-1 flex flex-wrap justify-center gap-2">
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-4 py-2 rounded-lg border font-semibold text-[1.3rem] transition ${
-                filter === f.value
-                  ? "bg-[#9945FF] text-white border-[#9945FF]"
-                  : "bg-[#23232A] text-[#ACB5BB] border-[#2C2C30] hover:bg-[#2C2C30]"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-          {filter && (
-            <button
-              onClick={() => setFilter("")}
-              className="px-4 py-2 rounded-lg border font-semibold text-[1.3rem] bg-[#23232A] text-[#ACB5BB] border-[#2C2C30] hover:bg-[#2C2C30]"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-        {/* Right: Stats */}
-        <div className="flex gap-3 flex-shrink-0 mt-4 md:mt-0">
-          <div className="w-[140px] xl:w-[170px] flex items-center justify-start gap-3 py-4 xl:py-5 px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={PowerShield} alt="" className="w-[28px] h-[28px] xl:w-[38px] xl:h-[38px]"/>
-            <div className="flex flex-col items-start justify-start gap-1">
-              <h3 className="text-white font-semibold text-[1.5rem]">{questsCompleted}</h3>
-              <span className="text-[1.1rem] text-[#ACB5BB]">Quests completed</span>
-            </div>
-          </div>
-          <div className="w-[140px] xl:w-[170px] flex items-center justify-start gap-3 py-4 xl:py-5 px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
-            <Image src={Moneybag} alt="" className="w-[28px] h-[28px] xl:w-[38px] xl:h-[38px]"/>
-            <div className="flex flex-col items-start justify-start gap-1">
-              <h3 className="text-white font-semibold text-[1.5rem]">{rewardEarned}</h3>
-              <span className="text-[1.1rem] text-[#ACB5BB]">Total Rewards</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Quest menu ends */}
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
+        <QuestHeader
+          filters={QUEST_FILTERS}
+          currentFilter={filter}
+          onFilterChange={handleFilterChange}
+          onCreateQuest={() => openModal("CreateQuest")}
+          questsCompleted={questsCompleted}
+          rewardEarned={rewardEarned}
+        />
 
-      <div className="w-full flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-9" style={{ maxHeight: "70vh" }}>
-        {loading ? (
-          <div className="col-span-full text-center text-white text-xl">Loading quests...</div>
-        ) : filteredQuests.length === 0 ? (
-          <div className="col-span-full text-center text-white text-xl">No quests found.</div>
-        ) : (
-          // Map through filtered quests and render QuestCard components
-         filteredQuests.map((quest, idx) => (
-          <QuestCard
-            key={quest._id || idx}
-            quest={quest}
+        <div className="flex-1 w-full">
+          <QuestGrid
+            quests={quests}
+            userQuests={userQuests}
+            user={user}
+            loading={loading}
+            loadingQuestId={loadingQuestId}
+            isExecutingQuest={isExecutingQuest}
             now={now}
-            onOpenModal={() => {
-              setSelectedQuestId(quest._id); // <-- Save the selected questId
-              openModal("QuestModal");
+            onQuestClick={handleQuestCardClick}
+            getButtonProps={(quest) => {
+              const userQuest = userQuests.find(
+                (uq) => uq.questId === quest._id
+              );
+              const isLoading =
+                loadingQuestId === quest._id && isExecutingQuest;
+              return questUtils.getQuestButtonProps(
+                quest,
+                userQuest,
+                user,
+                isLoading
+              );
             }}
           />
-        ))
-        )}
-      </div> 
-      {modalType === "QuestModal" && (
-        <QuestModal
-          isOpen={true}
-          questId={selectedQuestId} // <-- pass the selected questId 
-          onClose={closeModal}
-          onSessionExpired={() => setShowSessionExpiredModal(true)} // <-- Nuevo prop
-        />
-        
-      )}
-      {modalType === "CreateQuest" && (
-        <CreateQuest isOpen={true} onClose={() => setModalType(null)} refreshQuests={fetchQuests} />
-      )}
-      {showSessionExpiredModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 flex flex-col items-center">
-            <h2 className="text-red-700 text-xl font-bold mb-4">Session Expired</h2>
-            <p className="mb-6 text-gray-800">Your session has expired. Please restart the quest.</p>
-            <button
-              className="bg-red-700 text-white px-6 py-2 rounded font-semibold"
-              onClick={() => {
-                setShowSessionExpiredModal(false); // Oculta el modal global
-                setModalType(null); // Cierra el QuestModal si está abierto
-              }}
-            >
-              Close
-            </button>
-          </div>
         </div>
-      )}
+      </div>
+
+      <QuestFooter
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        totalCount={totalCount}
+        itemsPerPage={questsPerPage}
+      />
+
+       
+        <QuestModals
+          modalType={modalType}
+          selectedQuest={selectedQuest}
+          selectedUserQuest={selectedUserQuest}
+          user={user}
+          loading={loading || loadingUserQuests}
+          showConnectTwitterModal={showConnectTwitterModal}
+          showExpirationModal={showExpirationModal}
+          expiredQuestName={expiredQuestName}
+          isExecutingQuest={isExecutingQuest}
+          onCloseModal={closeModal}
+          onCloseTwitterModal={() => setShowConnectTwitterModal(false)}
+          onCloseExpirationModal={() => {
+            setShowExpirationModal(false);
+            setExpiredQuestName("");
+          }}
+          onSessionExpired={(questName) => {
+            setExpiredQuestName(questName);
+            setShowExpirationModal(true);
+          }}
+          onQuestCompleted={stopSessionTimer}
+          onRefreshData={refreshAllData}
+          onRefreshQuests={refreshQuests}
+        />
+
     </div>
   );
 };

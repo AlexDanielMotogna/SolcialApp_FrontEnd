@@ -26,17 +26,17 @@ export async function POST(req: NextRequest) {
       "tweet.fields": "author_id"
     });
 
-    const authorId = tweetData?.data?.author_id;
+    const userId = tweetData?.data?.author_id;
 
-    if (!authorId) {
-      return new Response(JSON.stringify({ success: false, error: "No se pudo obtener el authorId" }), { status: 400 });
+    if (!userId) {
+      return new Response(JSON.stringify({ success: false, error: "No se pudo obtener el userId" }), { status: 400 });
     }
 
     const quest = new Quest({
       tweetLink,
       questName,
       description,
-      authorId,
+      userId,
       tasks: { like: true } // puedes personalizar las tareas
     });
 
