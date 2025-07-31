@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import User from "../../../public/imgs/user.svg";
 import LeftArrow from "../../../public/imgs/arrow-left.svg";
-import Key from "../../../public/imgs/key.svg";
-import Eye from "../../../public/imgs/eye-slash.svg";
 import bg from "../../../public/imgs/bg2.svg";
 import logo from "../../../public/imgs/logo.png";
 import CryptoBalance from "../../../public/imgs/Crypto-Balancee.png";
@@ -17,50 +15,29 @@ import FilledLeftArrow from "../../../public/icons/FilledLeftArrow";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 
-const ResetPassword = () => {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+const ForgotPassword: React.FC = () => {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
     setMsg("");
 
-    if (!password || !confirm) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    if (password !== confirm) {
-      setError("Passwords do not match.");
-      return;
-    }
-    if (!token) {
-      setError("Invalid or missing reset token.");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const res = await fetch("/api/auth/reset-password", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ email }),
       });
       const data = await res.json();
 
       if (res.ok) {
-        setMsg("Your password has been reset. You can now log in.");
-        setPassword("");
-        setConfirm("");
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000); // Redirige vers login après 2 secondes
+        setMsg("Password reset email sent! Check your inbox.");
       } else {
         setError(data.msg || data.message || "Something went wrong.");
       }
@@ -95,34 +72,23 @@ const ResetPassword = () => {
                     onClick={() => router.push("/login")}
                   />
                   <h1 className="text-white font-semibold text-[3.2rem]">
-                    Reset Password
+                    Forgot Password
                   </h1>
                   <p className="text-[#ACB5BB] font-medium text-[1.6rem]">
-                    Enter your new password below
+                    Input your email address account to receive a reset link
                   </p>
                 </div>
 
                 <div className="w-full flex flex-col items-start justify-start gap-[1rem]">
                   <Input
-                    label="New Password"
-                    placeholder="********"
-                    imgSrc={Key}
-                    showPassword={Eye}
-                    type="password"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                  />
-                  <Input
-                    label="Confirm Password"
-                    placeholder="********"
-                    imgSrc={Key}
-                    showPassword={Eye}
-                    type="password"
-                    value={confirm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirm(e.target.value)}
+                    label="Email"
+                    placeholder="yourname@gmail.com"
+                    imgSrc={User}
+                    value={email}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   />
                 </div>
-                <Button text={loading ? "Resetting..." : "Reset Password"} type="submit" disabled={loading} />
+                <Button text={loading ? "Sending..." : "Continue"} type="submit" disabled={loading || !email} />
 
                 {msg && (
                   <div className="text-green-500 text-sm">{msg}</div>
@@ -139,4 +105,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default ForgotPassword;
