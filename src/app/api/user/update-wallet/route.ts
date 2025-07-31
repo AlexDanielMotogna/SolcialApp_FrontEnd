@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const mockUserId = new mongoose.Types.ObjectId("68833fafe943b5391dd5d821");
+    const mockUserId = new mongoose.Types.ObjectId("6883f941a7f69d335b0d2184");
     const db = mongoose.connection.db;
     
     if (!db) {
@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error in update-wallet API:', error);
-      return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
+}

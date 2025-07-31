@@ -8,6 +8,7 @@ export interface IQuest extends Document {
   tweetLink: string;
   authorId: string;
   banner: string;
+  bannerPublicId: string;
   maxParticipants: number;
   rewardPool: mongoose.Types.Decimal128;
   rewardPerTask: mongoose.Types.Decimal128;
@@ -17,6 +18,7 @@ export interface IQuest extends Document {
     like: boolean;
     retweet: boolean;
     comment: boolean;
+    banner: string;
     follow: boolean;
     quote: boolean;
   };
@@ -31,15 +33,22 @@ const QuestSchema = new Schema<IQuest>({
   questName: { type: String, required: true },
   description: { type: String, required: true },
   tweetLink: { type: String, required: true },
+  banner: {
+    type: String,
+    default: "", // URL de Cloudinary o vacío para placeholder
+  },
+  bannerPublicId: {
+    type: String,
+    default: "", // Public ID de Cloudinary para gestión
+  },
   authorId: { type: String, required: true },
-  banner: { type: String, required: false },
   maxParticipants: { type: Number, required: true },
   rewardPool: {
-    type: Schema.Types.Decimal128, // ✅ CAMBIAR de Number a Decimal128
+    type: Schema.Types.Decimal128, //
     required: true,
   },
   rewardPerTask: {
-    type: Schema.Types.Decimal128, // ✅ AGREGAR rewardPerTask como Decimal128
+    type: Schema.Types.Decimal128,
     required: true,
   },
   startDateTime: { type: Date, required: true },

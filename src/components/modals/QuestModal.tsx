@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
-import Button from "../../components/ButtonBorder";
+import Button from "../ButtonBorder";
 import { parseDecimal128ToNumber, formatDecimalForDisplay } from "@/utils/decimal";
 
 

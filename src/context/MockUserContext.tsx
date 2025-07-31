@@ -2,10 +2,10 @@
 import { createContext, useContext } from "react";
 
 export const MOCK_USER = {
-  id: "68833fafe943b5391dd5d821",
+  id: "6883f941a7f69d335b0d2184",
   name: "Demo User",
   email: "demo@demo.com",
-  walletaddress: "0x1234567890abcdef1234567890abcdef12345644",
+  walletaddress: "71GCQWTyYyjSoRYym14XQ1PjMQYu13M9qEnGcX3ZXjm6",
   hasTwitterAccess: true,
 };
 

@@ -1,8 +1,16 @@
+import {
+  formatLocalDate,
+  getEndInColor,
+  getTimeLeft,
+  getTimeStatus,
+} from "@/utils/dateUtils";
+import {
+  formatDecimalForDisplay,
+  parseDecimal128ToNumber,
+} from "@/utils/decimal";
 import Image from "next/image";
 import ButtonBorder from "./ButtonBorder";
-import { formatLocalDate, getTimeLeft, getEndInColor } from "@/utils/dateUtils";
-import { parseDecimal128ToNumber, formatDecimalForDisplay } from "@/utils/decimal";
-
+import { getOptimizedImageUrl } from "@/utils/cloudinaryClient";
 
 // ============================================================================
 // TYPES
@@ -39,14 +47,25 @@ const getStatusBadgeStyles = (status: string) => {
 };
 
 const getQuestImage = (quest: any) => {
-  return quest.banner && quest.banner !== ""
-    ? quest.banner
-    : "/imgs/placeholder.png";
+  // Si tiene bannerPublicId, usar Cloudinary con optimización
+  if (quest.bannerPublicId && quest.bannerPublicId !== "") {
+    return getOptimizedImageUrl(quest.bannerPublicId);
+  }
+
+  // Si tiene banner URL directo
+  if (quest.banner && quest.banner !== "") {
+    return quest.banner;
+  }
+
+  // Placeholder por defecto
+  return "/imgs/placeholder.png";
 };
 
 const getActiveTasks = (tasks: any) => {
   return Object.entries(tasks).filter(([, active]) => active);
 };
+
+// Removed invalid usage of 'quest' outside of component/function scope
 
 // ============================================================================
 // COMPONENTS
@@ -57,9 +76,12 @@ const QuestBanner: React.FC<{ quest: any; now: Date }> = ({ quest, now }) => (
     <Image
       src={getQuestImage(quest)}
       alt={quest.questName}
-      className="w-full rounded-lg"
+      className="w-full rounded-lg object-cover"
       width={400}
-      height={200}
+      height={240} //
+      priority={false}
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
     />
 
     {/* Status Badge */}
@@ -80,30 +102,33 @@ const QuestBanner: React.FC<{ quest: any; now: Date }> = ({ quest, now }) => (
   </div>
 );
 
-const QuestHeader: React.FC<{ quest: any; now: Date }> = ({ quest, now }) => (
-  <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-1">
-    <h4 className="text-white font-semibold text-[1.6rem] sm:text-[1.8rem] lg:text-[2rem] truncate w-full sm:w-auto">
-      {quest.questName}
-    </h4>
+const QuestHeader: React.FC<{ quest: any; now: Date }> = ({ quest, now }) => {
+  const timeStatus = getTimeStatus(quest.endDateTime, now);
 
-    {/* End Time Countdown */}
-    <div
-      className={`
-        flex flex-col sm:flex-row items-center justify-center px-3 sm:px-4 py-2 sm:py-1 rounded-xl border shadow-inner ml-0 sm:ml-4 mt-2 sm:mt-0 w-full sm:w-auto
-        ${getEndInColor(quest.endDateTime, now)} 
-        bg-[#18181b] border-[#23232A] text-center
-      `}
-      style={{ minWidth: "120px" }}
-    >
-      <span className="font-semibold text-sm sm:text-base lg:text-lg mb-1 sm:mb-0 sm:mr-2">
-        ⏰ End in:
-      </span>
-      <span className="font-mono text-base sm:text-lg lg:text-xl xl:text-xl font-bold">
-        {quest.endDateTime ? getTimeLeft(quest.endDateTime, now) : "--"}
-      </span>
+  return (
+    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-1">
+      <h4 className="text-white font-semibold text-[1.6rem] sm:text-[1.8rem] lg:text-[2rem] truncate w-full sm:w-auto">
+        {quest.questName}
+      </h4>
+
+      {/* End Time Countdown */}
+      <div
+        className="flex flex-col sm:flex-row items-center justify-center px-3 sm:px-4 py-2 sm:py-1 rounded-xl border shadow-inner ml-0 sm:ml-4 mt-2 sm:mt-0 w-full sm:w-auto bg-[#18181b] border-[#23232A] text-center"
+        style={{
+          minWidth: "120px",
+          color: timeStatus.colorValue, // ✅ Color dinámico aplicado al contenedor
+        }}
+      >
+        <span className="font-semibold text-sm sm:text-base lg:text-lg mb-1 sm:mb-0 sm:mr-2">
+          ⏰ End in:
+        </span>
+        <span className="font-mono text-base sm:text-lg lg:text-xl xl:text-xl font-bold">
+          {quest.endDateTime ? getTimeLeft(quest.endDateTime, now) : "--"}
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const TasksList: React.FC<{ tasks: any }> = ({ tasks }) => {
   const activeTasks = getActiveTasks(tasks);
@@ -148,7 +173,7 @@ const RewardInfo: React.FC<{ quest: any }> = ({ quest }) => {
   // ✅ PARSEAR el valor Decimal128 antes de renderizar
   const rewardPerTask = parseDecimal128ToNumber(quest.rewardPerTask);
   const formattedReward = formatDecimalForDisplay(rewardPerTask);
-  
+
   return (
     <h4 className="text-[#EDF1F3] font-semibold text-[1.8rem] mt-2">
       {formattedReward} <span className="text-[#9945FF]">SOL</span>

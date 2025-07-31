@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     console.log("Current time:", now);
 
-    // ✅ BUSCAR sesiones activas que REALMENTE expiraron por tiempo
+    // Checked for expired user quests
     const expiredUserQuests = await UserQuest.find({
       questId,
       status: "active",
-      sessionExpiresAt: { $lt: now }, // ✅ Solo sesiones que expiraron
+      sessionExpiresAt: { $lt: now }, // Only consider sessions that have actually expired
       $or: [
         { userId },
         { walletaddress }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       await session.abortTransaction();
       session.endSession();
       
-      // ✅ Verificar si hay sesiones activas que AÚN NO expiraron
+      // Verify if there are still active sessions
       const activeUserQuests = await UserQuest.find({
         questId,
         status: "active",
@@ -67,14 +67,14 @@ export async function POST(req: NextRequest) {
       }), { status: 200 });
     }
 
-    // ✅ ELIMINAR solo las sesiones que realmente expiraron
+    // Eliminate expired sessions
     const deleteResult = await UserQuest.deleteMany({
       _id: { $in: expiredUserQuests.map(uq => uq._id) }
     }, { session });
 
     console.log("Sessions deleted:", deleteResult.deletedCount);
 
-    // ✅ Liberar cupos solo de las sesiones eliminadas
+    // Actualize the quest's reserved participants count
     await Quest.updateOne(
       { _id: questId, reservedParticipants: { $gte: deleteResult.deletedCount } },
       { $inc: { reservedParticipants: -deleteResult.deletedCount } },

@@ -20,6 +20,7 @@ interface Props {
   quests: Quest[];
   onEdit?: (quest: Quest) => void;
   onCancel?: (quest: Quest) => void;
+  processing?: boolean;
 }
 
 const MyCreatedQuestsCard: React.FC<Props> = ({ quests, onEdit, onCancel }) => {

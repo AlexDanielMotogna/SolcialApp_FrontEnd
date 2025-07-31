@@ -7,6 +7,7 @@ import { fetchCreatedQuests } from "@/utils/questApi";
 import EditQuest from "@/components/modals/EditQuest";
 import { parseISOToFormFields } from "@/utils/dateUtils";
 import { useMockUserProvider } from "@/components/global/MockUserProvider";
+import toast from "react-hot-toast";
 
 const QuestAccount = () => {
   const { user } = useMockUserProvider();
@@ -90,7 +91,7 @@ const QuestAccount = () => {
     const start = quest.startDateTime ? new Date(quest.startDateTime) : null;
 
     if (start && now >= start) {
-      alert("No puedes editar este quest porque ya ha empezado.");
+      toast.error("You can't edit this quest because it has already started.");
       return;
     }
 
@@ -192,6 +193,7 @@ const QuestAccount = () => {
           <CompletedQuestsCard
             userQuests={completedUserQuests}
             onClaim={handleClaimReward}
+            processing={loading}
           />
         )}
       </div>

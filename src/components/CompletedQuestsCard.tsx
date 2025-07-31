@@ -12,12 +12,13 @@ interface CompletedUserQuest {
   rewardClaimed?: boolean;
 }
 
-interface Props {
-  userQuests: CompletedUserQuest[];
-  onClaim?: (userQuest: CompletedUserQuest) => void;
-}
+type Props = {
+  userQuests: any[];
+  onClaim: (userQuest: any) => Promise<void>;
+  processing: boolean;
+};
 
-const CompletedQuestsCard: React.FC<Props> = ({ userQuests, onClaim }) => {
+const CompletedQuestsCard: React.FC<Props> = ({ userQuests, onClaim, processing }) => {
   console.log("🔍 CompletedQuestsCard recibió userQuests:", userQuests);
   console.log("🔍 Cantidad de userQuests:", userQuests?.length);
 

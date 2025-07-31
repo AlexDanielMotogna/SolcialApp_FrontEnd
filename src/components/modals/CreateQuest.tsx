@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
 import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
-import ButtonBorder from "../../components/ButtonBorder";
+import ButtonBorder from "../ButtonBorder";
 import { toUTCISOString } from "../../utils/dateUtils";
+import BannerUpload from "../BannerUpload";
 
 export const initialForm = {
   questName: "",
@@ -35,7 +36,7 @@ export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
   refreshQuests: () => void;
-  initialData?: Partial<typeof initialForm> & { _id?: string };
+  initialData?: Partial<typeof initialForm> & {  _id?: string; banner?: string; bannerPublicId?: string  };
   isEdit?: boolean;
 }
 
@@ -53,9 +54,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     calculateRewardPerTask,
     loading,
     error,
- } = useCreateQuest(initialForm, onClose, userId, initialForm.authorId);
+  } = useCreateQuest(initialForm, onClose, userId, initialForm.authorId);
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [bannerData, setBannerData] = useState<{
+    publicId: string;
+    url: string;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchAuthorId() {
@@ -94,6 +99,8 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     const questData = {
       ...form,
       tasks: filteredTasks,
+      banner: bannerData?.url || "",
+      bannerPublicId: bannerData?.publicId || "",
       startDateTime: startDateTimeUTC,
       endDateTime: endDateTimeUTC,
       userId,
@@ -203,6 +210,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 placeholder="Engage with our social media"
                 required
               />
+              <BannerUpload onImageUpload={setBannerData} disabled={loading} />
             </div>
             {/* Tweet/Post Link */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
@@ -217,39 +225,6 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 placeholder="https://twitter.com/..."
                 required
               />
-            </div>
-
-            {/* Banner */}
-            <div className="w-full flex flex-col items-start justify-start gap-2">
-              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Banner Image
-              </h6>
-              <input
-                type="file"
-                accept="image/*"
-                name="banner"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    setForm((prev: any) => ({
-                      ...prev,
-                      banner: url,
-                      bannerFile: file,
-                    }));
-                  }
-                }}
-                className="w-full py-2 px-2 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal"
-                required
-              />
-              {/* Preview */}
-              {form.banner && (
-                <img
-                  src={form.banner}
-                  alt="Banner Preview"
-                  className="w-full h-32 object-cover rounded-xl mt-2"
-                />
-              )}
             </div>
 
             {/* Max Participants */}
