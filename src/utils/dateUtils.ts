@@ -11,10 +11,6 @@ export function formatLocalDate(
   return format(toZonedTime(new Date(dateString), timeZone), dateFormat);
 }
 
-export function toUTCISOString(date: string, time: string) {
-  return new Date(`${date}T${time}`).toISOString();
-}
-
 export function getTimeLeft(endDateTime: string, now: Date) {
   const end = new Date(endDateTime);
   const diffMs = end.getTime() - now.getTime();
@@ -103,4 +99,44 @@ export function getTimeStatus(endDateTime: string, now: Date) {
     colorValue: "#86efac",
     status: "safe"
   };
+
+  
 }
+
+// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\utils\dateUtils.ts
+
+export const toUTCISOString = (date: string, time: string): string => {
+  if (!date || !time) {
+    throw new Error('Date and time are required');
+  }
+  
+  // ✅ FIX: Crear fecha en timezone local del usuario
+  const localDateTime = new Date(`${date}T${time}:00`);
+  
+  // Verificar que la fecha sea válida
+  if (isNaN(localDateTime.getTime())) {
+    throw new Error('Invalid date or time format');
+  }
+  
+  // ✅ LOG PARA DEBUG
+  console.log('🌍 [DateUtils] Local time:', localDateTime.toLocaleString());
+  console.log('🌍 [DateUtils] UTC time:', localDateTime.toISOString());
+  
+  // Convertir a UTC y retornar en formato ISO
+  return localDateTime.toISOString();
+};
+
+// ✅ FUNCIÓN PARA OBTENER TIEMPO MÍNIMO ACTUAL EN TIMEZONE LOCAL
+export const getMinimumDateTime = (): { date: string; time: string } => {
+  const now = new Date();
+  
+  // Añadir 15 minutos como margen
+  now.setMinutes(now.getMinutes() + 15);
+  
+  const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const time = now.toTimeString().slice(0, 5);  // HH:MM
+  
+  console.log('⏰ [DateUtils] Minimum time (local):', { date, time });
+  
+  return { date, time };
+};

@@ -83,7 +83,7 @@ export const userService = {
       console.log("🐦 Initiating Twitter connection for user:", userId);
       
       // Redirect to Twitter auth endpoint
-      window.location.href = `/api/auth/twitter?userId=${userId}`;
+      window.location.href = '/api/twitter-auth/twitter';
       
       return { 
         success: true, 

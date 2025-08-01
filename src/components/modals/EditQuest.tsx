@@ -6,6 +6,7 @@ import ButtonBorder from "../../components/ButtonBorder";
 import BannerUpload from "../BannerUpload"; // ✅ AGREGAR IMPORT
 import { useState, useEffect } from "react";
 import { parseDecimal128ToNumber, formatDecimalForDisplay } from "@/utils/decimal";
+import type { User } from "@/types/quest";
 
 const ALL_AVAILABLE_TASKS = [
   { key: "like", label: "Like" },
@@ -20,6 +21,8 @@ const EditQuest: React.FC<CreateQuestProps> = ({
   onClose,
   refreshQuests,
   initialData,
+  isEdit = true, 
+  user,
 }) => {
   const [form, setForm] = useState(initialForm);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -112,6 +115,7 @@ const EditQuest: React.FC<CreateQuestProps> = ({
     // ✅ INCLUIR DATOS DEL BANNER EN LA ACTUALIZACIÓN
     const questData = {
       questId: initialData?._id,
+      userId: user?.id ?? "", 
       questName: form.questName,
       description: form.description,
       startDate: form.startDate,
@@ -127,7 +131,7 @@ const EditQuest: React.FC<CreateQuestProps> = ({
       bannerChanged: bannerData !== null && bannerData.publicId !== initialData?.bannerPublicId,
       oldBannerPublicId: initialData?.bannerPublicId || "",
     };
-    
+    console.log("✅ [EditQuest] Submitting quest data for user:", user?.email ?? "unknown");
     console.log("Submitting quest data:", questData);
     
     try {

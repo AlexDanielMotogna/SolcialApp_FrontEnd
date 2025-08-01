@@ -1,6 +1,8 @@
+// REEMPLAZAR COMPLETAMENTE: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\components\modals\CreateQuest.tsx
+
 "use client";
 import { questAPI } from "@/app/clientAPI/questAPI";
-import { useMockUser } from "@/context/MockUserContext";
+import { useSession } from 'next-auth/react';
 import { useCreateQuest } from "@/hooks/useCreateQuest";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -10,12 +12,20 @@ import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
 import ButtonBorder from "../ButtonBorder";
 import { toUTCISOString } from "../../utils/dateUtils";
 import BannerUpload from "../BannerUpload";
+import TaskSelector from "@/components/ui/TaskSelector";
+import SuccessModal from "@/components/ui/SuccessModal";
+import { validateQuestFormWithToast } from "@/utils/questValidation";
+import DateTimePicker from "@/components/ui/DateTimePicker";
+import { getMinimumDateTime } from "../../utils/dateUtils";
+
+// Types
+import type { User } from "@/types/quest";
 
 export const initialForm = {
   questName: "",
   description: "",
   tweetLink: "",
-  authorId: "", // <-- aquí el campo correcto
+  authorId: "",
   maxParticipants: "",
   rewardPool: "",
   rewardPerTask: "",
@@ -36,16 +46,31 @@ export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
   refreshQuests: () => void;
-  initialData?: Partial<typeof initialForm> & {  _id?: string; banner?: string; bannerPublicId?: string  };
+  initialData?: Partial<typeof initialForm> & { 
+    _id?: string; 
+    banner?: string; 
+    bannerPublicId?: string 
+  };
   isEdit?: boolean;
+  user: User | null;
 }
 
 const CreateQuest: React.FC<CreateQuestProps> = ({
   isOpen,
   onClose,
   refreshQuests,
+  initialData,
+  isEdit = false,
+  user,
 }) => {
-  const { id: userId } = useMockUser();
+  // ============================================================================
+  // AUTHENTICATION & VALIDATION
+  // ============================================================================
+  const { data: session, status } = useSession();
+
+  // ============================================================================
+  // HOOKS & STATE
+  // ============================================================================
   const {
     form,
     setForm,
@@ -54,7 +79,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     calculateRewardPerTask,
     loading,
     error,
-  } = useCreateQuest(initialForm, onClose, userId, initialForm.authorId);
+  } = useCreateQuest({
+    initialForm: initialData || initialForm,
+    onClose,
+    user,
+    refreshQuests,
+    isEdit,
+  });
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [bannerData, setBannerData] = useState<{
@@ -62,40 +93,104 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     url: string;
   } | null>(null);
 
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  
+  // ✅ FETCH AUTHOR ID FROM TWEET LINK
   useEffect(() => {
-    async function fetchAuthorId() {
-      if (form.tweetLink && form.tweetLink.startsWith("http")) {
+    const fetchAuthorId = async () => {
+      if (!form.tweetLink || !form.tweetLink.startsWith("http")) return;
+
+      try {
+        console.log('🔍 [CreateQuest] Fetching author ID for tweet:', form.tweetLink);
+        
         const res = await fetch("/api/quests/testAuthId", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tweetLink: form.tweetLink }),
         });
+        
         const data = await res.json();
-        if (data.success) {
-          setForm((prev: typeof initialForm) => ({
+        
+        if (data.success && data.userId) {
+          console.log('✅ [CreateQuest] Author ID found:', data.userId);
+            setForm((prev: typeof initialForm) => ({
             ...prev,
-            authorId: data.userId, // <-- guarda el authorId de Twitter aquí
-          }));
+            authorId: data.userId as string,
+            }));
+        } else {
+          console.log('❌ [CreateQuest] Could not fetch author ID:', data.error);
         }
+      } catch (error) {
+        console.error('❌ [CreateQuest] Error fetching author ID:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchAuthorId, 500);
+    return () => clearTimeout(timeoutId);
+  }, [form.tweetLink, setForm]);
+
+  // ✅ POPULATE FORM WITH INITIAL DATA (FOR EDIT MODE)
+  useEffect(() => {
+    if (initialData && isEdit) {
+      console.log('📝 [CreateQuest] Populating form with initial data for edit');
+      setForm((prev: typeof initialForm) => ({
+        ...prev,
+        ...initialData,
+      }));
+
+      if (initialData.banner) {
+        setBannerData({
+          url: initialData.banner,
+          publicId: initialData.bannerPublicId || '',
+        });
       }
     }
-    fetchAuthorId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.tweetLink]);
+  }, [initialData, isEdit, setForm]);
 
+  // ✅ VALIDACIÓN DE FECHAS EN TIEMPO REAL
+  useEffect(() => {
+    if (form.startDate && form.startTime && form.endDate && form.endTime) {
+      const now = new Date();
+      const startDateTime = new Date(`${form.startDate}T${form.startTime}`);
+      const endDateTime = new Date(`${form.endDate}T${form.endTime}`);
+
+      // Solo mostrar advertencias, no errores bloqueantes
+      if (startDateTime < now) {
+        console.warn('⚠️ Start date is in the past');
+      }
+
+      if (endDateTime <= startDateTime) {
+        console.warn('⚠️ End date must be after start date');
+      }
+    }
+  }, [form.startDate, form.startTime, form.endDate, form.endTime]);
+
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
   const handleSubmitWithPopup = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Convert dates and times to UTC ISO string
+  // ✅ USAR EL VALIDADOR ÉPICO
+  const isValid = await validateQuestFormWithToast(form, user);
+  if (!isValid) return;
+
+  try {
+    console.log(`🚀 [CreateQuest] ${isEdit ? 'Updating' : 'Creating'} quest...`);
+
+    // ✅ CONVERT DATES TO UTC
     const startDateTimeUTC = toUTCISOString(form.startDate, form.startTime);
     const endDateTimeUTC = toUTCISOString(form.endDate, form.endTime);
 
-    // Filtra solo los tasks seleccionados (true)
+    // ✅ FILTER SELECTED TASKS
     const filteredTasks = Object.fromEntries(
       Object.entries(form.tasks).filter(([_, value]) => value === true)
     );
 
-    // Prepara el quest data para enviar al backend
+    // ✅ PREPARE QUEST DATA
     const questData = {
       ...form,
       tasks: filteredTasks,
@@ -103,52 +198,80 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
       bannerPublicId: bannerData?.publicId || "",
       startDateTime: startDateTimeUTC,
       endDateTime: endDateTimeUTC,
-      userId,
-      authorId: form.authorId, // <-- asegúrate de incluirlo aquí
+      userId: user!.id,
+      authorId: form.authorId,
+      // FOR EDIT MODE
+      ...(isEdit && initialData?._id && { _id: initialData._id }),
     };
 
-    // Remove the original date and time fields
+    // ✅ REMOVE TEMPORARY FIELDS
     delete questData.startDate;
     delete questData.startTime;
     delete questData.endDate;
     delete questData.endTime;
 
-    try {
+    // ✅ CALL API
+    if (isEdit) {
+      await questAPI.updateQuest(initialData?._id || "", questData);
+      toast.success("✅ Quest updated successfully!");
+    } else {
       await questAPI.createQuest(questData);
       setShowSuccess(true);
-      refreshQuests();
-    } catch (error) {
-      toast.error("Error creating quest: " + (error as Error).message);
     }
-  };
 
+    console.log(`✅ [CreateQuest] Quest ${isEdit ? 'updated' : 'created'} successfully`);
+    refreshQuests();
+    
+    if (isEdit) {
+      onClose();
+    }
+  } catch (error) {
+    console.error(`❌ [CreateQuest] Error ${isEdit ? 'updating' : 'creating'} quest:`, error);
+    toast.error(`❌ Error ${isEdit ? 'updating' : 'creating'} quest: ` + (error as Error).message);
+  }
+};
+
+  // ============================================================================
+  // RENDER CONDITIONS
+  // ============================================================================
   if (!isOpen) return null;
 
+  if (status === 'loading') {
+    return (
+      <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-center z-50">
+        <div className="text-white text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return null;
+  }
+
+  if (!user) {
+    return (
+      <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-center z-50">
+        <div className="text-white text-lg">Loading user data...</div>
+      </div>
+    );
+  }
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
   return (
     <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50">
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
-          <div className="bg-[#18181b] p-8 rounded-2xl shadow-xl flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-green-400 mb-4">
-              Quest Created!
-            </h2>
-            <p className="text-white mb-6">
-              Your quest was created successfully.
-            </p>
-            <button
-              className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold"
-              onClick={() => {
-                setShowSuccess(false);
-                onClose();
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ✅ SUCCESS MODAL */}
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => {
+          setShowSuccess(false);
+          onClose();
+        }}
+        questName={form.questName}
+      />
 
+      {/* ✅ MAIN FORM */}
       <form
         onSubmit={handleSubmitWithPopup}
         className="bg-[#161618] w-[470px] max-h-[90vh] flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
@@ -158,13 +281,15 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
           msOverflowStyle: "none",
         }}
       >
+        {/* ✅ HEADER */}
         <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
           <h3 className="text-[1.8rem] text-white font-semibold">
-            Create Quest
+            {isEdit ? 'Edit Quest' : 'Create Quest'}
           </h3>
           <Close onClick={onClose} />
         </div>
 
+        {/* ✅ FORM CONTENT */}
         <div
           className="w-full flex flex-col items-start justify-start gap-6 px-8 overflow-y-auto"
           style={{
@@ -172,65 +297,85 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
             msOverflowStyle: "none",
           }}
         >
+          {/* ✅ INTRO */}
           <div className="w-full flex flex-col items-start justify-start gap-1">
             <h4 className="text-white font-semibold text-[1.8rem]">
-              Launch a New Quest
+              {isEdit ? 'Update Your Quest' : 'Launch a New Quest'}
             </h4>
             <p className="text-[#ACB5BB] text-[1.4rem]">
-              Engage your community with exciting quests and earn traction!
+              {isEdit 
+                ? 'Make changes to your quest details'
+                : 'Engage your community with exciting quests and earn traction!'
+              }
+            </p>
+            {/* ✅ USER INFO */}
+            <p className="text-[#6C7278] text-[1.2rem] mt-2">
+              Creating as: <span className="text-[#ACB5BB]">{user.email}</span>
             </p>
           </div>
 
           <div className="w-full flex flex-col items-start justify-start gap-[0.8rem]">
-            {/* Quest Name */}
+            {/* ✅ QUEST NAME */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Quest Name
+                Quest Name *
               </h6>
               <input
                 name="questName"
                 value={form.questName}
                 onChange={handleChange}
-                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
+                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
                 placeholder="Social Media Engagement Quest"
                 required
+                maxLength={100}
               />
             </div>
 
-            {/* Description */}
+            {/* ✅ DESCRIPTION */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Description
+                Description *
               </h6>
               <textarea
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                className="w-full h-[77px] px-5 py-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal resize-none"
-                placeholder="Engage with our social media"
+                className="w-full h-[77px] px-5 py-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal resize-none placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
+                placeholder="Engage with our social media and help us grow our community!"
                 required
+                maxLength={500}
               />
-              <BannerUpload onImageUpload={setBannerData} disabled={loading} />
+              <BannerUpload 
+                onImageUpload={setBannerData} 
+                disabled={loading}
+              />
             </div>
-            {/* Tweet/Post Link */}
+
+            {/* ✅ TWEET LINK */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Tweet/Post Link
+                Tweet/Post Link *
               </h6>
               <input
                 name="tweetLink"
                 value={form.tweetLink}
                 onChange={handleChange}
-                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
-                placeholder="https://twitter.com/..."
+                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
+                placeholder="https://twitter.com/username/status/..."
                 required
+                type="url"
               />
+              {form.authorId && (
+                <p className="text-[#10B981] text-[1.1rem]">
+                  ✅ Tweet author detected
+                </p>
+              )}
             </div>
 
-            {/* Max Participants */}
+            {/* ✅ MAX PARTICIPANTS */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Max Participants
+                Max Participants *
               </h6>
               <input
                 name="maxParticipants"
@@ -238,24 +383,28 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 onChange={handleChange}
                 type="number"
                 min={1}
-                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
+                max={10000}
+                className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
                 placeholder="50"
                 required
               />
             </div>
 
-            {/* Reward Pool */}
+            {/* ✅ REWARD POOL */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Reward Pool
+                Reward Pool (SOL) *
               </h6>
               <div className="w-full relative">
                 <input
                   name="rewardPool"
                   value={form.rewardPool}
                   onChange={handleChange}
-                  className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
-                  placeholder="50 SOL"
+                  type="number"
+                  step="0.001"
+                  min="0.001"
+                  className="w-full py-5 px-5 pr-14 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
+                  placeholder="0.5"
                   required
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -269,25 +418,23 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 </span>
               </div>
             </div>
-            {/* Reward per Task */}
+
+            {/* ✅ REWARD PER TASK (CALCULATED) */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Reward per Task
+                Reward per Task (Auto-calculated)
               </h6>
               <div className="w-full relative">
                 <input
-                  name="rewardPerTask"
                   value={calculateRewardPerTask()}
-                  onChange={handleChange}
-                  className="w-full py-5 px-5 pr-12 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-[#6C7278] font-normal"
-                  placeholder="0.01 SOL"
+                  className="w-full py-5 px-5 pr-14 bg-[#1a1a1c] border border-[#44444A] rounded-xl text-[1.4rem] text-[#ACB5BB] font-normal cursor-not-allowed"
                   readOnly
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2">
                   <Image
                     src={SolanaIcon}
                     alt="Solana"
-                    className="w-6 h-6"
+                    className="w-6 h-6 opacity-60"
                     width={24}
                     height={24}
                   />
@@ -295,132 +442,58 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               </div>
             </div>
 
-            {/* Dates */}
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Start Date & Time */}
-              <div className="w-full flex flex-col gap-2">
-                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                  Start Date & Time
-                </h6>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[1.1rem] text-[#ACB5BB]">Date</label>
-                  <input
-                    name="startDate"
-                    value={form.startDate}
-                    onChange={handleChange}
-                    type="date"
-                    className="w-full py-3 px-4 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal outline-none"
-                    required
-                  />
-                  <label className="text-[1.1rem] text-[#ACB5BB]">Time</label>
-                  <input
-                    name="startTime"
-                    value={form.startTime}
-                    onChange={handleChange}
-                    type="time"
-                    step="1"
-                    className="w-full py-3 px-4 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal outline-none"
-                    required
-                  />
-                </div>
-              </div>
-              {/* End Date & Time */}
-              <div className="w-full flex flex-col gap-2">
-                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                  End Date & Time
-                </h6>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[1.1rem] text-[#ACB5BB]">Date</label>
-                  <input
-                    name="endDate"
-                    value={form.endDate}
-                    onChange={handleChange}
-                    type="date"
-                    className="w-full py-3 px-4 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal outline-none"
-                    required
-                  />
-                  <label className="text-[1.1rem] text-[#ACB5BB]">Time</label>
-                  <input
-                    name="endTime"
-                    value={form.endTime}
-                    onChange={handleChange}
-                    type="time"
-                    step="1"
-                    className="w-full py-3 px-4 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.3rem] text-[#6C7278] font-normal outline-none"
-                    required
-                  />
-                </div>
-              </div>
+        
+             {/* ✅ DATE TIME PICKERS ÉPICOS */}
+           <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* START DATE TIME */}
+              <DateTimePicker
+                label="Start Date & Time"
+                dateValue={form.startDate}
+                timeValue={form.startTime}
+                onDateChange={(date) => setForm((prev: any) => ({ ...prev, startDate: date }))}
+                onTimeChange={(time) => setForm((prev: any) => ({ ...prev, startTime: time }))}
+                minDate={new Date().toISOString().split('T')[0]}
+                required
+              />
+
+              {/* END DATE TIME */}
+              <DateTimePicker
+                label="End Date & Time"
+                dateValue={form.endDate}
+                timeValue={form.endTime}
+                onDateChange={(date) => setForm((prev: any) => ({ ...prev, endDate: date }))}
+                onTimeChange={(time) => setForm((prev: any) => ({ ...prev, endTime: time }))}
+                minDate={form.startDate || new Date().toISOString().split('T')[0]}
+                required
+              />
             </div>
 
-            {/* Tasks checkboxes */}
-            <div className="w-full flex flex-col items-start justify-start gap-2">
-              <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
-                Tasks
-              </h6>
-              <div className="flex flex-col gap-2 w-full">
-                <label className="flex items-center gap-2 text-[1.4rem] text-[#EDF1F3]">
-                  <input
-                    type="checkbox"
-                    name="like"
-                    checked={form.tasks.like}
-                    onChange={handleChange}
-                    className="accent-[#9945FF] w-5 h-5"
-                  />
-                  Like Tweet
-                </label>
-                <label className="flex items-center gap-2 text-[1.4rem] text-[#EDF1F3]">
-                  <input
-                    type="checkbox"
-                    name="retweet"
-                    checked={form.tasks.retweet}
-                    onChange={handleChange}
-                    className="accent-[#9945FF] w-5 h-5"
-                  />
-                  Retweet
-                </label>
-                <label className="flex items-center gap-2 text-[1.4rem] text-[#EDF1F3]">
-                  <input
-                    type="checkbox"
-                    name="comment"
-                    checked={form.tasks.comment}
-                    onChange={handleChange}
-                    className="accent-[#9945FF] w-5 h-5"
-                  />
-                  Comment
-                </label>
-                <label className="flex items-center gap-2 text-[1.4rem] text-[#EDF1F3]">
-                  <input
-                    type="checkbox"
-                    name="follow"
-                    checked={form.tasks.follow}
-                    onChange={handleChange}
-                    className="accent-[#9945FF] w-5 h-5"
-                  />
-                  Follow
-                </label>
-                <label className="flex items-center gap-2 text-[1.4rem] text-[#EDF1F3]">
-                  <input
-                    type="checkbox"
-                    name="quote"
-                    checked={form.tasks.quote}
-                    onChange={handleChange}
-                    className="accent-[#9945FF] w-5 h-5"
-                  />
-                  Quote
-                </label>
-              </div>
-            </div>
+             {/* ✅ TASKS CHECKBOXES ÉPICOS */}
+             {/* ✅ TASK SELECTOR COMPONENT */}
+            <TaskSelector 
+              tasks={form.tasks}
+              onChange={handleChange}
+              className="animate-slideInUp"
+            />
           </div>
         </div>
+
+        {/* ✅ FOOTER */}
         <div className="w-full border-t border-[#44444A] p-8">
           <ButtonBorder
-            text={loading ? "Creating..." : "Create Quest"}
+            text={loading 
+              ? (isEdit ? "Updating..." : "Creating...") 
+              : (isEdit ? "Update Quest" : "Create Quest")
+            }
             onClick={handleSubmitWithPopup}
-            disabled={loading}
+            disabled={loading || !user?.id}
             type="button"
           />
-          {error && <div className="text-red-500 mt-2">{error}</div>}
+          {error && (
+            <div className="text-red-400 mt-3 p-2 bg-red-950 rounded-lg text-[1.2rem]">
+              ❌ {error}
+            </div>
+          )}
         </div>
       </form>
     </div>

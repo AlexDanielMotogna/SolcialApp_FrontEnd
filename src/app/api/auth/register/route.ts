@@ -6,7 +6,6 @@ import { sendMail } from "@/lib/mailer";
 import verificationEmailTemplate from "@/mail-templates/verification";
 import crypto from "crypto";
 import { uploadToCloudinary } from "@/lib/cloudinary";
-
 export async function POST(req: NextRequest) {
   await connectDB();
 
@@ -60,3 +59,4 @@ export async function POST(req: NextRequest) {
     { status: "success", msg: "User registered. Please verify your email." }
   ), { status: 200 });
 }
+

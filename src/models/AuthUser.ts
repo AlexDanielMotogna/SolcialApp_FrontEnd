@@ -58,7 +58,7 @@ const UserSchema = new Schema<IAuthUser>({
   },
   password: {
     type: String,
-    required: [true, "Please provide password"],
+    required: [false, "Please provide password"],
     minlength: 3,
   },
   avatar: {
@@ -91,7 +91,9 @@ const UserSchema = new Schema<IAuthUser>({
   verificationTokenExpire: { type: Date },
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorSecret: { type: String },
-  walletaddress: String,
+  walletaddress: {
+  type: String,
+  default: null,},
   twitterAccessToken: { type: String, default: null },
   twitterAccessSecret: { type: String, default: null },
   twitterScreenName: { type: String, default: null }, // <-- usa este nombre

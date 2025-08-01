@@ -1,7 +1,8 @@
-// CREAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\app\api\quest-access\route.ts
+// REEMPLAZAR COMPLETAMENTE: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\app\api\quest-access\route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
+import { getAuthenticatedUser, createAuthResponse } from "@/lib/auth-session";
 import { validateQuestAccess } from "@/lib/questValidation";
 import UserQuest from "@/models/UserQuest";
 
@@ -10,30 +11,48 @@ export async function POST(req: NextRequest) {
   console.log(`🔍 [${requestId}] Starting quest access validation...`);
   
   try {
+    // ✅ OBTENER USUARIO DE LA SESIÓN (SEGURO)
+    const authResult = await getAuthenticatedUser();
+    const authError = createAuthResponse(authResult);
+    if (authError) {
+      console.log(`❌ [${requestId}] Authentication failed:`, authResult.error);
+      return authError;
+    }
+
+    const { user } = authResult;
+    if (!user) {
+      console.log(`❌ [${requestId}] User object is null`);
+      return NextResponse.json(
+        { error: "User not found in session" },
+        { status: 401 }
+      );
+    }
+    console.log(`✅ [${requestId}] User authenticated:`, user.email);
+
     await connectDB();
     console.log(`✅ [${requestId}] Database connected`);
 
-    const { questId, userId, walletaddress } = await req.json();
+    const { questId } = await req.json();
     console.log(`📝 [${requestId}] Access request:`, {
-      userId,
+      userId: user.id,
       questId,
-      walletaddress,
+      walletaddress: user.walletaddress,
     });
 
     // ✅ BASIC INPUT VALIDATION
-    if (!userId || !questId || !walletaddress) {
-      console.log(`❌ [${requestId}] Missing required fields`);
+    if (!questId) {
+      console.log(`❌ [${requestId}] Missing questId`);
       return NextResponse.json(
-        { error: "Missing required fields: userId, questId, walletaddress" },
+        { error: "Quest ID is required" },
         { status: 400 }
       );
     }
 
-    // ✅ QUEST ACCESS VALIDATION (PERMISIVA)
+    // ✅ QUEST ACCESS VALIDATION (USAR DATOS DE SESIÓN)
     const questValidation = await validateQuestAccess(
       questId,
-      userId,
-      walletaddress
+      user.id, // ✅ DE LA SESIÓN
+      user.walletaddress // ✅ DE LA SESIÓN
     );
     
     if (!questValidation.valid) {
@@ -55,6 +74,11 @@ export async function POST(req: NextRequest) {
       userQuest: questValidation.userQuest || null,
       hasParticipated: !!questValidation.userQuest,
       canAccess: true,
+      user: {
+        id: user.id,
+        hasTwitterAccess: user.hasTwitterAccess,
+        walletaddress: user.walletaddress
+      }
     };
 
     return NextResponse.json(response, { status: 200 });

@@ -46,7 +46,7 @@ const MyCreatedQuestsCard: React.FC<Props> = ({ quests, onEdit, onCancel }) => {
   }, [menuOpen]);
 
   return (
-    <div className="bg-[#18181C] rounded-2xl p-10 mb-28 shadow-lg w-full max-w-6xl min-w-[1300px] overflow-x-auto">
+    <div className="bg-[#18181C] rounded-2xl p-10 mb-28 shadow-lg w-full max-w-6xl min-w-[1400px] overflow-x-auto">
       <table className="w-full text-left text-xl min-w-[1100px]">
         <thead>
           <tr className="text-[#ACB5BB] text-2xl">

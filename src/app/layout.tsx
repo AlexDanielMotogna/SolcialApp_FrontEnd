@@ -1,10 +1,9 @@
+// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\app\layout.tsx
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import MockUserProvider from "@/components/global/MockUserProvider";
-import { NotificacionesProvider } from "@/context/NotificacionesContext";
-import { SessionManagerProvider } from "@/context/SessionManagerContext";
-
+import ClientProviders from "@/components/ClientProviders"; // ✅ IMPORT CLIENT WRAPPER
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,13 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionManagerProvider>
-        <NotificacionesProvider>
-          <MockUserProvider>
-            {children}
-          </MockUserProvider>
-        </NotificacionesProvider>
-        </SessionManagerProvider>
+        {/* ✅ USAR CLIENT WRAPPER */}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   );

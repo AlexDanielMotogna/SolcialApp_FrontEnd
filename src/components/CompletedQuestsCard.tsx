@@ -23,7 +23,7 @@ const CompletedQuestsCard: React.FC<Props> = ({ userQuests, onClaim, processing 
   console.log("🔍 Cantidad de userQuests:", userQuests?.length);
 
   return (
-    <div className="bg-[#18181C] rounded-2xl p-10 shadow-lg w-full max-w-6xl min-w-[1300px] overflow-x-auto">
+    <div className="w-full bg-[#18181C] rounded-2xl p-10 shadow-lg w-full max-w-6xl min-w-[1400px] overflow-x-auto">
       {!userQuests || userQuests.length === 0 ? (
         <div className="text-center py-10 text-[#ACB5BB] text-xl">
           No completed quests found

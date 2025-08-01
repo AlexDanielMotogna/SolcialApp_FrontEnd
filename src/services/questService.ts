@@ -1,8 +1,10 @@
+import { use } from "react";
+import Wallet from "../../public/icons/Wallet";
+
 interface CreateQuestSessionData {
-  userId: string;
-  walletaddress: string;
-  questId: string;
-  tasks: any;
+  questId: string; 
+  walletaddress: string; // ❌ ELIMINAR: userId y walletaddress - vienen de la sesión
+  tasks: any;      
 }
 
 interface ApiResponse<T> {
@@ -20,7 +22,12 @@ export const questService = {
       const response = await fetch("/api/user-quests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          questId: data.questId,
+          tasks: data.tasks,
+          Walletaddress: data.walletaddress, // ❌ ELIMINAR: userId y walletaddress - vienen de la sesión
+          // ❌ ELIMINAR: userId y walletaddress - vienen de la sesión
+        }),
       });
 
       const result = await response.json();
@@ -48,12 +55,17 @@ export const questService = {
     }
   },
 
-  async checkQuestExpiration(questId: string, userId: string, walletaddress: string): Promise<ApiResponse<any>> {
+  async checkQuestExpiration(questId: string): Promise<ApiResponse<any>> {
     try {
       const response = await fetch("/api/user-quests/expire", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questId, userId, walletaddress }),
+        body: JSON.stringify({ 
+          questId,
+          Walletaddress: "",
+          userId: "" //
+
+        }),
       });
 
       const data = await response.json();
@@ -116,9 +128,10 @@ export const questService = {
     }
   },
 
-  async fetchUserQuests(userId: string) {
+  async fetchUserQuests(): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`/api/user-quests/allUserQuests?userId=${userId}`);
+      // ✅ NO ENVIAR userId - la API lo obtiene de la sesión
+      const response = await fetch(`/api/user-quests/allUserQuests`);
       const data = await response.json();
 
       if (!response.ok) {

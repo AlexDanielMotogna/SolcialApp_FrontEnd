@@ -1,8 +1,7 @@
-// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\app\api\user-quests\route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { validateQuestJoin } from "@/lib/questValidation"; // ✅ CAMBIAR IMPORT
+import { getAuthenticatedUser, createAuthResponse } from "@/lib/auth-session";
+import { validateQuestJoin } from "@/lib/questValidation";
 import { createQuestSession } from "@/lib/questSession";
 
 export async function POST(req: NextRequest) {
@@ -10,31 +9,49 @@ export async function POST(req: NextRequest) {
   console.log(`🚀 [${requestId}] Starting user-quest creation...`);
   
   try {
+    // ✅ OBTENER USUARIO DE LA SESIÓN (SEGURO)
+    const authResult = await getAuthenticatedUser();
+    const authError = createAuthResponse(authResult);
+    if (authError) {
+      console.log(`❌ [${requestId}] Authentication failed:`, authResult.error);
+      return authError;
+    }
+
+    const { user } = authResult;
+    if (!user) {
+      console.log(`❌ [${requestId}] User object is null after authentication`);
+      return NextResponse.json(
+        { error: "Authenticated user not found" },
+        { status: 401 }
+      );
+    }
+    console.log(`✅ [${requestId}] User authenticated:`, user.email);
+
     await connectDB();
     console.log(`✅ [${requestId}] Database connected`);
 
     const data = await req.json();
     console.log(`📝 [${requestId}] Request data:`, {
-      userId: data.userId,
+      userId: user.id, // ✅ DE LA SESIÓN
       questId: data.questId,
-      walletaddress: data.walletaddress,
+      walletaddress: user.walletaddress, // ✅ DE LA SESIÓN
       tasksCount: data.tasks?.length || 0,
     });
 
     // ✅ BASIC INPUT VALIDATION
-    if (!data.userId || !data.questId || !data.walletaddress) {
-      console.log(`❌ [${requestId}] Missing required fields`);
+    if (!data.questId) {
+      console.log(`❌ [${requestId}] Missing questId`);
       return NextResponse.json(
-        { error: "Missing required fields: userId, questId, walletaddress" },
+        { error: "Quest ID is required" },
         { status: 400 }
       );
     }
 
-    // ✅ QUEST JOIN VALIDATION (ESTRICTA)
-    const questValidation = await validateQuestJoin( // ✅ CAMBIAR FUNCIÓN
+    // ✅ QUEST JOIN VALIDATION CON DATOS DE SESIÓN
+    const questValidation = await validateQuestJoin(
       data.questId,
-      data.userId,
-      data.walletaddress
+      user.id, // ✅ DE LA SESIÓN
+      user.walletaddress // ✅ DE LA SESIÓN
     );
     
     if (!questValidation.valid) {
@@ -53,8 +70,8 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             ...userQuest.toObject(),
             message: "Quest already completed",
-            alreadyCompleted: true, // ✅ Flag para el frontend
-          }, { status: 200 }); // ✅ 200 en lugar de error
+            alreadyCompleted: true,
+          }, { status: 200 });
         }
         
         if (userQuest.status === "active") {
@@ -63,12 +80,11 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             ...userQuest.toObject(),
             message: "Quest session already active",
-            alreadyActive: true, // ✅ Flag para el frontend
-          }, { status: 200 }); // ✅ 200 en lugar de error
+            alreadyActive: true,
+          }, { status: 200 });
         }
       }
 
-      // ✅ Para otros errores, devolver error normal
       return NextResponse.json(
         { error: questValidation.error },
         { status: questValidation.statusCode || 400 }
@@ -77,11 +93,13 @@ export async function POST(req: NextRequest) {
     
     console.log(`✅ [${requestId}] Quest validations passed`);
 
-    // ✅ CREATE QUEST SESSION
+    // ✅ CREATE QUEST SESSION CON DATOS DE SESIÓN
     console.log(`📊 [${requestId}] Creating quest session...`);
     
     const sessionResult = await createQuestSession({
       ...data,
+      userId: user.id, // ✅ DE LA SESIÓN
+      walletaddress: user.walletaddress, // ✅ DE LA SESIÓN
       quest: questValidation.quest,
     });
 
@@ -106,17 +124,17 @@ export async function POST(req: NextRequest) {
         sessionResult.error?.includes("Write conflict") ||
         sessionResult.error?.includes("too many requests")
       ) {
-        statusCode = 429; // Too Many Requests
+        statusCode = 429;
       } else if (
         sessionResult.error?.includes("already participating") ||
         sessionResult.error?.includes("Quest already completed") ||
         sessionResult.error?.includes("already active")
       ) {
-        statusCode = 409; // Conflict
+        statusCode = 409;
       } else if (sessionResult.error?.includes("No spots available")) {
-        statusCode = 410; // Gone
+        statusCode = 410;
       } else if (sessionResult.error?.includes("not found")) {
-        statusCode = 404; // Not Found
+        statusCode = 404;
       }
 
       return NextResponse.json(

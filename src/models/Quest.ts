@@ -35,11 +35,11 @@ const QuestSchema = new Schema<IQuest>({
   tweetLink: { type: String, required: true },
   banner: {
     type: String,
-    default: "", // URL de Cloudinary o vacío para placeholder
+    default: "", 
   },
   bannerPublicId: {
     type: String,
-    default: "", // Public ID de Cloudinary para gestión
+    default: "", 
   },
   authorId: { type: String, required: true },
   maxParticipants: { type: Number, required: true },
