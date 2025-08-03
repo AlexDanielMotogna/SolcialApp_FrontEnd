@@ -2,7 +2,7 @@
 
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth"; // ✅ AGREGAR
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // ✅ AGREGAR
+import { authOptions } from "@/lib/auth"; // ✅ AGREGAR
 import { connectDB } from "@/lib/mongodb"; // ✅ AGREGAR
 import Quest from "@/models/Quest";
 import UserQuest from "@/models/UserQuest";

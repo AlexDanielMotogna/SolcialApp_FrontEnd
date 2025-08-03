@@ -111,7 +111,8 @@ const UserSchema = new Schema<IAuthUser>({
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
+  const pepper = process.env.HASH_PASSWORD_SECRET || "";
+  return await bcrypt.compare(candidatePassword + pepper, this.password);
 };
 
 const AuthUser: Model<IAuthUser> =

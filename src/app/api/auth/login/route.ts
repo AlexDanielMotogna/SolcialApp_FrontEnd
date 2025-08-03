@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { verifyPassword } from "@/lib/security-hash";
 import { connectDB } from "@/lib/mongodb";
 import AuthUser from "@/models/AuthUser";
 import { verify2FAToken } from "@/lib/2fa";
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
       return new Response(JSON.stringify({ status: "no_password", msg: "No password set for this account" }), { status: 403 });
     }
 
-    const isMatch = await verifyPassword(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return new Response(JSON.stringify({ msg: "Invalid credentials" }), { status: 409 });
     }
@@ -38,6 +37,9 @@ export async function POST(req: NextRequest) {
       if (!totp) {
         // Demande le code TOTP au frontend
         return new Response(JSON.stringify({ status: "2fa_required" }), { status: 401 });
+      }
+      if (!user.twoFactorSecret) {
+        return new Response(JSON.stringify({ msg: "2FA secret not set for this user" }), { status: 401 });
       }
       const isValid2FA = verify2FAToken(user.twoFactorSecret, totp);
       if (!isValid2FA) {

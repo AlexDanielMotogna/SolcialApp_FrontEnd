@@ -16,8 +16,10 @@ import logo from "../../../public/imgs/logo.png";
 import CryptoBalance from "../../../public/imgs/Crypto-Balancee.png";
 import Headline from "../../../public/imgs/Headline.png";
 import { signIn } from "next-auth/react";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const Login: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuthUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [totpCode, setTotpCode] = useState("");
@@ -36,37 +38,90 @@ const Login: React.FC = () => {
     setWidth(window.innerWidth);
   }, []);
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="w-screen min-h-screen bg-[#111113] flex items-center justify-center">
+        <div className="text-center">
+          <svg
+            className="animate-spin h-12 w-12 text-[#9945FF] mx-auto"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8z"
+            ></path>
+          </svg>
+          <p className="mt-4 text-[#ACB5BB] text-lg">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render login form if already authenticated
+  if (isAuthenticated) {
+    return null;
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      const body: any = { email, password };
-      if (is2faRequired) body.totp = totpCode;
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      // Use NextAuth signIn instead of custom API
+      const result = await signIn("credentials", {
+        email,
+        password,
+        totp: is2faRequired ? totpCode : undefined,
+        redirect: false, // Don't auto-redirect, handle it manually
       });
-      const data = await res.json();
-      if (res.ok && data.status === "success") {
-        setShowSpinner(true); // Affiche le spinner
+
+      if (result?.error) {
+        // Handle different error types
+        if (result.error === "2fa_required") {
+          setIs2faRequired(true);
+          setTotpCode("");
+          toast.error("Please enter your 2FA code");
+        } else if (result.error === "no_password") {
+          setNoPasswordEmail(email);
+          setNoPasswordModal(true);
+        } else {
+          setErrorModal(result.error || "Login failed");
+        }
+      } else if (result?.ok) {
+        setShowSpinner(true);
         toast.success("Login successful!");
+        // NextAuth will handle the session, just redirect
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1500); // Laisse le spinner visible avant la redirection
+        }, 1500);
         return;
-      } else if (data.status === "2fa_required") {
-        setIs2faRequired(true);
-        setTotpCode("");
-      } else if (data.status === "no_password") {
-        setNoPasswordEmail(email);
-        setNoPasswordModal(true);
       } else {
-        setErrorModal(data.msg || data.message || "Login failed");
+        setErrorModal("Login failed. Please try again.");
       }
-    } catch {
-      setErrorModal("Login failed");
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrorModal("Login failed. Please try again.");
     }
+    
     setLoading(false);
   };
 
@@ -309,15 +364,21 @@ const Login: React.FC = () => {
               className="mt-4 px-6 py-2 rounded-xl bg-[#9945FF] text-white font-bold hover:bg-[#7c37cc] transition"
               onClick={async () => {
                 setNoPasswordModal(false);
-                const res = await fetch("/api/auth/request-password", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email: noPasswordEmail }),
-                });
-                if (res.ok) {
-                  // Affiche un toast ou une modal de succès
-                } else {
-                  // Affiche une erreur
+                try {
+                  const res = await fetch("/api/auth/request-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: noPasswordEmail }),
+                  });
+                  
+                  if (res.ok) {
+                    toast.success("Password reset email sent!");
+                  } else {
+                    const data = await res.json();
+                    toast.error(data.message || "Failed to send reset email");
+                  }
+                } catch (error) {
+                  toast.error("Failed to send reset email");
                 }
               }}
             >

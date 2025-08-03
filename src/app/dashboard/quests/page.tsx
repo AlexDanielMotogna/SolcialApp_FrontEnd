@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";// ✅ REEMPLAZAR MockUser
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { LoadingBar, LoadingOverlay, ListLoadingSkeleton, LoadingSpinner } from "@/components/ui/LoadingBar";
-
 
 // Import Quest type
 import type { Quest } from "@/types/quest";
@@ -16,6 +14,7 @@ import { useQuests } from "@/hooks/useQuests";
 import { useUserQuests } from "@/hooks/useUserQuests";
 import { useSessionTimers } from "@/hooks/useSessionTimers";
 import { useQuestActions } from "@/hooks/useQuestActions";
+import { useAuthUser } from "@/hooks/useAuthUser"; // ✅ NEW SIMPLIFIED AUTH HOOK
 
 // Services
 import { questService } from "@/services/questService";
@@ -27,7 +26,6 @@ import {
   TWITTER_AUTH_MESSAGES,
   QUEST_MESSAGES,
 } from "@/constants/questConstants";
-
 
 // Components
 import QuestHeader from "@/components/quest/QuestHeader";
@@ -41,10 +39,10 @@ const QuestModals = dynamic(() => import("@/components/quest/QuestModals"), {
 
 const Quests = () => {
   // ============================================================================
-  // AUTHENTICATION - REEMPLAZAR MockUser CON SESIÓN REAL
+  // AUTHENTICATION - SIMPLIFIED WITH NEW HOOK
   // ============================================================================
-  const { data: session, status } = useSession(); // ✅ AUTENTICACIÓN REAL
-  const [user, setUser] = useState<any>(null); // ✅
+  const { user, isLoading: authLoading, isAuthenticated, isUnauthenticated, refreshUser } = useAuthUser();
+  
   // ============================================================================
   // CONTEXT & HOOKS
   // ============================================================================
@@ -69,7 +67,7 @@ const Quests = () => {
   // LOCAL STATE
   // ============================================================================
   const { userQuests, loadingUserQuests, refreshUserQuests } = useUserQuests(
-    user?.id // ✅ USAR USER REAL
+    user?.id 
   );
   const { startSessionTimer, stopSessionTimer } = useSessionTimers();
 
@@ -141,10 +139,10 @@ const Quests = () => {
     [modalType, selectedQuestId, closeModal, refreshAllData, stopSessionTimer]
   );
 
-  // ✅ USAR EL CUSTOM HOOK CON USUARIO REAL
+  // ✅ USE NEW SIMPLIFIED AUTH HOOK
   const { handleQuestCardClick, isExecutingQuest, loadingQuestId } =
     useQuestActions({
-      user, // ✅ USUARIO REAL
+      user, // ✅ SIMPLIFIED USER FROM SESSION
       walletAddress,
       isConnected,
       refreshAllData,
@@ -158,56 +156,21 @@ const Quests = () => {
     });
 
   // ============================================================================
-  // EFFECTS - OBTENER USUARIO REAL DE LA SESIÓN
-  // ============================================================================
-  useEffect(() => {
-    const fetchRealUser = async () => {
-      if (session?.user?.email && status === 'authenticated') {
-        try {
-          console.log('👤 Fetching real user data for:', session.user.email);
-          
-          // ✅ LLAMAR API PARA OBTENER USUARIO COMPLETO
-          const response = await fetch('/api/user/profile');
-          const result = await response.json();
-          
-          if (response.ok && result.success && result.user) {
-            setUser(result.user);
-            console.log('✅ Real user data loaded:', result.user.email);
-          } else {
-            console.error('❌ Failed to fetch user data:', result.error);
-          }
-        } catch (error) {
-          console.error('❌ Error fetching user data:', error);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    fetchRealUser();
-  }, [session, status]);
-
-  // ============================================================================
-  // WALLET SYNC EFFECT - SOLO SI HAY USUARIO REAL
+  // EFFECTS - SIMPLIFIED WALLET SYNC
   // ============================================================================
   useEffect(() => {
     const syncWallet = async () => {
-      if (session?.user && walletAddress && isConnected && user?.id) {
-        console.log('🔄 Auto-syncing wallet for real user:', session.user.email);
+      if (user && walletAddress && isConnected) {
+        console.log('🔄 Auto-syncing wallet for user:', user.email);
         console.log('🔄 Wallet address:', walletAddress);
         console.log('🔄 User ID:', user.id);
         
         try {
           await updateWalletInDB(walletAddress);
-          console.log('✅ Wallet sync completed for real user');
+          console.log('✅ Wallet sync completed');
           
-          // ✅ REFRESCAR DATOS DEL USUARIO DESPUÉS DEL SYNC
-          const response = await fetch('/api/user/profile');
-          const result = await response.json();
-          if (response.ok && result.success && result.user) {
-            setUser(result.user);
-            console.log('✅ User data refreshed after wallet sync');
-          }
+          // ✅ REFRESH USER SESSION AFTER WALLET SYNC
+          await refreshUser();
         } catch (error) {
           console.error('❌ Wallet sync failed:', error);
         }
@@ -216,7 +179,7 @@ const Quests = () => {
 
     const timeoutId = setTimeout(syncWallet, 1000);
     return () => clearTimeout(timeoutId);
-  }, [session, walletAddress, isConnected, user?.id, updateWalletInDB]);
+  }, [user, walletAddress, isConnected, updateWalletInDB, refreshUser]);
 
   // ============================================================================
   // TWITTER AUTH EFFECT
@@ -229,14 +192,8 @@ const Quests = () => {
       switch (twitterStatus) {
         case "success":
           toast.success(TWITTER_AUTH_MESSAGES.SUCCESS);
-          // ✅ REFRESCAR USUARIO REAL DESPUÉS DE TWITTER AUTH
-          if (session?.user?.email) {
-            const response = await fetch('/api/user/profile');
-            const result = await response.json();
-            if (response.ok && result.success && result.user) {
-              setUser(result.user);
-            }
-          }
+          // ✅ REFRESH USER SESSION AFTER TWITTER AUTH
+          await refreshUser();
           await refreshAllData();
           break;
         case "error":
@@ -256,7 +213,7 @@ const Quests = () => {
     };
 
     handleTwitterAuth();
-  }, [searchParams, router, session, refreshAllData]);
+  }, [searchParams, router, refreshUser, refreshAllData]);
 
   // ============================================================================
   // CLOCK EFFECT
@@ -267,9 +224,9 @@ const Quests = () => {
   }, []);
 
   // ============================================================================
-  // LOADING & AUTHENTICATION STATES
+  // LOADING & AUTHENTICATION STATES - SIMPLIFIED
   // ============================================================================
-  if (status === 'loading') {
+  if (authLoading) {
     return (
       <LoadingOverlay 
         show={true} 
@@ -279,7 +236,7 @@ const Quests = () => {
     );
   }
 
-  if (status === 'unauthenticated') {
+  if (isUnauthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -343,7 +300,7 @@ return (
             <QuestGrid
               quests={quests}
               userQuests={userQuests}
-              user={user} // ✅ USUARIO REAL
+              user={user} // ✅ SIMPLIFIED USER FROM SESSION
               loading={loading}
               loadingQuestId={loadingQuestId}
               isExecutingQuest={isExecutingQuest}
@@ -358,7 +315,7 @@ return (
                 return questUtils.getQuestButtonProps(
                   quest,
                   userQuest,
-                  user, // ✅ USUARIO REAL
+                  user, // ✅ SIMPLIFIED USER FROM SESSION
                   isLoading
                 );
               }}
@@ -395,7 +352,7 @@ return (
         modalType={modalType}
         selectedQuest={selectedQuest}
         selectedUserQuest={selectedUserQuest}
-        user={user} // ✅ USUARIO REAL
+        user={user} // ✅ SIMPLIFIED USER FROM SESSION
         loading={loading || loadingUserQuests}
         showConnectTwitterModal={showConnectTwitterModal}
         showExpirationModal={showExpirationModal}
