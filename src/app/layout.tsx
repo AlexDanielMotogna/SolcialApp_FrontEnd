@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders"; // ✅ IMPORT CLIENT WRAPPER
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,8 +24,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Ici, tu peux choisir la langue dynamiquement (ex: depuis le localStorage, cookie, etc.)
+  const locale = "en"; // ou "fr", à rendre dynamique plus tard
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* ✅ USAR CLIENT WRAPPER */}
         <ClientProviders>

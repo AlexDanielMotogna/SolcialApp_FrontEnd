@@ -17,12 +17,12 @@ export async function POST(req: NextRequest) {
   const avatarFile = formData.get("avatar");
 
   if (!username || !email || !password || !phone) {
-    return new Response(JSON.stringify({ msg: "Missing required fields" }), { status: 400 });
+    return new Response(JSON.stringify({ msg: "missing_required_fields" }), { status: 400 });
   }
 
   const existing = await AuthUser.findOne({ email });
   if (existing) {
-    return new Response(JSON.stringify({ msg: "User already exists" }), { status: 409 });
+    return new Response(JSON.stringify({ msg: "user_already_exists" }), { status: 409 });
   }
 
   const hashedPassword = await hashPassword(password);
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   });
 
   return new Response(JSON.stringify(
-    { status: "success", msg: "User registered. Please verify your email." }
+    { status: "success", msg: "user_registered_verify_email" }
   ), { status: 200 });
 }
 

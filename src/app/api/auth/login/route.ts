@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { email, password, totp } = body; // Ajoute totp ici
+    const { email, password, totp } = body;
 
     const user = await AuthUser.findOne({ email });
 
@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
 
     if (!user.isVerified) {
       return new Response(JSON.stringify({ msg: "Please verify your email address to login" }), { status: 409 });
+    }
+
+    // Cas où le password est null ou non défini
+    if (!user.password) {
+      return new Response(JSON.stringify({ status: "no_password", msg: "No password set for this account" }), { status: 403 });
     }
 
     const isMatch = await verifyPassword(password, user.password);
