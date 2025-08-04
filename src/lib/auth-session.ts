@@ -1,7 +1,7 @@
 // CREAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\lib\auth-session.ts
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/AuthUser";
 

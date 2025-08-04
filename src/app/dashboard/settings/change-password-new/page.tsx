@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import Image from "next/image";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Eye from "../../../../../public/imgs/eye.svg";
 import EyeSlash from "../../../../../public/imgs/eye-slash.svg";
 import Key from "../../../../../public/imgs/key.svg";
@@ -115,9 +115,14 @@ const ChangePasswordPage: React.FC = () => {
               <ArrowLeftIcon />
               Back to Settings
             </Link>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent mb-2">
-              Change Password
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] rounded-full flex items-center justify-center">
+                <Image src={Key} alt="key" width={20} height={20} />
+              </div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent">
+                Change Password
+              </h1>
+            </div>
             <p className="text-[#ACB5BB] text-lg">
               Update your account password to keep your account secure
             </p>
@@ -262,6 +267,29 @@ const ChangePasswordPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+
+          {/* Security Tips */}
+          <div className="mt-8 bg-[#161618] border border-[#2C2C30] rounded-2xl p-6">
+            <h3 className="text-white font-bold text-lg mb-4">Security Tips</h3>
+            <div className="space-y-3 text-[#ACB5BB]">
+              <div className="flex items-start gap-3">
+                <CheckIcon className="text-[#19F12F] mt-0.5 flex-shrink-0" />
+                <span>Use a unique password that you don't use elsewhere</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckIcon className="text-[#19F12F] mt-0.5 flex-shrink-0" />
+                <span>Include a mix of letters, numbers, and special characters</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckIcon className="text-[#19F12F] mt-0.5 flex-shrink-0" />
+                <span>Consider using a password manager to generate and store strong passwords</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckIcon className="text-[#19F12F] mt-0.5 flex-shrink-0" />
+                <span>Enable two-factor authentication for additional security</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

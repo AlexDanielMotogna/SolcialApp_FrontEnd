@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -6,7 +8,7 @@ interface PaginationProps {
   itemsPerPage: number;
 }
 
-const Pagination = ({
+const Pagination = memo(({
   currentPage,
   totalPages,
   onPageChange,
@@ -107,6 +109,8 @@ const Pagination = ({
       </div>
     </div>
   );
-};
+});
+
+Pagination.displayName = 'Pagination';
 
 export default Pagination;

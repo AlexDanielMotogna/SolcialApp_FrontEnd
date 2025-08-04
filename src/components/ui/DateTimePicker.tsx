@@ -304,14 +304,14 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   }, []);
 
   return (
-    <div className={`w-full flex flex-col gap-2 ${className}`}>
+    <div className={`w-full flex flex-col gap-4 ${className}`}>
       {/* ✅ HEADER SIMPLE */}
       <h6 className="text-[1.2rem] text-[#ACB5BB] font-medium flex items-center gap-2">
-        📅 {label} {required && <span className="text-red-400">*</span>}
+        {label} {required && <span className="text-red-400">*</span>}
       </h6>
 
       {/* ✅ DATE & TIME SELECTORS */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {/* DATE SELECTOR */}
         <div className="relative">
           <div

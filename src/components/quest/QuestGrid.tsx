@@ -1,3 +1,4 @@
+import { memo, useState, useEffect } from "react";
 import QuestCard from "../QuestCard";
 
 interface QuestGridProps {
@@ -7,22 +8,28 @@ interface QuestGridProps {
   loading: boolean;
   loadingQuestId: string | null;
   isExecutingQuest: boolean;
-  now: Date;
   onQuestClick: (quest: any) => void;
   getButtonProps: (quest: any) => { text: string; disabled: boolean };
 }
 
-const QuestGrid = ({
+const QuestGrid = memo(({
   quests,
   userQuests,
   user,
   loading,
   loadingQuestId,
   isExecutingQuest,
-  now,
   onQuestClick,
   getButtonProps,
 }: QuestGridProps) => {
+  // ✅ HANDLE TIME UPDATES INTERNALLY TO PREVENT PARENT RE-RENDERS
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    // ✅ UPDATE TIME ONLY EVERY 30 SECONDS FOR TIME-SENSITIVE DISPLAYS
+    const interval = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <>
       {/* Quest Grid */}
@@ -68,6 +75,8 @@ const QuestGrid = ({
       )}
     </>
   );
-};
+});
+
+QuestGrid.displayName = 'QuestGrid';
 
 export default QuestGrid;

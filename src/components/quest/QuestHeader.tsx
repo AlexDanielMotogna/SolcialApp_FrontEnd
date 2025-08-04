@@ -1,9 +1,11 @@
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonBlack from "../ButtonBlack";
 import ButtonBorder from "../ButtonBorder";
 import PowerShield from "../../../public/imgs/PowerShield.png";
 import Moneybag from "../../../public/imgs/Moneybag.png";
+import { formatDecimalForDisplay } from "@/utils/decimal";
 
 interface QuestHeaderProps {
   filters: Array<{ label: string; value: string }>;
@@ -14,7 +16,7 @@ interface QuestHeaderProps {
   rewardEarned: number;
 }
 
-const QuestHeader = ({
+const QuestHeader = memo(({
   filters,
   currentFilter,
   onFilterChange,
@@ -82,7 +84,7 @@ const QuestHeader = ({
           />
           <div className="flex flex-col items-start justify-start gap-1">
             <h3 className="text-white font-semibold text-[1.5rem]">
-              {rewardEarned}
+              {formatDecimalForDisplay(rewardEarned)}
             </h3>
             <span className="text-[1.1rem] text-[#ACB5BB]">Total Rewards</span>
           </div>
@@ -90,6 +92,8 @@ const QuestHeader = ({
       </div>
     </div>
   );
-};
+});
+
+QuestHeader.displayName = 'QuestHeader';
 
 export default QuestHeader;

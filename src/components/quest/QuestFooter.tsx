@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Pagination from "./Pagination";
 
 interface QuestFooterProps {
@@ -8,7 +9,7 @@ interface QuestFooterProps {
   itemsPerPage: number;
 }
 
-const QuestFooter = ({
+const QuestFooter = memo(({
   currentPage,
   totalPages,
   onPageChange,
@@ -35,6 +36,8 @@ const QuestFooter = ({
       </div>
     </footer>
   );
-};
+});
+
+QuestFooter.displayName = 'QuestFooter';
 
 export default QuestFooter;

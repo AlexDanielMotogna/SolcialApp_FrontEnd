@@ -1,7 +1,7 @@
 import InfoRow from "@/components/global/InfoRow";
 import Notification from "@/components/global/Notification";
 import TaskList from "@/components/global/TaskList";
-import RewardClaim from "@/components/modals/RewardClaim";
+import RewardSuccessModal from "@/components/ui/RewardSuccessModal";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import {
   getIncompleteRequiredTasks,
@@ -438,12 +438,14 @@ const QuestModal: React.FC<QuestModalProps> = ({
         </div>
       </div>
 
-      {/* Reward Claim Modal */}
-      <RewardClaim
+      {/* Reward Success Modal */}
+      <RewardSuccessModal
         isOpen={rewardModalOpen}
         onClose={() => setRewardModalOpen(false)}
-        amount={rewardPerUser}
-        token="SOL"
+        rewardAmount={rewardPerUser}
+        cryptoSymbol="solana"
+        cryptoTicker="SOL"
+        questName={quest.questName}
       />
     </>
   );

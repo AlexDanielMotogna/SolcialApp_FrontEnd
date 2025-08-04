@@ -29,9 +29,17 @@ export interface UserQuest {
 
 export interface User {
   id: string;
-  walletaddress: string;
-  hasTwitterAccess: boolean;
-  twitterUsername?: string;
+  email: string;
+  name: string;
+  walletaddress?: string; // ✅ Make optional to match AuthUser
+  hasTwitterAccess?: boolean; // ✅ Make optional to match AuthUser
+  isVerified?: boolean;
+  avatar?: string;
+  twitter_id?: string;
+  twitter_handle?: string;
+  twitterScreenName?: string;
+  twitterUserId?: string;
+  phone?: string;
   [key: string]: any;
 }
 

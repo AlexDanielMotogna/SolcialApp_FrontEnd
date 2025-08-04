@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import AuthUser from "@/models/AuthUser";
 import { hashPassword, comparePassword } from "@/lib/security-hash";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
