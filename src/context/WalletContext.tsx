@@ -1,7 +1,7 @@
 // MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\context\WalletContext.tsx
 
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import toast from "react-hot-toast";
 
@@ -139,8 +139,8 @@ export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({
     }
   };
 
-  // ✅ FUNCIÓN PARA GUARDAR EN BD (LLAMADA EXTERNAMENTE)
-  const updateWalletInDB = async (address: string) => {
+  // ✅ FUNCIÓN PARA GUARDAR EN BD (LLAMADA EXTERNAMENTE) - MEMOIZED
+  const updateWalletInDB = useCallback(async (address: string) => {
     try {
       console.log('💾 Sending wallet to database:', address);
       
@@ -230,7 +230,7 @@ export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({
       }
       toast.error('Connection error. Please try again');
     }
-  };
+  }, []); // ✅ NO DEPENDENCIES NEEDED - FUNCTION IS STABLE
 
   // ✅ FUNCIÓN PARA DESCONECTAR
   const disconnect = async () => {

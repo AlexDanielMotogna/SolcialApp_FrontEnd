@@ -7,6 +7,17 @@ import { useEffect, useState } from "react";
 import { useSession } from 'next-auth/react';
 import toast from "react-hot-toast";
 
+// ✅ CUSTOM STYLES FOR SMOOTH ANIMATIONS
+const customStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+`;
+
 // ============================================================================
 // COMPONENTS IMPORTS
 // ============================================================================
@@ -51,16 +62,27 @@ const QuestAccount = () => {
   const [selectedQuest, setSelectedQuest] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   
-  // ✅ LOADING STATES MEJORADOS
+  // ✅ LOADING STATES MEJORADOS CON LAZY LOADING
   const [loading, setLoading] = useState(false);
-  const [loadingCreated, setLoadingCreated] = useState(false);
-  const [loadingCompleted, setLoadingCompleted] = useState(false);
+  const [loadingCreated, setLoadingCreated] = useState(true); // ✅ START WITH TRUE FOR SMOOTH TRANSITION
+  const [loadingCompleted, setLoadingCompleted] = useState(true); // ✅ START WITH TRUE FOR SMOOTH TRANSITION
   const [loadingAction, setLoadingAction] = useState(false);
   const [actionText, setActionText] = useState('');
+  const [minLoadingTime, setMinLoadingTime] = useState(true); // ✅ MINIMUM LOADING TIME FOR SMOOTH TRANSITION
 
   // ============================================================================
-  // EFFECTS
+  // EFFECTS CON LAZY LOADING
   // ============================================================================
+  
+  // ✅ MINIMUM LOADING TIME EFFECT (PREVENT TOO FAST TRANSITIONS)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingTime(false);
+    }, 1500); // ✅ MINIMUM 1.5 SECONDS FOR SMOOTH TRANSITION
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const fetchRealUser = async () => {
       if (session?.user?.email && status === 'authenticated') {
@@ -91,16 +113,19 @@ const QuestAccount = () => {
   }, [session, status]);
 
   // ============================================================================
-  // API FUNCTIONS CON LOADING MEJORADO
+  // API FUNCTIONS CON LAZY LOADING MEJORADO
   // ============================================================================
   const fetchCompletedUserQuests = async (userId: string) => {
     try {
       setLoadingCompleted(true);
       console.log('📊 [Account] Fetching completed quests for user:', userId);
       
-      const response = await fetch(
-        `/api/user-quests/completed?userId=${userId}`
-      );
+      // ✅ SIMULATE MINIMUM LOADING TIME FOR SMOOTH UX
+      const [response] = await Promise.all([
+        fetch(`/api/user-quests/completed?userId=${userId}`),
+        new Promise(resolve => setTimeout(resolve, 800)) // ✅ MINIMUM 800ms DELAY
+      ]);
+      
       const data = await response.json();
 
       if (!response.ok) {
@@ -126,13 +151,19 @@ const QuestAccount = () => {
     }
 
     try {
-      setLoadingCreated(true);
-      setLoadingCompleted(true);
+      // ✅ DON'T SET LOADING TO TRUE IF IT'S ALREADY LOADING (SMOOTH TRANSITION)
+      if (!loadingCreated) setLoadingCreated(true);
+      if (!loadingCompleted) setLoadingCompleted(true);
+      
       console.log('🔄 [Account] Refreshing quests for user:', user.id);
       
+      // ✅ ADD MINIMUM LOADING TIME FOR SMOOTH TRANSITIONS
       const [created, completedUserQuests] = await Promise.all([
-        fetchCreatedQuests(user.id),
-        fetchCompletedUserQuests(user.id),
+        Promise.all([
+          fetchCreatedQuests(user.id),
+          new Promise(resolve => setTimeout(resolve, 600)) // ✅ MINIMUM 600ms FOR CREATED QUESTS
+        ]).then(([result]) => result),
+        fetchCompletedUserQuests(user.id), // ✅ ALREADY HAS ITS OWN DELAY
       ]);
 
       setCreatedQuests(created);
@@ -152,11 +183,11 @@ const QuestAccount = () => {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || minLoadingTime) return; // ✅ WAIT FOR MINIMUM LOADING TIME
     
-    console.log('🚀 [Account] User loaded, refreshing quests...');
+    console.log('🚀 [Account] User loaded and minimum time passed, refreshing quests...');
     refreshQuests();
-  }, [user?.id]);
+  }, [user?.id, minLoadingTime]); // ✅ DEPEND ON BOTH USER AND MINIMUM TIME
 
   // ============================================================================
   // EVENT HANDLERS CON LOADING
@@ -275,15 +306,27 @@ const QuestAccount = () => {
   const closeCancelModal = () => setShowCancelModal(false);
 
   // ============================================================================
-  // LOADING & AUTHENTICATION STATES CON LOADING ÉPICO
+  // LOADING & AUTHENTICATION STATES CON SMOOTH TRANSITION
   // ============================================================================
   if (status === 'loading') {
     return (
-      <LoadingOverlay 
-        show={true} 
-        text="Initializing your account dashboard..." 
-        variant="spinner" 
-      />
+      <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
+        {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
+        <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
+          <div className="group">
+            <ButtonBlack
+              text="← Back to Quests"
+              onClick={() => window.history.back()}
+            />
+          </div>
+        </div>
+        
+        <LoadingOverlay 
+          show={true} 
+          text="Initializing your account dashboard..." 
+          variant="spinner" 
+        />
+      </div>
     );
   }
 
@@ -300,32 +343,35 @@ const QuestAccount = () => {
 
   if (!user) {
     return (
-      <LoadingOverlay 
-        show={true} 
-        text="Loading your profile data..." 
-        variant="bar" 
-      />
+      <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
+        {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
+        <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
+          <div className="group">
+            <ButtonBlack
+              text="← Back to Quests"
+              onClick={() => window.history.back()}
+            />
+          </div>
+        </div>
+        
+        <LoadingOverlay 
+          show={true} 
+          text="Loading your profile data..." 
+          variant="bar" 
+        />
+      </div>
     );
   }
 
   // ============================================================================
-  // RENDER CON LOADING ÉPICO
+  // RENDER CON LAZY LOADING ÉPICO
   // ============================================================================
   return (
     <>
+      {/* ✅ INJECT CUSTOM STYLES */}
+      <style>{customStyles}</style>
+      
       <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
-        
-        {/* ✅ LOADING BAR GENERAL MEJORADO */}
-        {(loadingCreated || loadingCompleted) && (
-          <div className="w-full max-w-6xl mb-6">
-            <LoadingBar 
-              variant="primary" 
-              size="md" 
-              text="⚡ Syncing your epic quest data..." 
-              className="animate-slideInUp shadow-lg shadow-purple-500/20"
-            />
-          </div>
-        )}
 
         {/* ✅ BACK BUTTON MEJORADO */}
         <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
@@ -362,13 +408,13 @@ const QuestAccount = () => {
           </div>
         )}
 
-        {/* ✅ SKELETON TABLE O CONTENIDO REAL */}
-        {loadingCreated ? (
-          <div className="w-full max-w-6xl mx-auto">
+        {/* ✅ SKELETON TABLE O CONTENIDO REAL CON TRANSICIÓN SUAVE */}
+        {loadingCreated || minLoadingTime ? (
+          <div className="mx-auto opacity-100 transition-opacity duration-500">
           <CreatedQuestsTableSkeleton rows={5} />
           </div>
         ) : (
-          <div className="mx-auto transition-all duration-500 animate-slideInUp">
+          <div className="mx-auto transition-all duration-700 animate-slideInUp opacity-0 animate-fadeIn">
             <MyCreatedQuestsCard
               quests={createdQuests}
               onEdit={handleEdit}
@@ -402,11 +448,13 @@ const QuestAccount = () => {
           </div>
         )}
 
-        {/* ✅ SKELETON TABLE O CONTENIDO REAL */}
-        {loadingCompleted ? (
-          <CompletedQuestsTableSkeleton rows={3} />
+        {/* ✅ SKELETON TABLE O CONTENIDO REAL CON TRANSICIÓN SUAVE */}
+        {loadingCompleted || minLoadingTime ? (
+          <div className="opacity-100 transition-opacity duration-500">
+            <CompletedQuestsTableSkeleton rows={3} />
+          </div>
         ) : (
-          <div className="transition-all duration-500 animate-slideInUp">
+          <div className="transition-all duration-700 animate-slideInUp opacity-0 animate-fadeIn">
             <CompletedQuestsCard
               userQuests={completedUserQuests}
               onClaim={handleClaimReward}

@@ -5,6 +5,17 @@ import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { LoadingBar, LoadingOverlay, ListLoadingSkeleton, LoadingSpinner } from "@/components/ui/LoadingBar";
 
+// ✅ CUSTOM STYLES FOR SMOOTH ANIMATIONS
+const customStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+`;
+
 // Import Quest type
 import type { Quest } from "@/types/quest";
 
@@ -53,6 +64,8 @@ const Quests = () => {
   const {
     quests,
     loading,
+    filterLoading, // ✅ NEW: SPECIFIC LOADING FOR FILTERS
+    pageLoading, // ✅ NEW: SPECIFIC LOADING FOR PAGINATION
     currentPage,
     totalPages,
     totalCount,
@@ -78,7 +91,10 @@ const Quests = () => {
   const [showConnectTwitterModal, setShowConnectTwitterModal] = useState(false);
   const [showExpirationModal, setShowExpirationModal] = useState(false);
   const [expiredQuestName, setExpiredQuestName] = useState<string>("");
-  const [now, setNow] = useState(new Date());
+  // ✅ ADD WALLET SYNC STATE TO PREVENT INFINITE LOOPS
+  const [lastSyncedWallet, setLastSyncedWallet] = useState<string | null>(null);
+  // ✅ ADD MINIMUM LOADING TIME FOR SMOOTH TRANSITIONS
+  const [minLoadingTime, setMinLoadingTime] = useState(true);
 
   // ============================================================================
   // MEMOIZED VALUES
@@ -155,31 +171,62 @@ const Quests = () => {
       handleSessionExpiration,
     });
 
+  // ✅ MEMOIZE BUTTON PROPS FUNCTION TO PREVENT UNNECESSARY RE-RENDERS
+  const getButtonPropsCallback = useCallback((quest: any) => {
+    const userQuest = userQuests.find((uq) => uq.questId === quest._id);
+    const isLoading = loadingQuestId === quest._id && isExecutingQuest;
+    return questUtils.getQuestButtonProps(quest, userQuest, user, isLoading);
+  }, [userQuests, loadingQuestId, isExecutingQuest, user]);
+
   // ============================================================================
-  // EFFECTS - SIMPLIFIED WALLET SYNC
+  // EFFECTS - OPTIMIZED WALLET SYNC WITH LAZY LOADING
   // ============================================================================
+  
+  // ✅ MINIMUM LOADING TIME EFFECT (PREVENT TOO FAST TRANSITIONS)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingTime(false);
+    }, 1200); // ✅ MINIMUM 1.2 SECONDS FOR SMOOTH TRANSITION
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const syncWallet = async () => {
-      if (user && walletAddress && isConnected) {
-        console.log('🔄 Auto-syncing wallet for user:', user.email);
-        console.log('🔄 Wallet address:', walletAddress);
-        console.log('🔄 User ID:', user.id);
+      // ✅ ONLY SYNC IF WALLET CHANGED AND WE HAVEN'T ALREADY SYNCED IT
+      if (
+        user && 
+        walletAddress && 
+        isConnected && 
+        user.walletaddress !== walletAddress &&
+        lastSyncedWallet !== walletAddress
+      ) {
+        console.log('🔄 Syncing new wallet for user:', user.email);
+        console.log('🔄 Current wallet:', user.walletaddress);
+        console.log('🔄 New wallet:', walletAddress);
         
         try {
           await updateWalletInDB(walletAddress);
+          setLastSyncedWallet(walletAddress);
           console.log('✅ Wallet sync completed');
           
-          // ✅ REFRESH USER SESSION AFTER WALLET SYNC
-          await refreshUser();
+          // ✅ DON'T CALL refreshUser() - IT CREATES INFINITE LOOP
+          // The session will be updated on next navigation or manual refresh
         } catch (error) {
           console.error('❌ Wallet sync failed:', error);
         }
       }
     };
 
-    const timeoutId = setTimeout(syncWallet, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [user, walletAddress, isConnected, updateWalletInDB, refreshUser]);
+    syncWallet();
+  }, [user?.id, walletAddress, isConnected, user?.walletaddress, lastSyncedWallet]); // ✅ REMOVED updateWalletInDB - IT'S NOW STABLE
+
+  // ✅ RESET SYNC STATE WHEN USER CHANGES
+  useEffect(() => {
+    if (user?.walletaddress) {
+      setLastSyncedWallet(user.walletaddress);
+    }
+  }, [user?.id]);
 
   // ============================================================================
   // TWITTER AUTH EFFECT
@@ -216,23 +263,30 @@ const Quests = () => {
   }, [searchParams, router, refreshUser, refreshAllData]);
 
   // ============================================================================
-  // CLOCK EFFECT
-  // ============================================================================
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ============================================================================
-  // LOADING & AUTHENTICATION STATES - SIMPLIFIED
+  // LOADING & AUTHENTICATION STATES WITH SMOOTH TRANSITIONS
   // ============================================================================
   if (authLoading) {
     return (
-      <LoadingOverlay 
-        show={true} 
-        text="Initializing your quest dashboard..." 
-        variant="spinner" 
-      />
+      <>
+        <style>{customStyles}</style>
+        <div className="min-h-screen flex flex-col">
+          <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
+            {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
+            <div className="w-full mb-4">
+              <LoadingBar 
+                variant="primary" 
+                size="md" 
+                text="Initializing your quest dashboard..." 
+                className="animate-slideInUp"
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <ListLoadingSkeleton items={6} />
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -249,130 +303,128 @@ const Quests = () => {
 
   if (!user) {
     return (
-      <LoadingOverlay 
-        show={true} 
-        text="Loading your profile data..." 
-        variant="bar" 
-      />
+      <>
+        <style>{customStyles}</style>
+        <div className="min-h-screen flex flex-col">
+          <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
+            {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
+            <div className="w-full mb-4">
+              <LoadingBar 
+                variant="primary" 
+                size="md" 
+                text="Loading your profile data..." 
+                className="animate-slideInUp"
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <ListLoadingSkeleton items={6} />
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
   // ============================================================================
-  // RENDER
+  // RENDER WITH SMOOTH LAZY LOADING
   // ============================================================================
 return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
-        
-        {/* ✅ LOADING BAR EN EL HEADER */}
-        {loading && (
-          <div className="w-full mb-4">
-            <LoadingBar 
-              variant="primary" 
-              size="md" 
-              text="Loading quests..." 
-              className="animate-slideInUp"
-            />
-          </div>
-        )}
+    <>
+      {/* ✅ INJECT CUSTOM STYLES */}
+      <style>{customStyles}</style>
+      
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
 
-        <QuestHeader
-          filters={QUEST_FILTERS}
-          currentFilter={filter}
-          onFilterChange={handleFilterChange}
-          onCreateQuest={() => openModal("CreateQuest")}
-          questsCompleted={questsCompleted}
-          rewardEarned={rewardEarned}
+
+          <QuestHeader
+            filters={QUEST_FILTERS}
+            currentFilter={filter}
+            onFilterChange={handleFilterChange}
+            onCreateQuest={() => openModal("CreateQuest")}
+            questsCompleted={questsCompleted}
+            rewardEarned={rewardEarned}
+          />
+
+          <div className="flex-1 w-full">
+            {/* ✅ SKELETON LOADING WITH SMOOTH TRANSITIONS */}
+            {loading || minLoadingTime ? (
+              <div className="space-y-4 opacity-100 transition-opacity duration-500">
+                <LoadingBar 
+                  variant="secondary" 
+                  size="lg" 
+                  text="Fetching your epic quests..." 
+                  className="mb-6"
+                />
+                <ListLoadingSkeleton items={questsPerPage} />
+              </div>
+            ) : (
+              <div className="opacity-0 animate-fadeIn">
+                <QuestGrid
+                  quests={quests}
+                  userQuests={userQuests}
+                  user={user} // ✅ SIMPLIFIED USER FROM SESSION
+                  loading={loading}
+                  loadingQuestId={loadingQuestId}
+                  isExecutingQuest={isExecutingQuest}
+                  onQuestClick={handleQuestCardClick}
+                  getButtonProps={getButtonPropsCallback} // ✅ USE MEMOIZED FUNCTION
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ✅ LOADING OVERLAY PARA QUEST ACTIONS */}
+        <LoadingOverlay 
+          show={isExecutingQuest} 
+          text="Processing your quest action..." 
+          variant="dots" 
+          blur={true}
         />
 
-        <div className="flex-1 w-full">
-          {/* ✅ SKELETON LOADING PARA QUEST GRID */}
-          {loading ? (
-            <div className="space-y-4">
-              <LoadingBar 
-                variant="secondary" 
-                size="lg" 
-                text="Fetching your epic quests..." 
-                className="mb-6"
-              />
-              <ListLoadingSkeleton items={questsPerPage} />
-            </div>
-          ) : (
-            <QuestGrid
-              quests={quests}
-              userQuests={userQuests}
-              user={user} // ✅ SIMPLIFIED USER FROM SESSION
-              loading={loading}
-              loadingQuestId={loadingQuestId}
-              isExecutingQuest={isExecutingQuest}
-              now={now}
-              onQuestClick={handleQuestCardClick}
-              getButtonProps={(quest) => {
-                const userQuest = userQuests.find(
-                  (uq) => uq.questId === quest._id
-                );
-                const isLoading =
-                  loadingQuestId === quest._id && isExecutingQuest;
-                return questUtils.getQuestButtonProps(
-                  quest,
-                  userQuest,
-                  user, // ✅ SIMPLIFIED USER FROM SESSION
-                  isLoading
-                );
-              }}
-            />
-          )}
-        </div>
+        {/* ✅ LOADING OVERLAY PARA USER QUESTS */}
+        <LoadingOverlay 
+          show={loadingUserQuests && !loading} 
+          text="Syncing your quest progress..." 
+          variant="spinner" 
+          blur={false}
+        />
+
+        <QuestFooter
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalCount={totalCount}
+          itemsPerPage={questsPerPage}
+        />
+
+        <QuestModals
+          modalType={modalType}
+          selectedQuest={selectedQuest}
+          selectedUserQuest={selectedUserQuest}
+          user={user} // ✅ SIMPLIFIED USER FROM SESSION
+          loading={loading || loadingUserQuests}
+          showConnectTwitterModal={showConnectTwitterModal}
+          showExpirationModal={showExpirationModal}
+          expiredQuestName={expiredQuestName}
+          isExecutingQuest={isExecutingQuest}
+          onCloseModal={closeModal}
+          onCloseTwitterModal={() => setShowConnectTwitterModal(false)}
+          onCloseExpirationModal={() => {
+            setShowExpirationModal(false);
+            setExpiredQuestName("");
+          }}
+          onSessionExpired={(questName) => {
+            setExpiredQuestName(questName);
+            setShowExpirationModal(true);
+          }}
+          onQuestCompleted={stopSessionTimer}
+          onRefreshData={refreshAllData}
+          onRefreshQuests={refreshQuests}
+        />
       </div>
-
-      {/* ✅ LOADING OVERLAY PARA QUEST ACTIONS */}
-      <LoadingOverlay 
-        show={isExecutingQuest} 
-        text="Processing your quest action..." 
-        variant="dots" 
-        blur={true}
-      />
-
-      {/* ✅ LOADING OVERLAY PARA USER QUESTS */}
-      <LoadingOverlay 
-        show={loadingUserQuests && !loading} 
-        text="Syncing your quest progress..." 
-        variant="spinner" 
-        blur={false}
-      />
-
-      <QuestFooter
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        totalCount={totalCount}
-        itemsPerPage={questsPerPage}
-      />
-
-      <QuestModals
-        modalType={modalType}
-        selectedQuest={selectedQuest}
-        selectedUserQuest={selectedUserQuest}
-        user={user} // ✅ SIMPLIFIED USER FROM SESSION
-        loading={loading || loadingUserQuests}
-        showConnectTwitterModal={showConnectTwitterModal}
-        showExpirationModal={showExpirationModal}
-        expiredQuestName={expiredQuestName}
-        isExecutingQuest={isExecutingQuest}
-        onCloseModal={closeModal}
-        onCloseTwitterModal={() => setShowConnectTwitterModal(false)}
-        onCloseExpirationModal={() => {
-          setShowExpirationModal(false);
-          setExpiredQuestName("");
-        }}
-        onSessionExpired={(questName) => {
-          setExpiredQuestName(questName);
-          setShowExpirationModal(true);
-        }}
-        onQuestCompleted={stopSessionTimer}
-        onRefreshData={refreshAllData}
-        onRefreshQuests={refreshQuests}
-      />
-    </div>
+    </>
   );
 }
 

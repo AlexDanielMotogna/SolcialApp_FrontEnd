@@ -4,133 +4,194 @@
 import React from 'react';
 
 // ============================================================================
-// SKELETON PARA CREATED QUESTS TABLE
+// SKELETON PARA CREATED QUESTS TABLE - MATCH EXACT STRUCTURE
 // ============================================================================
 export const CreatedQuestsTableSkeleton: React.FC<{ rows?: number }> = ({ rows = 5 }) => {
   return (
-    <div className="w-full max-w-6xl mx-auto bg-[#1E1E20] border border-[#2C2C30] rounded-2xl overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#2C2C30] to-[#44444A] p-6">
-        <div className="h-8 bg-gradient-to-r from-[#44444A] to-[#6C7278] rounded w-64 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-        </div>
-      </div>
+    <div className="bg-[#18181C] rounded-2xl p-10 mb-28 shadow-lg w-full max-w-6xl min-w-[1400px] overflow-x-auto">
+      <table className="w-full text-left text-xl min-w-[1100px]">
+        {/* Table Header - EXACT MATCH */}
+        <thead>
+          <tr className="text-[#ACB5BB] text-2xl">
+            <th className="py-5 px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-14 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-20 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-32 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-28 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-24 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+          </tr>
+        </thead>
 
-      {/* Table Header */}
-      <div className="grid grid-cols-7 gap-4 p-4 border-b border-[#2C2C30] bg-[#18181C]">
-        {['Quest', 'Status', 'Start Date', 'Current Participants', 'Max Participants', 'Reward Pool', 'Actions'].map((_, index) => (
-          <div key={index} className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-        ))}
-      </div>
+        {/* Table Body - EXACT MATCH */}
+        <tbody>
+          {Array.from({ length: rows }).map((_, rowIndex) => (
+            <tr key={rowIndex} className="border-t border-[#23232A] text-white text-xl">
+              {/* Quest Name */}
+              <td className="py-6 px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-40 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-      {/* Table Rows */}
-      {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="grid grid-cols-7 gap-4 p-4 border-b border-[#2C2C30] last:border-b-0 hover:bg-[#1A1A1C] transition-colors">
-          {/* Quest Name */}
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-gradient-to-r from-purple-500/50 to-blue-500/50 rounded-full animate-pulse" />
-            <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-32 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-            </div>
-          </div>
+              {/* Status Badge */}
+              <td className="px-4">
+                <div className="h-8 bg-gradient-to-r from-green-600/30 to-green-500/20 rounded w-20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Status Badge */}
-          <div className="h-6 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded-full w-20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Start Date */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-24 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Start Date */}
-          <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-24 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Current Participants */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-8 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Current Participants */}
-          <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Max Participants */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-8 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Max Participants */}
-          <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Reward Pool */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Reward Pool */}
-          <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-16 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-
-          {/* Actions */}
-          <div className="flex space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-            </div>
-            <div className="w-8 h-8 bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-            </div>
-          </div>
-        </div>
-      ))}
+              {/* Actions - Settings Button */}
+              <td className="px-4 flex items-center justify-center relative">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#23232A] to-[#2C2C30] rounded-full relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
 // ============================================================================
-// SKELETON PARA COMPLETED QUESTS TABLE
+// SKELETON PARA COMPLETED QUESTS TABLE - MATCH EXACT STRUCTURE
 // ============================================================================
 export const CompletedQuestsTableSkeleton: React.FC<{ rows?: number }> = ({ rows = 3 }) => {
   return (
-     <div className="w-full max-w-6xl mx-auto bg-[#1E1E20] border border-[#2C2C30] rounded-2xl overflow-hidden">
-      {/* resto del código igual */}
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#2C2C30] to-[#44444A] p-6">
-        <div className="h-8 bg-gradient-to-r from-[#44444A] to-[#6C7278] rounded w-64 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-        </div>
-      </div>
+    <div className="w-full bg-[#18181C] rounded-2xl p-10 shadow-lg w-full max-w-6xl min-w-[1400px] overflow-x-auto">
+      <table className="w-full text-left text-xl min-w-[1100px]">
+        {/* Table Header - EXACT MATCH */}
+        <thead>
+          <tr className="text-[#ACB5BB] text-2xl">
+            <th className="py-5 px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-24 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-28 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-14 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+            <th className="px-4">
+              <div className="h-6 bg-gradient-to-r from-[#ACB5BB]/20 to-[#ACB5BB]/10 rounded w-24 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+              </div>
+            </th>
+          </tr>
+        </thead>
 
-      {/* Table Header */}
-      <div className="grid grid-cols-5 gap-4 p-4 border-b border-[#2C2C30] bg-[#18181C]">
-        {['Quest Title', 'Enrolled Date', 'Reward', 'Status', 'Claim Status'].map((_, index) => (
-          <div key={index} className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-        ))}
-      </div>
+        {/* Table Body - EXACT MATCH */}
+        <tbody>
+          {Array.from({ length: rows }).map((_, rowIndex) => (
+            <tr key={rowIndex} className="border-t border-[#23232A] text-white text-xl">
+              {/* Quest Title with Trophy Icon */}
+              <td className="py-6 px-4 flex items-center gap-3">
+                <span className="text-3xl">🏆</span>
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-32 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-      {/* Table Rows */}
-      {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="grid grid-cols-5 gap-4 p-4 border-b border-[#2C2C30] last:border-b-0 hover:bg-[#1A1A1C] transition-colors">
-          {/* Quest Title */}
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-gradient-to-r from-yellow-500/50 to-orange-500/50 rounded-full animate-pulse" />
-            <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-24 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-            </div>
-          </div>
+              {/* Enrolled Date */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-24 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Enrolled Date */}
-          <div className="h-4 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-28 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Reward - Purple color like real component */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-[#9945FF]/30 to-[#9945FF]/20 rounded w-20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Reward */}
-          <div className="h-4 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded w-20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
+              {/* Status - Green "Completed" */}
+              <td className="px-4">
+                <div className="h-5 bg-gradient-to-r from-green-400/30 to-green-400/20 rounded w-20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
 
-          {/* Status */}
-          <div className="h-6 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-full w-24 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-
-          {/* Claim Status */}
-          <div className="h-8 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg w-32 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-        </div>
-      ))}
+              {/* Claim Status - Button or Claimed status */}
+              <td className="px-4">
+                <div className="h-10 bg-gradient-to-r from-[#2C2C30] to-[#44444A] rounded w-28 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 // REEMPLAZAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\components\QuestCard.tsx
 
+import { memo } from "react";
 import {
   formatLocalDate,
   getEndInColor,
@@ -295,7 +296,7 @@ const QuestAction: React.FC<{
 // MAIN COMPONENT
 // ============================================================================
 
-const QuestCard: React.FC<QuestCardProps> = ({
+const QuestCard: React.FC<QuestCardProps> = memo(({
   quest,
   user,
   userQuest,
@@ -327,6 +328,8 @@ const QuestCard: React.FC<QuestCardProps> = ({
       />
     </div>
   );
-};
+});
+
+QuestCard.displayName = 'QuestCard';
 
 export default QuestCard;

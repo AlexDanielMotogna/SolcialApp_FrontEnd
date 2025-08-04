@@ -294,7 +294,7 @@ const TaskSelector: React.FC<TaskSelectorProps> = ({
 
   return (
     <div
-      className={`w-full flex flex-col items-start justify-start gap-2 ${className}`}
+      className={`w-full flex flex-col items-start justify-start gap-4 ${className}`}
     >
       {/* ✅ HEADER ÉPICO */}
       <div className="flex items-center gap-3 mb-2">
