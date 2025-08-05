@@ -26,6 +26,11 @@ export const authOptions: AuthOptions = {
             throw new Error("User not found");
           }
 
+          // Check if user is verified
+          if (!user.isVerified) {
+            throw new Error("not_verified");
+          }
+
           // Check if user has no password (OAuth user trying to set password)
           if (!user.password) {
             throw new Error("no_password");
