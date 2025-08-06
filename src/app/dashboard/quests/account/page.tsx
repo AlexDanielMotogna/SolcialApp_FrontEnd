@@ -7,17 +7,6 @@ import { useEffect, useState } from "react";
 import { useSession } from 'next-auth/react';
 import toast from "react-hot-toast";
 
-// ✅ CUSTOM STYLES FOR SMOOTH ANIMATIONS
-const customStyles = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-`;
-
 // ============================================================================
 // COMPONENTS IMPORTS
 // ============================================================================
@@ -353,25 +342,18 @@ const QuestAccount = () => {
             />
           </div>
         </div>
-        
-        <LoadingOverlay 
-          show={true} 
-          text="Loading your profile data..." 
-          variant="bar" 
-        />
       </div>
     );
   }
 
   // ============================================================================
-  // RENDER CON LAZY LOADING ÉPICO
+  // RENDER CON LOADING ÉPICO
   // ============================================================================
   return (
     <>
-      {/* ✅ INJECT CUSTOM STYLES */}
-      <style>{customStyles}</style>
-      
       <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
+        
+
 
         {/* ✅ BACK BUTTON MEJORADO */}
         <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">

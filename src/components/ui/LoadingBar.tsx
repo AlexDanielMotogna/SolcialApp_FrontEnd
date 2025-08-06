@@ -179,33 +179,64 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   if (!show) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center ${
-      blur ? 'backdrop-blur-sm' : ''
-    } bg-black/60`}>
-      <div className="bg-[#161618] p-8 rounded-2xl border border-[#44444A] shadow-2xl max-w-sm w-full mx-4">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
+      blur ? 'backdrop-blur-[8px]' : ''
+    } bg-white/10`}>
+      <style>{`
+        @keyframes overlayFadeIn {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes dotPulse {
+          0%, 100% { box-shadow: 0 0 0 0 #9945FF88; opacity: 0.7; }
+          50% { box-shadow: 0 0 12px 4px #9945FFcc; opacity: 1; }
+        }
+        @keyframes glassGlow {
+          0%, 100% { box-shadow: 0 0 24px 0 #9945FF44; }
+          50% { box-shadow: 0 0 48px 8px #9945FF99; }
+        }
+      `}</style>
+      <div
+        className="bg-white/20 backdrop-blur-[16px] border border-white/30 shadow-2xl rounded-3xl max-w-sm w-full mx-4 p-10 flex flex-col items-center animate-[overlayFadeIn_0.4s_ease]"
+        style={{
+          boxShadow: '0 8px 40px 0 #9945FF33, 0 1.5px 8px 0 #0002',
+          border: '1.5px solid rgba(255,255,255,0.18)',
+          animation: 'glassGlow 2.2s ease-in-out infinite',
+        }}
+      >
         {variant === 'spinner' && (
-          <LoadingSpinner size="lg" text={text} />
+          <div className="flex flex-col items-center gap-6">
+            <div className="relative flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full border-4 border-t-4 border-t-[#9945FF] border-b-[#14F195] border-l-[#9945FF] border-r-[#14F195] animate-spin shadow-[0_0_24px_0_#9945FF88]" />
+            </div>
+            <p className="text-white text-center font-bold text-lg tracking-wide drop-shadow-md animate-pulse">
+              {text}
+            </p>
+          </div>
         )}
-        
+
         {variant === 'bar' && (
-          <LoadingBar size="lg" text={text} />
+          <div className="w-full">
+            <LoadingBar size="lg" text={text} />
+          </div>
         )}
-        
+
         {variant === 'dots' && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex gap-2">
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex gap-3 mt-2 mb-2">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-4 h-4 bg-[#9945FF] rounded-full animate-bounce"
+                  className="w-5 h-5 rounded-full bg-gradient-to-br from-[#9945FF] to-[#14F195] shadow-lg"
                   style={{
-                    animationDelay: `${i * 0.1}s`,
-                    animationDuration: '0.6s'
+                    animation: `dotPulse 1.1s ${i * 0.18}s infinite`,
                   }}
                 />
               ))}
             </div>
-            <p className="text-white text-center font-medium">{text}</p>
+            <p className="text-white text-center font-bold text-lg tracking-wide drop-shadow-md animate-pulse">
+              {text}
+            </p>
           </div>
         )}
       </div>

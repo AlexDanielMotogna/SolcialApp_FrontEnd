@@ -9,6 +9,9 @@ interface SuccessModalProps {
   onClose: () => void;
   questName: string;
   className?: string;
+  title?: string;
+  successMessage?: string;
+  infoMessage?: string;
 }
 
 // ============================================================================
@@ -49,7 +52,10 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
   isOpen, 
   onClose, 
   questName,
-  className = "" 
+  className = "",
+  title = "Quest Created Successfully!",
+  successMessage = "Quest Successfully Created!",
+  infoMessage = "Your quest is now live and visible to all community members. Participants can start engaging immediately!"
 }) => {
   const [showEffects, setShowEffects] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -121,7 +127,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
 
         {/* ✅ SUCCESS TITLE */}
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent mb-4 text-center">
-          Quest Created Successfully!
+          {title}
         </h2>
 
         {/* ✅ QUEST INFO CARD */}
@@ -172,10 +178,10 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
         <div className="bg-[#19F12F]/10 border border-[#19F12F]/20 rounded-xl p-4 mb-6 w-full">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">🎉</span>
-            <span className="text-[#19F12F] font-semibold text-xl">Quest Successfully Created!</span>
+            <span className="text-[#19F12F] font-semibold text-xl">{successMessage}</span>
           </div>
           <p className="text-[#ACB5BB] text-base">
-            Your quest is now live and visible to all community members. Participants can start engaging immediately!
+            {infoMessage}
           </p>
         </div>
 
