@@ -11,17 +11,14 @@ export default function Home() {
       <Link href="/reset-password" className="link-style">
         2. Reset Password
       </Link>
-      <Link href="/reset-success" className="link-style">
-        3. Reset Success
-      </Link>
       <Link href="/register" className="link-style">
-        4. Register
+        3. Register
       </Link>
       <Link href="/create-password" className="link-style">
-        5. Create new password
+        4. Create new password
       </Link>
       <Link href="/dashboard" className="link-style">
-        6. Dashboard
+        5. Dashboard
       </Link>
     </div>
   );

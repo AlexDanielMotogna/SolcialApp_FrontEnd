@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!user.isVerified) {
-      return new Response(JSON.stringify({ msg: "Please verify your email address to login" }), { status: 409 });
+      return new Response(
+        JSON.stringify({ status: "not_verified", msg: "Please verify your email address to login" }),
+        { status: 403 }
+      );
     }
 
     // Cas où le password est null ou non défini
