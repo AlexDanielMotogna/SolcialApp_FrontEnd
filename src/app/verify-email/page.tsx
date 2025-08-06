@@ -7,9 +7,11 @@ import CryptoBalance from "../../../public/imgs/Crypto-Balancee.png";
 import Headline from "../../../public/imgs/Headline.png";
 import { LoadingBar } from "@/components/ui/LoadingBar";
 import AuthLayout from "@/components/layouts/auth-layout";
+import { useTranslation } from "react-i18next";
 
 const VerifyEmail = () => {
-  const [status, setStatus] = useState<string>("Please wait...");
+  const { t } = useTranslation();
+  const [status, setStatus] = useState<string>(t("please_wait", "Please wait..."));
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const hasVerified = useRef(false);
@@ -20,7 +22,7 @@ const VerifyEmail = () => {
     const token = queryParams.get("token");
 
     if (!token) {
-      setStatus("Verification token is missing!");
+      setStatus(t("verification_token_missing", "Verification token is missing!"));
       setLoading(false);
       return;
     }
@@ -30,24 +32,32 @@ const VerifyEmail = () => {
         const response = await fetch(`/api/auth/verify-email?token=${token}`);
         const data = await response.json();
         if (response.ok && data.message === "User verified successfully") {
-          setStatus("Email verified successfully.\nRedirecting to login page...");
+          setStatus(t("email_verified_success", "Email successfully verified. Redirecting to login page..."));
           setTimeout(() => {
             router.push("/login");
-            setLoading(false); // Facultatif, car la page va changer
+            setLoading(false);
           }, 3000);
         } else {
-          setStatus(`Verification failed: ${data.msg || data.message}`);
+          setStatus(
+            t("verification_failed", "Verification failed:") +
+              " " +
+              (t(data.msg, data.msg) || t(data.message, data.message) || "")
+          );
           setLoading(false);
         }
       } catch (error: any) {
-        setStatus(`Something went wrong: ${error.message}`);
+        setStatus(
+          t("something_went_wrong", "Something went wrong:") +
+            " " +
+            (error.message || "")
+        );
         setLoading(false);
       }
     };
 
     verifyEmail();
     hasVerified.current = true;
-  }, [router]);
+  }, [router, t]);
 
   return (
     <AuthLayout>
@@ -55,10 +65,10 @@ const VerifyEmail = () => {
         {/* Header */}
         <div className="w-full p-8 flex items-center justify-center">
           <h3 className="text-5xl text-white font-bold text-center">
-            Email Verification
+            {t("email_verification", "Email verification")}
           </h3>
         </div>
-        {/* Status box centrée */}
+        {/* Status box centered */}
         <div className="w-full flex justify-center">
           <div className="w-full max-w-md flex flex-col items-center gap-8 bg-[#161618] p-9">
             {loading ? (
@@ -69,12 +79,8 @@ const VerifyEmail = () => {
                     size="md"
                     text={
                       <span className="text-green-400 text-2xl font-semibold text-center">
-                    {status.startsWith("Email verified")
-                      ? "✅ Email verified! \n Redirecting to login page..."
-                      : status.startsWith("Verification failed")
-                      ? "❌ Verification failed"
-                      : "⏳ Please wait..."}
-                  </span>
+                        {status}
+                      </span>
                     }
                     className="shadow-md shadow-green-500/20 w-full"
                   />

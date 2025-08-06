@@ -1,17 +1,18 @@
 "use client";
-
+import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import Image from 'next/image';
 import Link from "next/link";
 import User from "../../../public/imgs/user.svg";
 import Key from "../../../public/imgs/key.svg";
 import Eye from "../../../public/imgs/eye.svg";
 import EyeSlash from "../../../public/imgs/eye-slash.svg";
-import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LoadingBar } from "@/components/ui/LoadingBar";
 import AuthLayout from "@/components/layouts/auth-layout";
 import AuthErrorModal from "@/components/modals/AuthErrorModal";
 import AuthSuccessModal from "@/components/modals/AuthSuccessModal";
+import PasswordStrengthBar from "@/components/PasswordStrengthBar";
 
 const initialForm = {
   fullName: "",
@@ -33,6 +34,8 @@ const getPasswordStrength = (password: string) => {
 };
 
 const Register = () => {
+  const { t, i18n } = useTranslation();
+  const [ready, setReady] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -46,6 +49,19 @@ const Register = () => {
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    // Attend que la langue soit détectée côté client
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      i18n.on("initialized", () => setReady(true));
+    }
+    // Nettoyage
+    return () => {
+      i18n.off("initialized", () => setReady(true));
+    };
+  }, [i18n]);
 
   useEffect(() => {
     if (form.avatar) {
@@ -82,23 +98,23 @@ const Register = () => {
     // Validation
     const errors: { [key: string]: string } = {};
 
-    if (!form.fullName.trim()) errors.fullName = "Full name is required.";
-    if (!form.email.trim()) errors.email = "Email is required.";
+    if (!form.fullName.trim()) errors.fullName = t("full_name_is_required");
+    if (!form.email.trim()) errors.email = t("email_is_required");
     else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(form.email)) errors.email = "Please enter a valid email address.";
+      if (!emailRegex.test(form.email)) errors.email = t("valid_email_is_required");
     }
-    if (!form.phone.trim()) errors.phone = "Phone number is required.";
+    if (!form.phone.trim()) errors.phone = t("phone_number_is_required");
     else {
       const phoneRegex = /^\+?\d{7,15}$/;
-      if (!phoneRegex.test(form.phone)) errors.phone = "Please enter a valid phone number (e.g. +1234567890).";
+      if (!phoneRegex.test(form.phone)) errors.phone = t("invalid_phone_number");
     }
-    if (!form.password.trim()) errors.password = "Password is required.";
-    else if (getPasswordStrength(form.password) < 3) errors.password = "Password is too weak. Please use a stronger password.";
-    if (!form.repeatPassword.trim()) errors.repeatPassword = "Repeat password is required.";
+    if (!form.password.trim()) errors.password = t("password_is_required");
+    else if (getPasswordStrength(form.password) < 3) errors.password = t("password_too_weak");
+    if (!form.repeatPassword.trim()) errors.repeatPassword = t("repeat_password_is_required");
     if (form.password && form.repeatPassword && form.password !== form.repeatPassword)
-      errors.repeatPassword = "Passwords don't match.";
-    if (!form.avatar) errors.avatar = "Avatar is required.";
+      errors.repeatPassword = t("passwords_dont_match");
+    if (!form.avatar) errors.avatar = t("avatar_is_required");
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -127,7 +143,7 @@ const Register = () => {
           router.push("/login");
         }, 1500);
       } else {
-        setError(data.msg || "Registration failed");
+        setError(data.msg || "registration_failed");
         setShowErrorModal(true);
       }
     } catch (err: any) {
@@ -137,6 +153,11 @@ const Register = () => {
       setLoading(false);
     }
   };
+
+  if (!ready) {
+    // Affiche un loader ou rien tant que la langue n'est pas prête
+    return null;
+  }
 
   return (
     <AuthLayout>
@@ -156,7 +177,7 @@ const Register = () => {
           onSubmit={handleRegister}
         >
           <div className="w-full p-8 flex items-center justify-between">
-            <h3 className="text-5xl text-white font-bold">Register</h3>
+            <h3 className="text-5xl text-white font-bold">{t("register")}</h3>
           </div>
           <div className="w-full flex flex-col gap-6 px-4 py-4 sm:px-8">
             <div className="w-full flex flex-col items-center gap-4">
@@ -189,15 +210,15 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">Full name</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">{t("full_name")}</label>
               <input
                 name="fullName"
+                placeholder={t("your_name")}
                 value={form.fullName}
                 onChange={handleChange}
                 className={`w-full py-5 px-4 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
                   fieldErrors.fullName ? "border-red-500" : "border-[#44444A]"
                 }`}
-                placeholder="Yourname"
                 required
               />
               {fieldErrors.fullName && (
@@ -205,20 +226,20 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">Email</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">{t("email")}</label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={User} alt="user" width={32} height={32} />
                 </span>
                 <input
                   name="email"
+                  placeholder={t("placeholder_email")}
                   value={form.email}
                   onChange={handleChange}
                   type="email"
                   className={`w-full py-5 pl-16 pr-4 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
                     fieldErrors.email ? "border-red-500" : "border-[#44444A]"
                   }`}
-                  placeholder="yourname@gmail.com"
                   required
                 />
               </div>
@@ -227,15 +248,15 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">Phone Number</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">{t("phone_number")}</label>
               <input
                 name="phone"
+                placeholder={t("placeholder_phone")}
                 value={form.phone}
                 onChange={handleChange}
                 className={`w-full py-5 px-4 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
                   fieldErrors.phone ? "border-red-500" : "border-[#44444A]"
                 }`}
-                placeholder="(+12)435-1213-232"
                 required
               />
               {fieldErrors.phone && (
@@ -243,20 +264,20 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">Password</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">{t("password")}</label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={Key} alt="key" width={32} height={32} />
                 </span>
                 <input
                   name="password"
+                  placeholder="********"
                   value={form.password}
                   onChange={handleChange}
                   type={showPassword ? "text" : "password"}
                   className={`w-full py-5 pl-16 pr-12 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
                     fieldErrors.password ? "border-red-500" : "border-[#44444A]"
                   }`}
-                  placeholder="********"
                   required
                 />
                 <button
@@ -271,25 +292,29 @@ const Register = () => {
                   </span>
                 </button>
               </div>
+              {/* Password Strength Bar */}
+              <div className="mt-2">
+                <PasswordStrengthBar password={form.password} />
+              </div>
               {fieldErrors.password && (
                 <p className="text-red-500 text-xl mt-1">{fieldErrors.password}</p>
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">Repeat Password</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">{t("repeat_password")}</label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={Key} alt="key" width={32} height={32} />
                 </span>
                 <input
                   name="repeatPassword"
+                  placeholder="********"
                   value={form.repeatPassword}
                   onChange={handleChange}
                   type={showRepeatPassword ? "text" : "password"}
                   className={`w-full py-5 pl-16 pr-12 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
                     fieldErrors.repeatPassword ? "border-red-500" : "border-[#44444A]"
                   }`}
-                  placeholder="********"
                   required
                 />
                 <button
@@ -316,7 +341,7 @@ transform transition-all duration-200 hover:scale-105 hover:shadow-lg hover:from
               type="submit"
               disabled={loading}
             >
-              {loading ? "Loading..." : "Register"}
+              {loading ? t("loading") : t("register")}
             </button>
 
             {loading && (
@@ -324,19 +349,19 @@ transform transition-all duration-200 hover:scale-105 hover:shadow-lg hover:from
                 <LoadingBar
                   variant="success"
                   size="md"
-                  text={<span className="text-xl">Creating account...</span>}
+                  text={<span className="text-xl">{t("creating_account")}...</span>}
                   className="shadow-md shadow-green-500/20"
                 />
               </div>
             )}
 
             <p className="font-medium text-xl text-[#ACB5BB] text-center">
-              Already have an account?{" "}
+              {t("already_have_account")}{" "}
               <Link
                 href="/login"
                 className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl"
               >
-                Login Here
+                {t("login_here")}
               </Link>
             </p>
           </div>
@@ -345,8 +370,8 @@ transform transition-all duration-200 hover:scale-105 hover:shadow-lg hover:from
       {/* Success Modal */}
       {showSuccessModal && (
         <AuthSuccessModal
-          title="Email Sent!"
-          message="Registration successful! Please check your inbox and follow the instructions in the email."
+          title={t("email_sent")}
+          message={t("registration_successful_check_inbox")}
           onClose={() => setShowSuccessModal(false)}
           className="text-xl"
         />
@@ -354,8 +379,8 @@ transform transition-all duration-200 hover:scale-105 hover:shadow-lg hover:from
       {/* Error Modal */}
       {showErrorModal && error && (
         <AuthErrorModal
-          title="Error"
-          message={error}
+          title={t("error")}
+          message={t(error)} // error = key received from API
           onClose={() => setShowErrorModal(false)}
           className="text-xl"
         />

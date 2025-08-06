@@ -13,6 +13,7 @@ import PasswordStrengthBar from "../../components/PasswordStrengthBar";
 import Button from "../../components/Button";
 import Link from "next/link";
 import { LoadingBar } from "@/components/ui/LoadingBar";
+import { useTranslation } from "react-i18next";
 
 function getPasswordStrength(password: string): number {
   let score = 0;
@@ -24,6 +25,7 @@ function getPasswordStrength(password: string): number {
 }
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,23 +45,23 @@ const ResetPassword = () => {
     setLoading(true);
 
     if (!password || !confirm) {
-      setError("Please fill in all fields.");
+      setError(t("please_fill_all_fields", "Please fill all fields."));
       setLoading(false);
       return;
     }
     const passwordStrength = getPasswordStrength(password);
     if (passwordStrength < 3) {
-      setError("Password is too weak. Please use a stronger password.");
+      setError(t("password_too_weak", "Password is too weak. Please use a stronger password."));
       setLoading(false);
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match.");
+      setError(t("passwords_dont_match", "Passwords do not match."));
       setLoading(false);
       return;
     }
     if (!token) {
-      setError("Invalid or missing reset token.");
+      setError(t("invalid_or_missing_token", "Invalid or missing reset tokens."));
       setLoading(false);
       return;
     }
@@ -73,7 +75,7 @@ const ResetPassword = () => {
       const data = await res.json();
 
       if (res.ok) {
-        setMsg("Your password has been reset. You can now log in.");
+        setMsg(t("password_reset_success", "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter."));
         setPassword("");
         setConfirm("");
         setRedirecting(true);
@@ -81,10 +83,10 @@ const ResetPassword = () => {
           router.push("/login");
         }, 2000);
       } else {
-        setError(data.msg || data.message || "Something went wrong.");
+        setError(t(data.msg) || t("something_went_wrong", "Une erreur est survenue."));
       }
     } catch {
-      setError("Something went wrong.");
+      setError(t("something_went_wrong", "Une erreur est survenue."));
     }
     setLoading(false);
   };
@@ -97,12 +99,12 @@ const ResetPassword = () => {
       >
         {/* Header */}
         <div className="w-full p-8 flex items-center justify-between">
-          <h3 className="text-5xl text-white font-bold">Reset Password</h3>
+          <h3 className="text-5xl text-white font-bold">{t("reset_password", "Reset password")}</h3>
         </div>
         {/* Form content */}
         <div className="w-full flex flex-col gap-6 px-10 py-4">
           <div className="w-full flex flex-col gap-2">
-            <label className="font-semibold text-[#ACB5BB] text-xl">New Password</label>
+            <label className="font-semibold text-[#ACB5BB] text-xl">{t("new_password", "New password")}</label>
             <div className="relative w-full">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <Image src={Key} alt="key" width={28} height={28} />
@@ -121,7 +123,7 @@ const ResetPassword = () => {
                 tabIndex={-1}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6C7278] hover:text-[#9945FF] transition-colors"
                 onClick={() => setShowPassword(v => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? t("hide_password", "Hide password") : t("show_password", "Show password")}
               >
                 <Image src={showPassword ? EyeSlash : Eye} alt="toggle password" width={24} height={24} />
               </button>
@@ -129,7 +131,7 @@ const ResetPassword = () => {
             <PasswordStrengthBar password={password} />
           </div>
           <div className="w-full flex flex-col gap-2">
-            <label className="font-semibold text-[#ACB5BB] text-xl">Confirm Password</label>
+            <label className="font-semibold text-[#ACB5BB] text-xl">{t("confirm_password", "Confirm password")}</label>
             <div className="relative w-full">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <Image src={Key} alt="key" width={28} height={28} />
@@ -148,7 +150,7 @@ const ResetPassword = () => {
                 tabIndex={-1}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6C7278] hover:text-[#9945FF] transition-colors"
                 onClick={() => setShowConfirm(v => !v)}
-                aria-label={showConfirm ? "Hide password" : "Show password"}
+                aria-label={showConfirm ? t("hide_password", "Hide password") : t("show_password", "Show password")}
               >
                 <Image src={showConfirm ? EyeSlash : Eye} alt="toggle password" width={24} height={24} />
               </button>
@@ -158,7 +160,7 @@ const ResetPassword = () => {
         {/* Footer */}
         <div className="w-full border-t border-[#44444A] p-8 flex flex-col gap-4">
           <Button
-            text={loading ? "Resetting..." : "Reset Password"}
+            text={loading ? t("resetting", "Resetting...") : t("reset_password", "Reset password")}
             type="submit"
             disabled={loading || redirecting}
             className="w-full py-4 rounded-xl font-bold text-xl shadow-green-500/20 hover:scale-105 transition-transform"
@@ -170,20 +172,20 @@ const ResetPassword = () => {
                 size="md"
                 text={
                   redirecting
-                    ? <span className="text-xl font-semibold">Redirecting to login page...</span>
-                    : <span className="text-xl font-semibold">Resetting password...</span>
+                    ? <span className="text-xl font-semibold">{t("redirecting_to_login", "Redirecting to login page...")}</span>
+                    : <span className="text-xl font-semibold">{t("resetting_password", "Resetting password...")}</span>
                 }
                 className="shadow-md shadow-green-500/20"
               />
             </div>
           )}
           <p className="font-medium text-xl text-[#ACB5BB] text-center">
-            Remember your password?{" "}
+            {t("remember_password", "Remember your password ?")}{" "}
             <Link
               href="/login"
               className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl"
             >
-              Login Here
+              {t("login_here", "Login here")}
             </Link>
           </p>
         </div>
@@ -191,7 +193,7 @@ const ResetPassword = () => {
       {/* Error Modal */}
       {error && (
         <AuthErrorModal
-          title="Error"
+          title={t("error", "Erreur")}
           message={error}
           onClose={() => setError("")}
           className="text-xl"
@@ -200,7 +202,7 @@ const ResetPassword = () => {
       {/* Success Modal */}
       {msg && (
         <AuthSuccessModal
-          title="Success"
+          title={t("success", "Succès")}
           message={msg}
           onClose={() => setMsg("")}
           className="text-xl"
