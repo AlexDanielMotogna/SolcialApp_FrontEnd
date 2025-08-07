@@ -286,6 +286,18 @@ const Login: React.FC = () => {
             className="w-full py-4 rounded-xl font-bold text-xl shadow-green-500/20 hover:scale-105 transition-transform"
           />
 
+          {/* Loader pendant le login */}
+          {loginLoading && !redirectingMsg && (
+            <div className="w-full my-4">
+              <LoadingBar
+                variant="primary"
+                size="md"
+                text={<span className="text-xl">{t("loading", "Loading...")}</span>}
+                className="shadow-md shadow-blue-500/20"
+              />
+            </div>
+          )}
+
           {/* Loader pour la redirection */}
           {redirectingMsg && (
             <div className="w-full my-4">
@@ -319,8 +331,8 @@ const Login: React.FC = () => {
                   "/register",
                   t("redirecting_register", "Redirecting to registration page...")
                 )
-              }
-              className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
+                }
+                className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
             >
               {t("register_here")}
             </button>
