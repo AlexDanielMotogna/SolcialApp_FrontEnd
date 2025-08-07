@@ -46,6 +46,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
 }) => {
   const { setMensaje } = useNotificaciones();
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // for verify/claim
 
   // ============================================================================
   // COMPUTED VALUES
@@ -130,9 +131,10 @@ const QuestModal: React.FC<QuestModalProps> = ({
     }
   };
 
-  const handleClaimReward = async () => {
+  const handleClaimReward = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!userQuest) return;
-
+    setActionLoading(true);
     try {
       const res = await fetch("/api/user-quests/claim", {
         method: "POST",
@@ -151,9 +153,12 @@ const QuestModal: React.FC<QuestModalProps> = ({
     } catch (error) {
       toast.error("Error claiming reward. Please try again.");
     }
+    setActionLoading(false);
   };
 
-  const handleVerifyTasks = async () => {
+  const handleVerifyTasks = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setActionLoading(true);
     try {
       const verifyRes = await fetch("/api/user-quests/verify-twitter", {
         method: "POST",
@@ -179,6 +184,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
             },
           }
         );
+        setActionLoading(false);
         return;
       }
       if (
@@ -197,6 +203,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
             },
           }
         );
+        setActionLoading(false);
         return;
       }
       if (verifyData.success) {
@@ -209,6 +216,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
     } catch (error) {
       toast.error("Error verifying tasks. Please try again.");
     }
+    setActionLoading(false);
   };
 
   // ============================================================================
@@ -218,7 +226,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
   const getFooterButton = () => {
     // Session expired - close modal to restart
     if (isSessionExpired) {
-      return <Button text="Session Expired - Close" onClick={onClose} />;
+      return <Button text="Session Expired - Close" onClick={onClose} type="button" />;
     }
 
     // Quest inactive (but allow claim if user completed and quest finished)
@@ -230,7 +238,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
         userQuest.status === "finished"
       )
     ) {
-      return <Button text={`Quest ${quest.status}`} disabled />;
+      return <Button text={`Quest ${quest.status}`} disabled type="button" />;
     }
 
     // Reward ready to claim (highest priority)
@@ -240,24 +248,25 @@ const QuestModal: React.FC<QuestModalProps> = ({
       allUserTasksCompleted &&
       !rewardClaimed
     ) {
-      return <Button text="Claim Reward" onClick={handleClaimReward} />;
+      return <Button text="Claim Reward" onClick={handleClaimReward} type="button" disabled={actionLoading} />;
     }
 
     // Tasks verification available (only if quest not finished)
     if (canVerifyAgain && quest.status !== "finished") {
       return (
         <Button
-          text="Verify Tasks"
+          text={actionLoading ? "Verifying..." : "Verify Tasks"}
           className="bg-yellow-500 hover:bg-yellow-600 text-black"
-          disabled={!user?.hasTwitterAccess}
+          disabled={!user?.hasTwitterAccess || actionLoading}
           onClick={handleVerifyTasks}
+          type="button"
         />
       );
     }
 
     // Quest finished but tasks not completed
     if (quest.status === "finished" && userQuest && !allUserTasksCompleted) {
-      return <Button text="Quest ended - Tasks not completed" disabled />;
+      return <Button text="Quest ended - Tasks not completed" disabled type="button" />;
     }
 
     // Session completed, reward available (alternative path)
@@ -267,34 +276,35 @@ const QuestModal: React.FC<QuestModalProps> = ({
       return (
         <Button
           text="Claim Reward"
-          disabled={!canClaim}
+          disabled={!canClaim || actionLoading}
           onClick={canClaim ? handleClaimReward : undefined}
+          type="button"
         />
       );
     }
 
     // All tasks completed (final verification)
     if (allUserTasksCompleted && !rewardClaimed) {
-      return <Button text="Claim Reward" onClick={handleClaimReward} />;
+      return <Button text="Claim Reward" onClick={handleClaimReward} type="button" disabled={actionLoading} />;
     }
 
     // Active session but pending tasks (only if quest not finished)
     if (hasActiveSession && quest.status !== "finished") {
-      return <Button text="Complete all tasks to claim reward" disabled />;
+      return <Button text="Complete all tasks to claim reward" disabled type="button" />;
     }
 
     // Reward already claimed
     if (rewardClaimed) {
-      return <Button text="Reward already claimed" disabled />;
+      return <Button text="Reward already claimed" disabled type="button" />;
     }
 
     // No userQuest - modal shouldn't be open
     if (!userQuest) {
-      return <Button text="Close" onClick={onClose} />;
+      return <Button text="Close" onClick={onClose} type="button" />;
     }
 
     // Default state
-    return <Button text="Close" onClick={onClose} />;
+    return <Button text="Close" onClick={onClose} type="button" />;
   };
 
   // ============================================================================

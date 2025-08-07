@@ -140,3 +140,33 @@ export const getMinimumDateTime = (): { date: string; time: string } => {
   
   return { date, time };
 };
+
+export const formatTimeLeft = (endDateTime: string, now: Date): string => {
+  if (!endDateTime) return "--";
+
+  const endTime = new Date(endDateTime);
+  const diffMs = endTime.getTime() - now.getTime();
+
+  if (diffMs <= 0) return "Expired";
+
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (days > 0) {
+    if (days >= 7) {
+      const weeks = Math.floor(days / 7);
+      const remainingDays = days % 7;
+      return remainingDays > 0
+        ? `${weeks}w ${remainingDays}d ${hours}h`
+        : `${weeks}w ${hours}h`;
+    }
+    return hours > 0 ? `${days}d ${hours}h` : `${days}d ${minutes}m`;
+  }
+
+  if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+
+  return `${minutes}m`;
+};

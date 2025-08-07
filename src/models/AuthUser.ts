@@ -22,7 +22,7 @@ export interface IAuthUser extends Document {
   walletaddress: string;
   twitterAccessToken?: string;
   twitterAccessSecret?: string;
-  twitterScreenName?: string; // <-- usa este nombre para el handle
+  twitterScreenName?: string; 
   twitterUserId?: string;
   hasTwitterAccess?: boolean;
   friends?: mongoose.Types.ObjectId[];
@@ -96,7 +96,7 @@ const UserSchema = new Schema<IAuthUser>({
   default: null,},
   twitterAccessToken: { type: String, default: null },
   twitterAccessSecret: { type: String, default: null },
-  twitterScreenName: { type: String, default: null }, // <-- usa este nombre
+  twitterScreenName: { type: String, default: null }, 
   twitterUserId: { type: String, default: null },
   hasTwitterAccess: { type: Boolean, default: false },
   friends: [{ type: Schema.Types.ObjectId, ref: "AuthUser" }],

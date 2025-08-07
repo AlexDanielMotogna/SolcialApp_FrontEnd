@@ -30,7 +30,7 @@ export async function createQuestSession(data: CreateSessionData): Promise<Sessi
       Object.keys(tasks).map((k) => [k, false])
     );
     
-    const sessionExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutos
+    const sessionExpiresAt = new Date(Date.now() + 10  * 1000); // 5 minutos
     
     console.log("✅ Session data prepared:", {
       completedTasksCount: Object.keys(completedTasks).length,

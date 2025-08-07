@@ -7,6 +7,7 @@ import CryptoRow from "../../components/global/CryptoRow/CryptoRow";
 import { Toaster } from "react-hot-toast";
 import { SolanaWalletProvider } from "@/providers/WalletProvider";
 
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [activePath, setActivePath] = useState<string>("/dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
