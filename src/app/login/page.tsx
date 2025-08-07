@@ -93,6 +93,12 @@ const Login: React.FC = () => {
       });
       const data = await res.json();
 
+      if (!res.ok) {
+        setErrorModal(data.msg || data.error || "internal_server_error");
+        setLoginLoading(false);
+        return;
+      }
+
       if (data.status === "no_password") {
         setNoPasswordModal(true);
         setNoPasswordEmail(email);
@@ -143,8 +149,8 @@ const Login: React.FC = () => {
       setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err) {
       setErrorModal("internal_server_error");
+      setLoginLoading(false);
     }
-    setLoginLoading(false);
   };
 
   const handleGoogleLogin = async () => {

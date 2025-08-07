@@ -80,5 +80,7 @@
   "email_verified_success": "Correo verificado con éxito. Redirigiendo a la página de inicio de sesión...",
   "verification_failed": "La verificación falló:",
   "something_went_wrong": "Algo salió mal:",
-  "email_verification": "Verificación de correo"
+  "email_verification": "Verificación de correo",
+  "Invalid credentials": "Credenciales inválidas",
+  "internal_server_error": "Error interno del servidor"
 }
