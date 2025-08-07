@@ -79,28 +79,33 @@ export const questUtils = {
 
     // Usuario con quest
     if (userQuest) {
+      // UI-only: If sessionExpiresAt is in the past, treat as expired (even if backend hasn't updated status yet)
+      if (userQuest.sessionExpiresAt) {
+        const expiresAt = new Date(userQuest.sessionExpiresAt).getTime();
+        if (expiresAt < Date.now()) {
+          return { text: "Join Quest", disabled: false };
+        }
+      }
       if (userQuest.status === "expired") {
         return { text: "Join Quest", disabled: false };
       }
-
       if (userQuest.status === "active") {
-        return { text: "Continue Quest", disabled: false }; // ✅ Siempre clickeable
+        return { text: "Continue Quest", disabled: false };
       }
-
       if (userQuest.status === "finished") {
         const allTasksCompleted = Object.values(
           userQuest.completedTasks || {}
         ).every(Boolean);
 
         if (allTasksCompleted && !userQuest.rewardClaimed) {
-          return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+          return { text: "Complete", disabled: false };
         }
 
         if (userQuest.rewardClaimed) {
-          return { text: "Reward Claimed", disabled: false }; // ✅ Siempre clickeable
+          return { text: "Reward Claimed", disabled: false };
         }
 
-        return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+        return { text: "Complete", disabled: false };
       }
     }
 

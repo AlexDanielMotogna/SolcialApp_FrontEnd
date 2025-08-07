@@ -1,25 +1,19 @@
-// REEMPLAZAR COMPLETAMENTE: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\components\modals\CreateQuest.tsx
-
 "use client";
 import { questAPI } from "@/app/clientAPI/questAPI";
-import { useSession } from 'next-auth/react';
+import DateTimePicker from "@/components/ui/DateTimePicker";
+import SuccessModal from "@/components/ui/SuccessModal";
 import { useCreateQuest } from "@/hooks/useCreateQuest";
+import type { User } from "@/types/quest";
+import { validateQuestFormWithToast } from "@/utils/questValidation";
+import { useSession } from 'next-auth/react';
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
 import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
-import ButtonBorder from "../ButtonBorder";
 import { toUTCISOString } from "../../utils/dateUtils";
 import BannerUpload from "../BannerUpload";
-import TaskSelector from "@/components/ui/TaskSelector";
-import SuccessModal from "@/components/ui/SuccessModal";
-import { validateQuestFormWithToast } from "@/utils/questValidation";
-import DateTimePicker from "@/components/ui/DateTimePicker";
-import { getMinimumDateTime } from "../../utils/dateUtils";
-
-// Types
-import type { User } from "@/types/quest";
+import ButtonBorder from "../ButtonBorder";
 
 export const initialForm = {
   questName: "",
@@ -42,6 +36,7 @@ export const initialForm = {
   },
 };
 
+//export interface for CreateQuest component props
 export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,7 +49,7 @@ export interface CreateQuestProps {
   isEdit?: boolean;
   user: User | null;
 }
-
+//create quest modal component
 const CreateQuest: React.FC<CreateQuestProps> = ({
   isOpen,
   onClose,
@@ -96,16 +91,12 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
   // ============================================================================
   // EFFECTS
   // ============================================================================
-
-  
-  // ✅ FETCH AUTHOR ID FROM TWEET LINK
+  // Fetch author ID from tweet link
   useEffect(() => {
     const fetchAuthorId = async () => {
       if (!form.tweetLink || !form.tweetLink.startsWith("http")) return;
 
       try {
-        console.log('🔍 [CreateQuest] Fetching author ID for tweet:', form.tweetLink);
-        
         const res = await fetch("/api/quests/testAuthId", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -115,16 +106,15 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
         const data = await res.json();
         
         if (data.success && data.userId) {
-          console.log('✅ [CreateQuest] Author ID found:', data.userId);
             setForm((prev: typeof initialForm) => ({
             ...prev,
             authorId: data.userId as string,
             }));
         } else {
-          console.log('❌ [CreateQuest] Could not fetch author ID:', data.error);
+          toast.error('Could not fetch author ID:', data.error);
         }
       } catch (error) {
-        console.error('❌ [CreateQuest] Error fetching author ID:', error);
+        console.error('Error fetching author ID:', error);
       }
     };
 
@@ -132,10 +122,9 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     return () => clearTimeout(timeoutId);
   }, [form.tweetLink, setForm]);
 
-  // ✅ POPULATE FORM WITH INITIAL DATA (FOR EDIT MODE)
+  // Populate form with initial data if editing
   useEffect(() => {
     if (initialData && isEdit) {
-      console.log('📝 [CreateQuest] Populating form with initial data for edit');
       setForm((prev: typeof initialForm) => ({
         ...prev,
         ...initialData,
@@ -150,20 +139,19 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     }
   }, [initialData, isEdit, setForm]);
 
-  // ✅ VALIDACIÓN DE FECHAS EN TIEMPO REAL
+  // Validations for start and end dates
   useEffect(() => {
     if (form.startDate && form.startTime && form.endDate && form.endTime) {
       const now = new Date();
       const startDateTime = new Date(`${form.startDate}T${form.startTime}`);
       const endDateTime = new Date(`${form.endDate}T${form.endTime}`);
 
-      // Solo mostrar advertencias, no errores bloqueantes
       if (startDateTime < now) {
-        console.warn('⚠️ Start date is in the past');
+        console.warn('Start date is in the past');
       }
 
       if (endDateTime <= startDateTime) {
-        console.warn('⚠️ End date must be after start date');
+        console.warn('End date must be after start date');
       }
     }
   }, [form.startDate, form.startTime, form.endDate, form.endTime]);
@@ -174,23 +162,21 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
   const handleSubmitWithPopup = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  // ✅ USAR EL VALIDADOR ÉPICO
+  //validate form
   const isValid = await validateQuestFormWithToast(form, user);
   if (!isValid) return;
 
   try {
-    console.log(`🚀 [CreateQuest] ${isEdit ? 'Updating' : 'Creating'} quest...`);
-
-    // ✅ CONVERT DATES TO UTC
+    // convert dates to UTC
     const startDateTimeUTC = toUTCISOString(form.startDate, form.startTime);
     const endDateTimeUTC = toUTCISOString(form.endDate, form.endTime);
 
-    // ✅ FILTER SELECTED TASKS
+    // remove tasks that are not selected
     const filteredTasks = Object.fromEntries(
       Object.entries(form.tasks).filter(([_, value]) => value === true)
     );
 
-    // ✅ PREPARE QUEST DATA
+    // construct quest data
     const questData = {
       ...form,
       tasks: filteredTasks,
@@ -200,34 +186,29 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
       endDateTime: endDateTimeUTC,
       userId: user!.id,
       authorId: form.authorId,
-      // FOR EDIT MODE
       ...(isEdit && initialData?._id && { _id: initialData._id }),
     };
 
-    // ✅ REMOVE TEMPORARY FIELDS
+    // remove temporary fields
     delete questData.startDate;
     delete questData.startTime;
     delete questData.endDate;
     delete questData.endTime;
 
-    // ✅ CALL API
+    //
     if (isEdit) {
       await questAPI.updateQuest(initialData?._id || "", questData);
-      toast.success("✅ Quest updated successfully!");
+      toast.success("Quest updated successfully!");
     } else {
       await questAPI.createQuest(questData);
       setShowSuccess(true);
     }
-
-    console.log(`✅ [CreateQuest] Quest ${isEdit ? 'updated' : 'created'} successfully`);
     refreshQuests();
-    
     if (isEdit) {
       onClose();
     }
   } catch (error) {
-    console.error(`❌ [CreateQuest] Error ${isEdit ? 'updating' : 'creating'} quest:`, error);
-    toast.error(`❌ Error ${isEdit ? 'updating' : 'creating'} quest: ` + (error as Error).message);
+    toast.error(`Error ${isEdit ? 'updating' : 'creating'} quest: ` + (error as Error).message);
   }
 };
 
@@ -261,7 +242,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
   // ============================================================================
   return (
     <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50 overflow-x-hidden">
-      {/* ✅ SUCCESS MODAL */}
+      {/* show success modal*/}
       <SuccessModal
         isOpen={showSuccess}
         onClose={() => {
@@ -271,7 +252,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
         questName={form.questName}
       />
 
-      {/* ✅ MAIN FORM */}
+      {/* create quest form */}
       <form
         onSubmit={handleSubmitWithPopup}
         className="bg-[#161618] w-[470px] max-h-[90vh] flex flex-col items-start justify-start gap-6 border border-[#44444A] rounded-2xl shadow-[0px_2px_10px_-3px_rgba(0,0,0,0)]"
@@ -281,15 +262,13 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
           msOverflowStyle: "none",
         }}
       >
-        {/* ✅ HEADER */}
+        {/* header */}
         <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
           <h3 className="text-[1.8rem] text-white font-semibold">
             {isEdit ? 'Edit Quest' : 'Create Quest'}
           </h3>
           <Close onClick={onClose} />
         </div>
-
-        {/* ✅ FORM CONTENT */}
         <div
           className="w-full flex flex-col items-start justify-start gap-6 px-8 overflow-y-auto overflow-x-hidden"
           style={{
@@ -297,7 +276,6 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
             msOverflowStyle: "none",
           }}
         >
-          {/* ✅ INTRO */}
           <div className="w-full flex flex-col items-start justify-start gap-1">
             <h4 className="text-white font-semibold text-[1.8rem]">
               {isEdit ? 'Update Your Quest' : 'Launch a New Quest'}
@@ -308,14 +286,14 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 : 'Engage your community with exciting quests and earn traction!'
               }
             </p>
-            {/* ✅ USER INFO */}
+            {/* user info, for development enviorment*/}
             <p className="text-[#6C7278] text-[1.2rem] mt-2">
               Creating as: <span className="text-[#ACB5BB]">{user.email}</span>
             </p>
           </div>
 
           <div className="w-full flex flex-col items-start justify-start gap-[0.8rem]">
-            {/* ✅ QUEST NAME */}
+            {/* Name*/}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Quest Name *
@@ -331,7 +309,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
             </div>
 
-            {/* ✅ DESCRIPTION */}
+            {/* Description */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Description *
@@ -351,7 +329,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
             </div>
 
-            {/* ✅ TWEET LINK */}
+            {/* Tweet link*/}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Tweet/Post Link *
@@ -361,18 +339,18 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 value={form.tweetLink}
                 onChange={handleChange}
                 className="w-full py-5 px-5 bg-[#2C2C30] border border-[#44444A] rounded-xl text-[1.4rem] text-white font-normal placeholder-[#6C7278] focus:border-[#9945FF] focus:outline-none transition-colors"
-                placeholder="https://twitter.com/username/status/..."
+                placeholder="https://x.com/username/status/..."
                 required
                 type="url"
               />
               {form.authorId && (
                 <p className="text-[#10B981] text-[1.1rem]">
-                  ✅ Tweet author detected
+                  Tweet author detected 
                 </p>
               )}
             </div>
 
-            {/* ✅ MAX PARTICIPANTS */}
+            {/* Max participants */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Max Participants *
@@ -390,7 +368,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
             </div>
 
-            {/* ✅ REWARD POOL */}
+            {/* Reward Pool */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Reward Pool (SOL) *
@@ -419,7 +397,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               </div>
             </div>
 
-            {/* ✅ REWARD PER TASK (CALCULATED) */}
+            {/* Reward per task / autocalculated */}
             <div className="w-full flex flex-col items-start justify-start gap-2">
               <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
                 Reward per Task (Auto-calculated)
@@ -443,7 +421,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
             </div>
 
         
-             {/* ✅ DATE TIME PICKERS ÉPICOS */}
+             {/* Date and time, DateTimePicked from UI component */}
            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* START DATE TIME */}
               <DateTimePicker
@@ -468,7 +446,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
             </div>
 
-            {/* ✅ TASK SELECTOR COMPONENT - EPIC DESIGN */}
+            {/* Task selector */}
             <div className="w-full flex flex-col items-start justify-start gap-4 animate-slideInUp">
               {/* Header */}
               <div className="flex items-center gap-3 mb-2">
@@ -582,7 +560,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
           </div>
         </div>
 
-        {/* ✅ FOOTER */}
+        {/* Footer / Button place */}
         <div className="w-full border-t border-[#44444A] p-8">
           <ButtonBorder
             text={loading 

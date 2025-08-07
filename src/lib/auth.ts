@@ -10,18 +10,18 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "email", placeholder: "your@email.com" },
         password: { label: "Password", type: "password" },
-        totp: { label: "2FA Code", type: "text" }
+        totp: { label: "2FA Code", type: "text" },
       },
       async authorize(credentials) {
         try {
           await connectDB();
-          
+
           if (!credentials?.email || !credentials?.password) {
             throw new Error("Email and password are required");
           }
 
           const user = await User.findOne({ email: credentials.email });
-          
+
           if (!user) {
             throw new Error("User not found");
           }
@@ -37,7 +37,9 @@ export const authOptions: AuthOptions = {
           }
 
           // Verify password
-          const isPasswordValid = await user.comparePassword(credentials.password);
+          const isPasswordValid = await user.comparePassword(
+            credentials.password
+          );
           if (!isPasswordValid) {
             throw new Error("Invalid credentials");
           }
@@ -47,16 +49,16 @@ export const authOptions: AuthOptions = {
             if (!credentials.totp) {
               throw new Error("2fa_required");
             }
-            
+
             // Verify TOTP code (you'll need to implement this)
-            const speakeasy = require('speakeasy');
+            const speakeasy = require("speakeasy");
             const verified = speakeasy.totp.verify({
               secret: user.twoFactorSecret,
-              encoding: 'base32',
+              encoding: "base32",
               token: credentials.totp,
-              window: 1
+              window: 1,
             });
-            
+
             if (!verified) {
               throw new Error("Invalid 2FA code");
             }
@@ -78,7 +80,7 @@ export const authOptions: AuthOptions = {
           console.error("Authorization error:", error.message);
           throw new Error(error.message);
         }
-      }
+      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -134,6 +136,29 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async jwt({ token, user }: { token: any; user?: any }) {
+      // Si el usuario existe (primer login), añade datos al token
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.avatar = user.avatar;
+        token.walletaddress = user.walletaddress;
+        token.hasTwitterAccess = user.hasTwitterAccess;
+        token.isVerified = user.isVerified;
+      }
+      // Si el token tiene email, busca el usuario en la base de datos y añade datos
+      if (token.email) {
+        await connectDB();
+        const dbUser = await User.findOne({ email: token.email }).lean();
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.name = dbUser.name;
+          token.avatar = dbUser.avatar;
+          token.walletaddress = dbUser.walletaddress;
+          token.hasTwitterAccess = dbUser.hasTwitterAccess;
+          token.isVerified = dbUser.isVerified;
+        }
+      }
       return token;
     },
   },

@@ -8,6 +8,7 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
+        console.log("Token en middleware:", token);
         // Protect dashboard routes
         if (req.nextUrl.pathname.startsWith("/dashboard")) {
           return !!token;

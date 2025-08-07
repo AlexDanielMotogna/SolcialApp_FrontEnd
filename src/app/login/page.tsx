@@ -34,7 +34,9 @@ const Login: React.FC = () => {
   const [verificationSent, setVerificationSent] = useState(false);
   const [noPasswordModal, setNoPasswordModal] = useState(false);
   const [noPasswordEmail, setNoPasswordEmail] = useState("");
-  const [loginLoadingVariant, setLoginLoadingVariant] = useState<"bar" | "dots" | "spinner">("dots");
+  const [loginLoadingVariant, setLoginLoadingVariant] = useState<
+    "bar" | "dots" | "spinner"
+  >("dots");
   const [hasTried2fa, setHasTried2fa] = useState(false);
   const [redirectingMsg, setRedirectingMsg] = useState<string | null>(null);
   const [mailSent, setMailSent] = useState(false);
@@ -62,7 +64,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (email) {
       fetch(`/api/auth/needs-2fa?email=${encodeURIComponent(email)}`)
-        .then(res => res.json())
+        .then((res) => res.json())
         .then((data) => setIs2faRequired(!!data.twoFactorEnabled));
     } else {
       setIs2faRequired(false);
@@ -73,7 +75,9 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Attend que le DOM soit prêt pour lire la valeur de l'input
     setTimeout(() => {
-      const input = document.querySelector<HTMLInputElement>('input[type="email"]');
+      const input = document.querySelector<HTMLInputElement>(
+        'input[type="email"]'
+      );
       if (input && input.value && !email) {
         setEmail(input.value);
       }
@@ -85,66 +89,55 @@ const Login: React.FC = () => {
     setLoginLoading(true);
     setErrorModal(null);
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, totp: is2faRequired ? totpCode : undefined }),
-      });
-      const data = await res.json();
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+      totp: is2faRequired ? totpCode : undefined,
+      callbackUrl: "/dashboard",
+    });
 
-      if (data.status === "no_password") {
+    if (result?.error) {
+      if (result.error === "no_password") {
         setNoPasswordModal(true);
         setNoPasswordEmail(email);
-
         // Envoi automatique du mail de reset
         fetch("/api/auth/request-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
         })
-          .then(r => {
+          .then((r) => {
             if (r.ok) {
               toast.success(t("password_reset_email_sent"));
             } else {
-              r.json().then(d => toast.error(d.msg || t("failed_to_send_reset_email")));
+              r.json().then((d) =>
+                toast.error(d.msg || t("failed_to_send_reset_email"))
+              );
             }
           })
           .catch(() => toast.error(t("failed_to_send_reset_email")));
-
         setLoginLoading(false);
         return;
       }
-
-      // Cas 2FA demandé ou code manquant
-      if (is2faRequired && (!totpCode || data?.error === "2fa_required")) {
+      if (
+        is2faRequired &&
+        (result.error === "2fa_required" ||
+          result.error.toLowerCase().includes("2fa"))
+      ) {
         setHasTried2fa(true);
         setLoginLoading(false);
         return;
       }
-
-      // Cas code 2FA invalide
-      if (is2faRequired && data?.error && data.error.toLowerCase().includes("2fa")) {
-        setHasTried2fa(true);
-        setLoginLoading(false);
-        return;
-      }
-
-      // Autres erreurs
-      if (data?.error) {
-        setErrorModal(data.error);
-        setLoginLoading(false);
-        return;
-      }
-
-      // Succès
+      setErrorModal(result.error);
       setLoginLoading(false);
-      setShowSpinner(true);
-      setTimeout(() => router.push("/dashboard"), 1500);
-    } catch (err) {
-      setErrorModal("internal_server_error");
+      return;
     }
+
+    // Succès
     setLoginLoading(false);
+    setShowSpinner(true);
+    setTimeout(() => router.push("/dashboard"), 1500);
   };
 
   const handleGoogleLogin = async () => {
@@ -170,17 +163,24 @@ const Login: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: noPasswordEmail }),
       })
-        .then(res => {
+        .then((res) => {
           if (res.ok) {
-            toast.success(t("password_reset_email_sent", "Password reset email sent!"));
+            toast.success(
+              t("password_reset_email_sent", "Password reset email sent!")
+            );
           } else {
-            res.json().then(data => {
-              toast.error(data.message || t("failed_to_send_reset_email", "Failed to send reset email"));
+            res.json().then((data) => {
+              toast.error(
+                data.message ||
+                  t("failed_to_send_reset_email", "Failed to send reset email")
+              );
             });
           }
         })
         .catch(() => {
-          toast.error(t("failed_to_send_reset_email", "Failed to send reset email"));
+          toast.error(
+            t("failed_to_send_reset_email", "Failed to send reset email")
+          );
         });
     }
     // Reset mailSent quand la modale se ferme
@@ -195,14 +195,17 @@ const Login: React.FC = () => {
       >
         {/* Header */}
         <div className="w-full p-8 flex items-center justify-between">
-          <h3 className="text-5xl text-white font-bold">{t("login")}</h3> {/* Passe à text-5xl */}
+          <h3 className="text-5xl text-white font-bold">{t("login")}</h3>{" "}
+          {/* Passe à text-5xl */}
         </div>
 
         {/* Form content */}
         <div className="w-full flex flex-col gap-6 px-10 py-4">
           {/* Email */}
           <div className="w-full flex flex-col gap-2">
-            <label className="font-semibold text-[#ACB5BB] text-xl">{t("email")}</label>
+            <label className="font-semibold text-[#ACB5BB] text-xl">
+              {t("email")}
+            </label>
             <div className="relative w-full">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <Image src={User} alt="user" width={28} height={28} />
@@ -220,7 +223,9 @@ const Login: React.FC = () => {
           </div>
           {/* Password */}
           <div className="w-full flex flex-col gap-2">
-            <label className="font-semibold text-[#ACB5BB] text-xl">{t("password")}</label>
+            <label className="font-semibold text-[#ACB5BB] text-xl">
+              {t("password")}
+            </label>
             <div className="relative w-full">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <Image src={Key} alt="key" width={28} height={28} />
@@ -241,8 +246,16 @@ const Login: React.FC = () => {
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                <span className="inline-block" style={{ filter: "contrast(2) brightness(1.5)" }}>
-                  <Image src={showPassword ? EyeSlash : Eye} alt="toggle password" width={24} height={24} />
+                <span
+                  className="inline-block"
+                  style={{ filter: "contrast(2) brightness(1.5)" }}
+                >
+                  <Image
+                    src={showPassword ? EyeSlash : Eye}
+                    alt="toggle password"
+                    width={24}
+                    height={24}
+                  />
                 </span>
               </button>
             </div>
@@ -269,7 +282,10 @@ const Login: React.FC = () => {
               onClick={() =>
                 handleRedirect(
                   "/forgot-password",
-                  t("redirecting_forgot_password", "Redirecting to forgot password page...")
+                  t(
+                    "redirecting_forgot_password",
+                    "Redirecting to forgot password page..."
+                  )
                 )
               }
               className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
@@ -293,7 +309,7 @@ const Login: React.FC = () => {
               <LoadingBar
                 variant="primary"
                 size="md"
-                text={<span className="text-xl">{redirectingMsg}</span>}
+                text={redirectingMsg}
                 className="shadow-md shadow-blue-500/20"
               />
             </div>
@@ -301,7 +317,9 @@ const Login: React.FC = () => {
 
           <div className="w-full flex items-center gap-3">
             <div className="h-[1px] bg-[#44444A] w-1/2" />
-            <span className="text-[#6C7278] font-normal text-xl">{t("or")}</span>
+            <span className="text-[#6C7278] font-normal text-xl">
+              {t("or")}
+            </span>
             <div className="h-[1px] bg-[#44444A] w-1/2" />
           </div>
           <div
@@ -309,7 +327,9 @@ const Login: React.FC = () => {
             onClick={handleGoogleLogin}
           >
             <Image src={google} alt="google" width={32} height={32} />
-            <span className="text-white font-medium text-xl">{t("login_with_google")}</span>
+            <span className="text-white font-medium text-xl">
+              {t("login_with_google")}
+            </span>
           </div>
           <p className="font-medium text-xl text-[#ACB5BB] text-center">
             {t("dont_have_account")}{" "}
@@ -318,7 +338,10 @@ const Login: React.FC = () => {
               onClick={() =>
                 handleRedirect(
                   "/register",
-                  t("redirecting_register", "Redirecting to registration page...")
+                  t(
+                    "redirecting_register",
+                    "Redirecting to registration page..."
+                  )
                 )
               }
               className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
@@ -334,7 +357,10 @@ const Login: React.FC = () => {
         <AuthErrorModal
           message={
             errorModal === "no_password"
-              ? t("no_password_modal", "This account does not have a password associated. Please create one using the link sent to your email.")
+              ? t(
+                  "no_password_modal",
+                  "This account does not have a password associated. Please create one using the link sent to your email."
+                )
               : t(errorModal)
           }
           onClose={() => setErrorModal(null)}
@@ -346,7 +372,10 @@ const Login: React.FC = () => {
       {verificationSent && (
         <AuthSuccessModal
           title={t("email_sent")}
-          message={t("verification_email_sent", "Please check your inbox and follow the instructions to verify your email.")}
+          message={t(
+            "verification_email_sent",
+            "Please check your inbox and follow the instructions to verify your email."
+          )}
           onClose={() => setVerificationSent(false)}
           className="text-xl"
         />
@@ -356,7 +385,10 @@ const Login: React.FC = () => {
       {noPasswordModal && (
         <AuthSuccessModal
           title={t("password_missing", "Mot de passe manquant")}
-          message={t("no_password_modal", "Ce compte n'a pas de mot de passe associé. Un email pour en créer un vient de vous être envoyé.")}
+          message={t(
+            "no_password_modal",
+            "Ce compte n'a pas de mot de passe associé. Un email pour en créer un vient de vous être envoyé."
+          )}
           buttonText={t("ok_got_it", "OK, got it")}
           onButtonClick={() => setNoPasswordModal(false)}
           onClose={() => setNoPasswordModal(false)}

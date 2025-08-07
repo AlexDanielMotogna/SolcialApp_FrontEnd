@@ -3,19 +3,12 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
-import { LoadingBar, LoadingOverlay, ListLoadingSkeleton, LoadingSpinner } from "@/components/ui/LoadingBar";
-
-// ✅ CUSTOM STYLES FOR SMOOTH ANIMATIONS
-const customStyles = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fadeIn {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-`;
-
+import {
+  LoadingBar,
+  LoadingOverlay,
+  ListLoadingSkeleton,
+  LoadingSpinner,
+} from "@/components/ui/LoadingBar";
 // Import Quest type
 import type { Quest } from "@/types/quest";
 
@@ -36,12 +29,13 @@ import {
   QUEST_FILTERS,
   TWITTER_AUTH_MESSAGES,
   QUEST_MESSAGES,
-} from "@/constants/questConstants";
+} from "@/constants/quest/questConstants";
 
 // Components
 import QuestHeader from "@/components/quest/QuestHeader";
 import QuestGrid from "@/components/quest/QuestGrid";
 import QuestFooter from "@/components/quest/QuestFooter";
+import "../../styles/animation.css";
 
 // Lazy loaded components
 const QuestModals = dynamic(() => import("@/components/quest/QuestModals"), {
@@ -52,8 +46,14 @@ const Quests = () => {
   // ============================================================================
   // AUTHENTICATION - SIMPLIFIED WITH NEW HOOK
   // ============================================================================
-  const { user, isLoading: authLoading, isAuthenticated, isUnauthenticated, refreshUser } = useAuthUser();
-  
+  const {
+    user,
+    isLoading: authLoading,
+    isAuthenticated,
+    isUnauthenticated,
+    refreshUser,
+  } = useAuthUser();
+
   // ============================================================================
   // CONTEXT & HOOKS
   // ============================================================================
@@ -64,8 +64,8 @@ const Quests = () => {
   const {
     quests,
     loading,
-    filterLoading, // ✅ NEW: SPECIFIC LOADING FOR FILTERS
-    pageLoading, // ✅ NEW: SPECIFIC LOADING FOR PAGINATION
+    filterLoading,
+    pageLoading,
     currentPage,
     totalPages,
     totalCount,
@@ -80,7 +80,7 @@ const Quests = () => {
   // LOCAL STATE
   // ============================================================================
   const { userQuests, loadingUserQuests, refreshUserQuests } = useUserQuests(
-    user?.id 
+    user?.id
   );
   const { startSessionTimer, stopSessionTimer } = useSessionTimers();
 
@@ -172,16 +172,19 @@ const Quests = () => {
     });
 
   // ✅ MEMOIZE BUTTON PROPS FUNCTION TO PREVENT UNNECESSARY RE-RENDERS
-  const getButtonPropsCallback = useCallback((quest: any) => {
-    const userQuest = userQuests.find((uq) => uq.questId === quest._id);
-    const isLoading = loadingQuestId === quest._id && isExecutingQuest;
-    return questUtils.getQuestButtonProps(quest, userQuest, user, isLoading);
-  }, [userQuests, loadingQuestId, isExecutingQuest, user]);
+  const getButtonPropsCallback = useCallback(
+    (quest: any) => {
+      const userQuest = userQuests.find((uq) => uq.questId === quest._id);
+      const isLoading = loadingQuestId === quest._id && isExecutingQuest;
+      return questUtils.getQuestButtonProps(quest, userQuest, user, isLoading);
+    },
+    [userQuests, loadingQuestId, isExecutingQuest, user]
+  );
 
   // ============================================================================
   // EFFECTS - OPTIMIZED WALLET SYNC WITH LAZY LOADING
   // ============================================================================
-  
+
   // ✅ MINIMUM LOADING TIME EFFECT (PREVENT TOO FAST TRANSITIONS)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -195,31 +198,37 @@ const Quests = () => {
     const syncWallet = async () => {
       // ✅ ONLY SYNC IF WALLET CHANGED AND WE HAVEN'T ALREADY SYNCED IT
       if (
-        user && 
-        walletAddress && 
-        isConnected && 
+        user &&
+        walletAddress &&
+        isConnected &&
         user.walletaddress !== walletAddress &&
         lastSyncedWallet !== walletAddress
       ) {
-        console.log('🔄 Syncing new wallet for user:', user.email);
-        console.log('🔄 Current wallet:', user.walletaddress);
-        console.log('🔄 New wallet:', walletAddress);
-        
+        console.log("🔄 Syncing new wallet for user:", user.email);
+        console.log("🔄 Current wallet:", user.walletaddress);
+        console.log("🔄 New wallet:", walletAddress);
+
         try {
           await updateWalletInDB(walletAddress);
           setLastSyncedWallet(walletAddress);
-          console.log('✅ Wallet sync completed');
-          
+          console.log("✅ Wallet sync completed");
+
           // ✅ DON'T CALL refreshUser() - IT CREATES INFINITE LOOP
           // The session will be updated on next navigation or manual refresh
         } catch (error) {
-          console.error('❌ Wallet sync failed:', error);
+          console.error("❌ Wallet sync failed:", error);
         }
       }
     };
 
     syncWallet();
-  }, [user?.id, walletAddress, isConnected, user?.walletaddress, lastSyncedWallet]); // ✅ REMOVED updateWalletInDB - IT'S NOW STABLE
+  }, [
+    user?.id,
+    walletAddress,
+    isConnected,
+    user?.walletaddress,
+    lastSyncedWallet,
+  ]); // ✅ REMOVED updateWalletInDB - IT'S NOW STABLE
 
   // ✅ RESET SYNC STATE WHEN USER CHANGES
   useEffect(() => {
@@ -234,12 +243,11 @@ const Quests = () => {
   useEffect(() => {
     const twitterStatus = searchParams.get("twitter");
     if (!twitterStatus) return;
-
+    // handle Twitter authentication status
     const handleTwitterAuth = async () => {
       switch (twitterStatus) {
         case "success":
           toast.success(TWITTER_AUTH_MESSAGES.SUCCESS);
-          // ✅ REFRESH USER SESSION AFTER TWITTER AUTH
           await refreshUser();
           await refreshAllData();
           break;
@@ -268,19 +276,18 @@ const Quests = () => {
   if (authLoading) {
     return (
       <>
-        <style>{customStyles}</style>
         <div className="min-h-screen flex flex-col">
           <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
             {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
             <div className="w-full mb-4">
-              <LoadingBar 
-                variant="primary" 
-                size="md" 
-                text="Initializing your quest dashboard..." 
+              <LoadingBar
+                variant="primary"
+                size="md"
+                text="Initializing your quest dashboard..."
                 className="animate-slideInUp"
               />
             </div>
-            
+
             <div className="space-y-4">
               <ListLoadingSkeleton items={6} />
             </div>
@@ -304,19 +311,18 @@ const Quests = () => {
   if (!user) {
     return (
       <>
-        <style>{customStyles}</style>
         <div className="min-h-screen flex flex-col">
           <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
             {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
             <div className="w-full mb-4">
-              <LoadingBar 
-                variant="primary" 
-                size="md" 
-                text="Loading your profile data..." 
+              <LoadingBar
+                variant="primary"
+                size="md"
+                text="Loading your profile data..."
                 className="animate-slideInUp"
               />
             </div>
-            
+
             <div className="space-y-4">
               <ListLoadingSkeleton items={6} />
             </div>
@@ -328,15 +334,10 @@ const Quests = () => {
   // ============================================================================
   // RENDER WITH SMOOTH LAZY LOADING
   // ============================================================================
-return (
+  return (
     <>
-      {/* ✅ INJECT CUSTOM STYLES */}
-      <style>{customStyles}</style>
-      
       <div className="min-h-screen flex flex-col">
         <div className="flex-1 w-full px-5 p-[1.6rem] xl:py-[1.8rem] xl:px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
-
-
           <QuestHeader
             filters={QUEST_FILTERS}
             currentFilter={filter}
@@ -347,13 +348,12 @@ return (
           />
 
           <div className="flex-1 w-full">
-            {/* ✅ SKELETON LOADING WITH SMOOTH TRANSITIONS */}
             {loading || minLoadingTime ? (
               <div className="space-y-4 opacity-100 transition-opacity duration-500">
-                <LoadingBar 
-                  variant="secondary" 
-                  size="lg" 
-                  text="Fetching your epic quests..." 
+                <LoadingBar
+                  variant="secondary"
+                  size="lg"
+                  text="Fetching your epic quests..."
                   className="mb-6"
                 />
                 <ListLoadingSkeleton items={questsPerPage} />
@@ -376,18 +376,18 @@ return (
         </div>
 
         {/* ✅ LOADING OVERLAY PARA QUEST ACTIONS */}
-        <LoadingOverlay 
-          show={isExecutingQuest} 
-          text="Processing your quest action..." 
-          variant="dots" 
+        <LoadingOverlay
+          show={isExecutingQuest}
+          text="Processing your quest action..."
+          variant="dots"
           blur={true}
         />
 
         {/* ✅ LOADING OVERLAY PARA USER QUESTS */}
-        <LoadingOverlay 
-          show={loadingUserQuests && !loading} 
-          text="Syncing your quest progress..." 
-          variant="spinner" 
+        <LoadingOverlay
+          show={loadingUserQuests && !loading}
+          text="Syncing your quest progress..."
+          variant="spinner"
           blur={false}
         />
 
@@ -403,7 +403,7 @@ return (
           modalType={modalType}
           selectedQuest={selectedQuest}
           selectedUserQuest={selectedUserQuest}
-          user={user} // ✅ SIMPLIFIED USER FROM SESSION
+          user={user}
           loading={loading || loadingUserQuests}
           showConnectTwitterModal={showConnectTwitterModal}
           showExpirationModal={showExpirationModal}
@@ -426,6 +426,6 @@ return (
       </div>
     </>
   );
-}
+};
 
 export default Quests;

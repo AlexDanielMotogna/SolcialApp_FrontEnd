@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ButtonBlack from "../ButtonBlack";
 
 interface QuestAccountHeaderProps {
@@ -18,16 +18,15 @@ interface QuestAccountHeaderProps {
 }
 
 const QuestAccountHeader = ({ stats }: QuestAccountHeaderProps) => {
-  const router = useRouter();
+
 
   return (
     <div className="w-full max-w-8xl flex flex-col gap-6 mb-8 ml-12">
       {/* Back Button */}
       <div className="flex items-center justify-start">
-        <ButtonBlack
-          text="Back to Quests"
-          onClick={() => router.push("/dashboard/quests")}
-        />
+        <Link href="/dashboard/quests" prefetch>
+          <ButtonBlack text="Back to Quests" />
+        </Link>
       </div>
 
       {/* Stats Cards */}

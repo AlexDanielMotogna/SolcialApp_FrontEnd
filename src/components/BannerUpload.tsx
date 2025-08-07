@@ -1,7 +1,5 @@
-// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\components\BannerUpload.tsx
-
-import React, { useState, useRef } from 'react';
-import Image from 'next/image';
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 
 interface BannerUploadProps {
   onImageUpload: (imageData: { publicId: string; url: string }) => void;
@@ -25,13 +23,13 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
     // Validaciones del lado del cliente
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
-      alert('File size exceeds 2MB limit');
+      alert("File size exceeds 2MB limit");
       return;
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      alert('Invalid file type. Only JPEG, PNG, and WebP are allowed');
+      alert("Invalid file type. Only JPEG, PNG, and WebP are allowed");
       return;
     }
 
@@ -46,10 +44,10 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const response = await fetch('/api/upload/banner', {
-        method: 'POST',
+      const response = await fetch("/api/upload/banner", {
+        method: "POST",
         body: formData,
       });
 
@@ -60,14 +58,14 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
           publicId: result.data.publicId,
           url: result.data.url,
         });
-        console.log('✅ Image uploaded successfully:', result.data.publicId);
+        console.log("✅ Image uploaded successfully:", result.data.publicId);
       } else {
-        alert(result.error || 'Upload failed');
+        alert(result.error || "Upload failed");
         setPreview(currentImage || null);
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Upload failed');
+      console.error("Upload error:", error);
+      alert("Upload failed");
       setPreview(currentImage || null);
     } finally {
       setUploading(false);
@@ -116,17 +114,19 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
       <label className="block text-white font-semibold mb-2">
         Quest Banner
       </label>
-      
+
       <div
         className={`
           relative w-full h-60 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200
-          ${dragOver 
-            ? 'border-[#9945FF] bg-[#9945FF]/10' 
-            : 'border-[#44444A] hover:border-[#9945FF]/50'
+          ${
+            dragOver
+              ? "border-[#9945FF] bg-[#9945FF]/10"
+              : "border-[#44444A] hover:border-[#9945FF]/50"
           }
-          ${disabled || uploading 
-            ? 'cursor-not-allowed opacity-50' 
-            : 'hover:bg-[#2C2C30]/30'
+          ${
+            disabled || uploading
+              ? "cursor-not-allowed opacity-50"
+              : "hover:bg-[#2C2C30]/30"
           }
         `}
         onDrop={handleDrop}
@@ -153,12 +153,22 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
               fill
               className="object-cover rounded-lg"
             />
-            
+
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
               <div className="text-white text-center">
-                <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                <svg
+                  className="w-8 h-8 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"
+                  />
                 </svg>
                 <p className="text-sm font-medium">Click to change banner</p>
               </div>
@@ -183,13 +193,27 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
               </>
             ) : (
               <>
-                <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                <svg
+                  className="w-12 h-12 mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"
+                  />
                 </svg>
                 <p className="text-lg font-medium mb-2">Choose quest banner</p>
                 <p className="text-sm text-center">
-                  Drag & drop an image here, or click to select<br/>
-                  <span className="text-[#9945FF]">Max 2MB • JPEG, PNG, WebP</span><br/>
+                  Drag & drop an image here, or click to select
+                  <br />
+                  <span className="text-[#9945FF]">
+                    Max 2MB • JPEG, PNG, WebP
+                  </span>
+                  <br />
                   <span className="text-[#ACB5BB]">Recommended: 400x240px</span>
                 </p>
               </>
@@ -206,5 +230,4 @@ const BannerUpload: React.FC<BannerUploadProps> = ({
   );
 };
 
-// ✅ IMPORTANTE: EXPORTACIÓN CORRECTA
 export default BannerUpload;

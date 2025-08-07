@@ -1,31 +1,30 @@
-
 "use client";
 // ============================================================================
 // REACT & NEXT.JS IMPORTS
 // ============================================================================
 import { useEffect, useState } from "react";
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 // ============================================================================
 // COMPONENTS IMPORTS
 // ============================================================================
 import ButtonBlack from "@/components/ButtonBlack";
-import MyCreatedQuestsCard from "@/components/MyCreatedQuestsCard";
-import CompletedQuestsCard from "@/components/CompletedQuestsCard";
+import MyCreatedQuestsCard from "@/components/quest/MyCreatedQuestsCard";
+import CompletedQuestsCard from "@/components/quest/CompletedQuestsCard";
 import EditQuest from "@/components/modals/EditQuest";
 
 // ============================================================================
 // UI LOADING COMPONENTS
 // ============================================================================
-import { 
-  LoadingBar, 
-  LoadingOverlay, 
-  LoadingSpinner 
+import {
+  LoadingBar,
+  LoadingOverlay,
+  LoadingSpinner,
 } from "@/components/ui/LoadingBar";
 import {
   CreatedQuestsTableSkeleton,
-  CompletedQuestsTableSkeleton
+  CompletedQuestsTableSkeleton,
 } from "@/components/ui/TableSkeletons";
 
 // ============================================================================
@@ -50,19 +49,19 @@ const QuestAccount = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedQuest, setSelectedQuest] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  
+
   // ✅ LOADING STATES MEJORADOS CON LAZY LOADING
   const [loading, setLoading] = useState(false);
   const [loadingCreated, setLoadingCreated] = useState(true); // ✅ START WITH TRUE FOR SMOOTH TRANSITION
   const [loadingCompleted, setLoadingCompleted] = useState(true); // ✅ START WITH TRUE FOR SMOOTH TRANSITION
   const [loadingAction, setLoadingAction] = useState(false);
-  const [actionText, setActionText] = useState('');
+  const [actionText, setActionText] = useState("");
   const [minLoadingTime, setMinLoadingTime] = useState(true); // ✅ MINIMUM LOADING TIME FOR SMOOTH TRANSITION
 
   // ============================================================================
   // EFFECTS CON LAZY LOADING
   // ============================================================================
-  
+
   // ✅ MINIMUM LOADING TIME EFFECT (PREVENT TOO FAST TRANSITIONS)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -74,22 +73,31 @@ const QuestAccount = () => {
 
   useEffect(() => {
     const fetchRealUser = async () => {
-      if (session?.user?.email && status === 'authenticated') {
+      if (session?.user?.email && status === "authenticated") {
         try {
           setLoading(true);
-          console.log('👤 [Account] Fetching real user data for:', session.user.email);
-          
-          const response = await fetch('/api/user/profile');
+          console.log(
+            "👤 [Account] Fetching real user data for:",
+            session.user.email
+          );
+
+          const response = await fetch("/api/user/profile");
           const result = await response.json();
-          
+
           if (response.ok && result.success && result.user) {
             setUser(result.user);
-            console.log('✅ [Account] Real user data loaded:', result.user.email);
+            console.log(
+              "✅ [Account] Real user data loaded:",
+              result.user.email
+            );
           } else {
-            console.error('❌ [Account] Failed to fetch user data:', result.error);
+            console.error(
+              "❌ [Account] Failed to fetch user data:",
+              result.error
+            );
           }
         } catch (error) {
-          console.error('❌ [Account] Error fetching user data:', error);
+          console.error("❌ [Account] Error fetching user data:", error);
         } finally {
           setLoading(false);
         }
@@ -107,22 +115,28 @@ const QuestAccount = () => {
   const fetchCompletedUserQuests = async (userId: string) => {
     try {
       setLoadingCompleted(true);
-      console.log('📊 [Account] Fetching completed quests for user:', userId);
-      
+      console.log("📊 [Account] Fetching completed quests for user:", userId);
+
       // ✅ SIMULATE MINIMUM LOADING TIME FOR SMOOTH UX
       const [response] = await Promise.all([
         fetch(`/api/user-quests/completed?userId=${userId}`),
-        new Promise(resolve => setTimeout(resolve, 800)) // ✅ MINIMUM 800ms DELAY
+        new Promise((resolve) => setTimeout(resolve, 800)), // ✅ MINIMUM 800ms DELAY
       ]);
-      
+
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('❌ [Account] Failed to fetch completed quests:', data.error);
+        console.error(
+          "❌ [Account] Failed to fetch completed quests:",
+          data.error
+        );
         throw new Error(data.error || "Failed to fetch completed userQuests");
       }
 
-      console.log('✅ [Account] Completed quests fetched:', data.completedQuests?.length || 0);
+      console.log(
+        "✅ [Account] Completed quests fetched:",
+        data.completedQuests?.length || 0
+      );
       return data.completedQuests || [];
     } catch (error) {
       console.error("❌ [Account] Error fetching completed userQuests:", error);
@@ -135,7 +149,7 @@ const QuestAccount = () => {
 
   const refreshQuests = async () => {
     if (!user?.id) {
-      console.log('⏳ [Account] No user ID available for refreshing quests');
+      console.log("⏳ [Account] No user ID available for refreshing quests");
       return;
     }
 
@@ -143,24 +157,24 @@ const QuestAccount = () => {
       // ✅ DON'T SET LOADING TO TRUE IF IT'S ALREADY LOADING (SMOOTH TRANSITION)
       if (!loadingCreated) setLoadingCreated(true);
       if (!loadingCompleted) setLoadingCompleted(true);
-      
-      console.log('🔄 [Account] Refreshing quests for user:', user.id);
-      
+
+      console.log("🔄 [Account] Refreshing quests for user:", user.id);
+
       // ✅ ADD MINIMUM LOADING TIME FOR SMOOTH TRANSITIONS
       const [created, completedUserQuests] = await Promise.all([
         Promise.all([
           fetchCreatedQuests(user.id),
-          new Promise(resolve => setTimeout(resolve, 600)) // ✅ MINIMUM 600ms FOR CREATED QUESTS
+          new Promise((resolve) => setTimeout(resolve, 600)), // ✅ MINIMUM 600ms FOR CREATED QUESTS
         ]).then(([result]) => result),
         fetchCompletedUserQuests(user.id), // ✅ ALREADY HAS ITS OWN DELAY
       ]);
 
       setCreatedQuests(created);
       setCompletedUserQuests(completedUserQuests);
-      
-      console.log('✅ [Account] Quests refreshed:', {
+
+      console.log("✅ [Account] Quests refreshed:", {
         created: created.length,
-        completed: completedUserQuests.length
+        completed: completedUserQuests.length,
       });
     } catch (error) {
       console.error("❌ [Account] Error refreshing quests:", error);
@@ -173,8 +187,10 @@ const QuestAccount = () => {
 
   useEffect(() => {
     if (!user?.id || minLoadingTime) return; // ✅ WAIT FOR MINIMUM LOADING TIME
-    
-    console.log('🚀 [Account] User loaded and minimum time passed, refreshing quests...');
+
+    console.log(
+      "🚀 [Account] User loaded and minimum time passed, refreshing quests..."
+    );
     refreshQuests();
   }, [user?.id, minLoadingTime]); // ✅ DEPEND ON BOTH USER AND MINIMUM TIME
 
@@ -189,9 +205,9 @@ const QuestAccount = () => {
 
     try {
       setLoadingAction(true);
-      setActionText('Claiming your reward...');
-      console.log('💰 [Account] Claiming reward for quest:', userQuest._id);
-      
+      setActionText("Claiming your reward...");
+      console.log("💰 [Account] Claiming reward for quest:", userQuest._id);
+
       const response = await fetch("/api/user-quests/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -202,15 +218,15 @@ const QuestAccount = () => {
       });
 
       if (response.ok) {
-        console.log('✅ [Account] Reward claimed successfully');
+        console.log("✅ [Account] Reward claimed successfully");
         toast.success("Reward claimed successfully!");
-        
-        setActionText('Refreshing your quests...');
+
+        setActionText("Refreshing your quests...");
         const updated = await fetchCompletedUserQuests(user.id);
         setCompletedUserQuests(updated);
       } else {
         const errorData = await response.json();
-        console.error('❌ [Account] Failed to claim reward:', errorData.error);
+        console.error("❌ [Account] Failed to claim reward:", errorData.error);
         toast.error(errorData.error || "Failed to claim reward");
       }
     } catch (error) {
@@ -218,7 +234,7 @@ const QuestAccount = () => {
       toast.error("Error claiming reward");
     } finally {
       setLoadingAction(false);
-      setActionText('');
+      setActionText("");
     }
   };
 
@@ -227,9 +243,9 @@ const QuestAccount = () => {
 
     try {
       setLoadingAction(true);
-      setActionText('Canceling quest...');
-      console.log('🚫 [Account] Canceling quest:', selectedQuest._id);
-      
+      setActionText("Canceling quest...");
+      console.log("🚫 [Account] Canceling quest:", selectedQuest._id);
+
       const response = await fetch("/api/quests/cancel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -237,16 +253,16 @@ const QuestAccount = () => {
       });
 
       if (response.ok) {
-        console.log('✅ [Account] Quest canceled successfully');
+        console.log("✅ [Account] Quest canceled successfully");
         toast.success("Quest canceled successfully");
-        
-        setActionText('Refreshing quests...');
+
+        setActionText("Refreshing quests...");
         await refreshQuests();
         setShowCancelModal(false);
         setSelectedQuest(null);
       } else {
         const errorData = await response.json();
-        console.error('❌ [Account] Failed to cancel quest:', errorData.error);
+        console.error("❌ [Account] Failed to cancel quest:", errorData.error);
         toast.error("Failed to cancel quest");
       }
     } catch (error) {
@@ -254,7 +270,7 @@ const QuestAccount = () => {
       toast.error("Error canceling quest");
     } finally {
       setLoadingAction(false);
-      setActionText('');
+      setActionText("");
     }
   };
 
@@ -286,10 +302,13 @@ const QuestAccount = () => {
     setShowCancelModal(true);
   };
 
-  const closeEditModal = () => {
+  // Accepts shouldRefresh: boolean
+  const closeEditModal = (shouldRefresh = false) => {
     setShowEditModal(false);
     setSelectedQuest(null);
-    refreshQuests();
+    if (shouldRefresh) {
+      refreshQuests();
+    }
   };
 
   const closeCancelModal = () => setShowCancelModal(false);
@@ -297,10 +316,9 @@ const QuestAccount = () => {
   // ============================================================================
   // LOADING & AUTHENTICATION STATES CON SMOOTH TRANSITION
   // ============================================================================
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
-        {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
         <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
           <div className="group">
             <ButtonBlack
@@ -309,38 +327,23 @@ const QuestAccount = () => {
             />
           </div>
         </div>
-        
-        <LoadingOverlay 
-          show={true} 
-          text="Initializing your account dashboard..." 
-          variant="spinner" 
+        <LoadingOverlay
+          show={true}
+          text="Initializing your account dashboard..."
+          variant="spinner"
         />
       </div>
     );
   }
 
-  if (status === 'unauthenticated') {
+  if (status === "unauthenticated") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <LoadingSpinner size="lg" variant="secondary" />
-          <p className="text-lg mt-4 text-white">Please log in to access your account.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
-        {/* ✅ SHOW PAGE STRUCTURE IMMEDIATELY */}
-        <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
-          <div className="group">
-            <ButtonBlack
-              text="← Back to Quests"
-              onClick={() => window.history.back()}
-            />
-          </div>
+          <p className="text-lg mt-4 text-white">
+            Please log in to access your account.
+          </p>
         </div>
       </div>
     );
@@ -352,10 +355,6 @@ const QuestAccount = () => {
   return (
     <>
       <div className="w-full min-h-[1200px] flex flex-col items-center justify-start py-12 px-2">
-        
-
-
-        {/* ✅ BACK BUTTON MEJORADO */}
         <div className="w-full max-w-8xl flex items-center justify-start mb-8 ml-12">
           <div className="group">
             <ButtonBlack
@@ -365,9 +364,7 @@ const QuestAccount = () => {
           </div>
         </div>
 
-        {/* ============================================================================ */}
-        {/* CREATED QUESTS SECTION MEJORADA */}
-        {/* ============================================================================ */}
+        {/* CREATED QUESTS SECTION */}
         <div className="flex items-center space-x-4 w-full max-w-6xl mb-6">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             🚀 My Created Quests
@@ -378,22 +375,21 @@ const QuestAccount = () => {
           </div>
         </div>
 
-        {/* ✅ LOADING BAR ESPECÍFICO MEJORADO */}
         {loadingCreated && (
           <div className="w-full max-w-6xl mb-4">
-            <LoadingBar 
-              variant="success" 
-              size="sm" 
-              text="🎯 Loading your created quests..." 
+            <LoadingBar
+              variant="success"
+              size="sm"
+              text="🎯 Loading your created quests..."
               className="shadow-md shadow-green-500/20"
             />
           </div>
         )}
 
-        {/* ✅ SKELETON TABLE O CONTENIDO REAL CON TRANSICIÓN SUAVE */}
-        {loadingCreated || minLoadingTime ? (
+        {/* Show skeletons if loading or user not loaded yet */}
+        {loadingCreated || minLoadingTime || !user ? (
           <div className="mx-auto opacity-100 transition-opacity duration-500">
-          <CreatedQuestsTableSkeleton rows={5} />
+            <CreatedQuestsTableSkeleton rows={5} />
           </div>
         ) : (
           <div className="mx-auto transition-all duration-700 animate-slideInUp opacity-0 animate-fadeIn">
@@ -405,9 +401,7 @@ const QuestAccount = () => {
           </div>
         )}
 
-        {/* ============================================================================ */}
-        {/* COMPLETED QUESTS SECTION MEJORADA */}
-        {/* ============================================================================ */}
+        {/* COMPLETED QUESTS SECTION */}
         <div className="flex items-center space-x-4 w-full max-w-6xl mb-6 mt-16">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             🏆 Completed Quests
@@ -418,20 +412,19 @@ const QuestAccount = () => {
           </div>
         </div>
 
-        {/* ✅ LOADING BAR ESPECÍFICO MEJORADO */}
         {loadingCompleted && (
           <div className="w-full max-w-6xl mb-4">
-            <LoadingBar 
-              variant="warning" 
-              size="sm" 
-              text="💰 Loading your completed quests..." 
+            <LoadingBar
+              variant="warning"
+              size="sm"
+              text="💰 Loading your completed quests..."
               className="shadow-md shadow-yellow-500/20"
             />
           </div>
         )}
 
-        {/* ✅ SKELETON TABLE O CONTENIDO REAL CON TRANSICIÓN SUAVE */}
-        {loadingCompleted || minLoadingTime ? (
+        {/* Show skeletons if loading or user not loaded yet */}
+        {loadingCompleted || minLoadingTime || !user ? (
           <div className="opacity-100 transition-opacity duration-500">
             <CompletedQuestsTableSkeleton rows={3} />
           </div>
@@ -445,45 +438,44 @@ const QuestAccount = () => {
           </div>
         )}
 
-        {/* ============================================================================ */}
-        {/* MODALS MEJORADOS */}
-        {/* ============================================================================ */}
+        {/* MODALS */}
         <EditQuest
           isOpen={showEditModal}
           onClose={closeEditModal}
-          refreshQuests={refreshQuests}
           initialData={selectedQuest}
           user={user}
         />
 
-        {/* ✅ MODAL DE CONFIRMACIÓN ÉPICO */}
+        {/* confirmation modal */}
         {showCancelModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-gradient-to-br from-[#18181C] to-[#1E1E20] p-8 rounded-3xl shadow-2xl flex flex-col items-center min-w-[450px] border border-[#44444A] transform transition-all duration-300 animate-slideInUp">
-              
-              {/* ✅ LOADING BAR ÉPICO EN EL MODAL */}
+              {/* loadbar */}
               {loadingAction && (
                 <div className="w-full mb-6">
-                  <LoadingBar 
-                    variant="error" 
-                    size="md" 
-                    text="🚫 Processing cancellation..." 
+                  <LoadingBar
+                    variant="error"
+                    size="md"
+                    text="🚫 Processing cancellation..."
                     className="shadow-lg shadow-red-500/30"
                   />
                 </div>
               )}
 
-              {/* ✅ ICONO Y TEXTO MEJORADOS */}
+              {/* ICONO Y TEXTO */}
               <div className="w-16 h-16 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-full flex items-center justify-center mb-6">
                 <span className="text-3xl">⚠️</span>
               </div>
 
-              <h3 className="text-2xl font-bold text-white mb-2">Cancel Quest?</h3>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                Cancel Quest?
+              </h3>
               <p className="text-gray-400 mb-8 text-center">
-                This action cannot be undone. The quest will be permanently cancelled.
+                This action cannot be undone. The quest will be permanently
+                cancelled.
               </p>
 
-              {/* ✅ BOTONES MEJORADOS */}
+              {/* BOTONES */}
               <div className="flex gap-4 w-full">
                 <button
                   onClick={closeCancelModal}
@@ -512,15 +504,15 @@ const QuestAccount = () => {
         )}
       </div>
 
-      {/* ✅ LOADING OVERLAY ÉPICO PARA ACCIONES */}
-      <LoadingOverlay 
-        show={loadingAction} 
-        text={actionText || "⚡ Processing your request..."} 
-        variant="dots" 
+      {/* LOADING OVERLAY PARA ACCIONES */}
+      <LoadingOverlay
+        show={loadingAction}
+        text={actionText || "⚡ Processing your request..."}
+        variant="dots"
         blur={true}
       />
 
-      {/* ✅ FOOTER MEJORADO */}
+      {/* FOOTER */}
       <footer className="w-full h-20 mt-24 bg-gradient-to-t from-[#0A0A0B] to-transparent" />
     </>
   );

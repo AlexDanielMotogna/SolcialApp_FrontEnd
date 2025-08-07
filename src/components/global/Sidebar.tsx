@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FC, useState, useCallback, JSX } from "react";
-import ReactLoading from 'react-loading';
+import ReactLoading from "react-loading";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Menu from "../../../public/icons/Menu";
@@ -19,6 +19,8 @@ import Help from "../../../public/icons/Help";
 import Logo from "../../../public/imgs/logo.png";
 import Sort from "../../../public/icons/Sort";
 import Avatar from "../../../public/imgs/Avatar.png";
+import UserAvatar from "./UserAvatar";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 interface MenuItemProps {
   icon: JSX.Element;
@@ -36,11 +38,13 @@ const MenuItem: FC<MenuItemProps> = ({
   onClick,
 }) => (
   <div
-    className={`w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer ${
-      isActive
-        ? "bg-[#2C2C30] border border-[#F6F7FA33] text-white shadow-[0px_8px_23px_-3px_rgba(0,0,0,1)]"
-        : "text-[#ACB5BB]"
-    }`}
+    className={`w-full flex items-center justify-start gap-3 py-[10px] px-3 rounded-xl cursor-pointer transition-colors duration-150
+      ${
+        isActive
+          ? "bg-[#2C2C30] border border-[#F6F7FA33] text-white shadow-[0px_8px_23px_-3px_rgba(0,0,0,1)]"
+          : "text-[#ACB5BB] hover:bg-[#23232A] hover:text-white"
+      }
+    `}
     style={
       isActive
         ? { boxShadow: "inset 0px -5px 10px 0px rgba(255, 255, 255, 0.1)" }
@@ -61,6 +65,7 @@ const Sidebar: FC<{
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ activePath, setActivePath, isSidebarOpen, setIsSidebarOpen }) => {
   const router = useRouter();
+  const { user } = useAuthUser();
 
   const handleNavigation = useCallback(
     (path: string) => {
@@ -81,76 +86,84 @@ const Sidebar: FC<{
         } lg:w-[250px] lg:translate-x-0 lg:relative`}
       >
         <div className="w-full h-full flex flex-col justify-between items-start gap-[2.4rem]">
-         <div className="w-full flex flex-col justify-start items-start gap-[2.4rem]">
-
-          <div className="w-full flex items-center justify-between">
-            <Image src={Logo} className="w-56" alt="Logo" />
-            <button onClick={toggleSidebar} className="lg:hidden">
-              {isSidebarOpen ? <Close /> : <Menu />}
-            </button>
-          </div>
-
-          <div className="w-full flex flex-col items-start gap-3">
-            <span className="text-[#6C7278] text-lg font-normal">MAIN MENU</span>
-            <div className="w-full flex flex-col items-start gap-2">
-              <MenuItem
-                icon={<Analyzer />}
-                label="Analyzer"
-                path="/dashboard"
-                isActive={activePath === "/dashboard"}
-                onClick={() => handleNavigation("/dashboard")}
-              />
-              <MenuItem
-                icon={<Matches />}
-                label="Matches"
-                path="/dashboard/matches"
-                isActive={activePath === "/dashboard/matches"}
-                onClick={() => handleNavigation("/dashboard/matches")}
-              />
-              <MenuItem
-                icon={<Quests />}
-                label="Quests"
-                path="/dashboard/quests"
-                isActive={activePath === "/dashboard/quests"}
-                onClick={() => handleNavigation("/dashboard/quests")}
-              />
-              <MenuItem
-                icon={<Profile />}
-                label="Profile"
-                path="/dashboard/profile"
-                isActive={activePath === "/dashboard/profile"}
-                onClick={() => handleNavigation("/dashboard/profile")}
-              />
-              <MenuItem
-                icon={<Events />}
-                label="Events"
-                path="/dashboard/events"
-                isActive={activePath === "/dashboard/events"}
-                onClick={() => handleNavigation("/dashboard/events")}
-              />
-              <MenuItem
-                icon={<Tournaments />}
-                label="Tournaments"
-                path="/dashboard/tournaments"
-                isActive={activePath === "/dashboard/tournaments"}
-                onClick={() => handleNavigation("/dashboard/tournaments")}
-              />
-              <MenuItem
-                icon={<Clock />}
-                label="Boost Token"
-                path="/dashboard/boost"
-                isActive={activePath === "/dashboard/boost"}
-                onClick={() => handleNavigation("/dashboard/boost")}
-              />
-              <MenuItem
-                icon={<Referrals />}
-                label="Referrals"
-                path="/dashboard/referrals"
-                isActive={activePath === "/dashboard/referrals"}
-                onClick={() => handleNavigation("/dashboard/referrals")}
-              />
+          <div className="w-full flex flex-col justify-start items-start gap-[2.4rem]">
+            <div className="w-full flex items-center justify-between">
+              <Image src={Logo} className="w-56" alt="Logo" />
+              <button onClick={toggleSidebar} className="lg:hidden">
+                {isSidebarOpen ? <Close /> : <Menu />}
+              </button>
             </div>
-          </div>
+
+            <div className="w-full flex flex-col items-start gap-3">
+              <span className="text-[#6C7278] text-lg font-normal">
+                MAIN MENU
+              </span>
+              <div className="w-full flex flex-col items-start gap-2">
+                <MenuItem
+                  icon={<Analyzer />}
+                  label="Analyzer"
+                  path="/dashboard"
+                  isActive={activePath === "/dashboard"}
+                  onClick={() => handleNavigation("/dashboard")}
+                />
+                <MenuItem
+                  icon={<Matches />}
+                  label="Matches"
+                  path="/dashboard/matches"
+                  isActive={activePath === "/dashboard/matches"}
+                  onClick={() => handleNavigation("/dashboard/matches")}
+                />
+                <MenuItem
+                  icon={<Quests />}
+                  label="Quests"
+                  path="/dashboard/quests"
+                  isActive={activePath === "/dashboard/quests"}
+                  onClick={() => handleNavigation("/dashboard/quests")}
+                />
+                <MenuItem
+                  icon={<Profile />}
+                  label="Profile"
+                  path="/dashboard/profile"
+                  isActive={activePath === "/dashboard/profile"}
+                  onClick={() => handleNavigation("/dashboard/profile")}
+                />
+                <MenuItem
+                  icon={<Events />}
+                  label="Events"
+                  path="/dashboard/events"
+                  isActive={activePath === "/dashboard/events"}
+                  onClick={() => handleNavigation("/dashboard/events")}
+                />
+                <MenuItem
+                  icon={<Tournaments />}
+                  label="Tournaments"
+                  path="/dashboard/tournaments"
+                  isActive={activePath === "/dashboard/tournaments"}
+                  onClick={() => handleNavigation("/dashboard/tournaments")}
+                />
+                <MenuItem
+                  icon={<Clock />}
+                  label="Advertising"
+                  path="/dashboard/adversting"
+                  isActive={activePath === "/dashboard/adversting"}
+                  onClick={() => handleNavigation("/dashboard/adversting")}
+                />
+                <MenuItem
+                  icon={<Clock />}
+                  label="Boost Token"
+                  path="/dashboard/boost"
+                  isActive={activePath === "/dashboard/boost"}
+                  onClick={() => handleNavigation("/dashboard/boost")}
+                />
+                <MenuItem
+                  icon={<Referrals />}
+                  label="Referrals"
+                  path="/dashboard/referrals"
+                  isActive={activePath === "/dashboard/referrals"}
+                  onClick={() => handleNavigation("/dashboard/referrals")}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="w-full flex flex-col items-start gap-2">
@@ -168,16 +181,16 @@ const Sidebar: FC<{
               isActive={activePath === "/dashboard/help"}
               onClick={() => handleNavigation("/dashboard/help")}
             />
-            <div className="w-full bg-[#2C2C30] border-white border-opacity-30 flex items-center justify-between gap-3 py-[10px] px-3 rounded-lg">
-              <div className="w-full flex items-start justify-start gap-2">
-                <Image src={Avatar} alt="User Avatar" />
-                <div className="flex flex-col items-start justify-center gap-1">
-                  <h2 className="text-white font-medium text-[1.4rem]">Alex</h2>
-                  <span className="text-[#6C7278] text-lg">alex@gmail.com</span>
-                </div>
-              </div>
-              <Sort />
-            </div>
+            <UserAvatar
+              name={user?.name || "User"}
+              email={user?.email || ""}
+              avatar={user?.avatar || Avatar}
+              onLogout={() => {
+                // TODO: Implement logout logic here
+                // For example: auth.signOut() or router.push('/login')
+                console.log("Logout clicked");
+              }}
+            />
           </div>
         </div>
       </div>

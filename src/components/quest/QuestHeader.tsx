@@ -1,11 +1,15 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonBlack from "../ButtonBlack";
 import ButtonBorder from "../ButtonBorder";
 import PowerShield from "../../../public/imgs/PowerShield.png";
 import Moneybag from "../../../public/imgs/Moneybag.png";
+import SolanaIcon from "../../../public/icons/SolanaIconReward.png";
+import UsdtIcon from "../../../public/icons/Usdt.svg";
+import { FaExchangeAlt } from "react-icons/fa";
 import { formatDecimalForDisplay } from "@/utils/decimal";
+import { getSolPrice } from "@/utils/getSolPrice";
 
 interface QuestHeaderProps {
   filters: Array<{ label: string; value: string }>;
@@ -14,6 +18,7 @@ interface QuestHeaderProps {
   onCreateQuest: () => void;
   questsCompleted: number;
   rewardEarned: number;
+  rewardEarnedUSD?: number; // optional, if you have it
 }
 
 const QuestHeader = memo(({
@@ -23,7 +28,33 @@ const QuestHeader = memo(({
   onCreateQuest,
   questsCompleted,
   rewardEarned,
+  rewardEarnedUSD,
 }: QuestHeaderProps) => {
+  const [currency, setCurrency] = useState<'SOL' | 'USDT'>('SOL');
+  const [solPrice, setSolPrice] = useState<number | null>(null);
+  const [loadingPrice, setLoadingPrice] = useState(false);
+
+
+useEffect(() => {
+  if (currency === 'USDT') {
+    setLoadingPrice(true);
+    getSolPrice().then((price) => {
+      setSolPrice(price);
+      setLoadingPrice(false);
+    });
+  }
+}, [currency]);
+
+  console.log("Currency:", solPrice);
+
+  const solToUsd = rewardEarnedUSD !== undefined
+    ? rewardEarnedUSD
+    : solPrice !== null
+      ? rewardEarned * solPrice
+      : rewardEarned * 150; // fallback
+
+  const handleSwitch = () => setCurrency((c) => (c === 'SOL' ? 'USDT' : 'SOL'));
+
   return (
     <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
       {/* Navigation Buttons */}
@@ -76,18 +107,32 @@ const QuestHeader = memo(({
             </span>
           </div>
         </div>
-        <div className="w-[140px] xl:w-[170px] flex items-center justify-start gap-3 py-4 xl:py-5 px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl">
+        <div className="w-[170px] flex items-center justify-start gap-3 py-4 xl:py-5 px-3 xl:px-4 bg-[#1E1E20] border border-[#2C2C30] rounded-2xl relative">
           <Image
-            src={Moneybag}
-            alt=""
+            src={currency === 'SOL' ? SolanaIcon : UsdtIcon}
+            alt={currency}
             className="w-[28px] h-[28px] xl:w-[38px] xl:h-[38px]"
           />
           <div className="flex flex-col items-start justify-start gap-1">
-            <h3 className="text-white font-semibold text-[1.5rem]">
-              {formatDecimalForDisplay(rewardEarned)}
+            <h3 className="text-white font-semibold text-[1.5rem] transition-all duration-300">
+              {currency === 'SOL'
+                ? formatDecimalForDisplay(rewardEarned)
+                : loadingPrice
+                  ? <span className="text-xs text-[#ACB5BB]">Loading...</span>
+                  : formatDecimalForDisplay(solToUsd, 2)}
+              <span className="ml-1 text-xs text-[#ACB5BB]">{currency}</span>
             </h3>
             <span className="text-[1.1rem] text-[#ACB5BB]">Total Rewards</span>
           </div>
+          <button
+            type="button"
+            onClick={handleSwitch}
+            className="absolute top-2 right-2 bg-[#23232A] hover:bg-[#2C2C30] rounded-full p-1 transition-colors"
+            title="Switch currency"
+            aria-label="Switch currency"
+          >
+            <FaExchangeAlt className={`text-[#ACB5BB] transition-transform duration-300 ${currency === 'USDT' ? 'rotate-180' : ''}`} size={18} />
+          </button>
         </div>
       </div>
     </div>
