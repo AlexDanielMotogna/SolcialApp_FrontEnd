@@ -80,5 +80,7 @@
   "email_verified_success": "Email vérifié avec succès. Redirection vers la page de connexion...",
   "verification_failed": "Échec de la vérification :",
   "something_went_wrong": "Une erreur est survenue :",
-  "email_verification": "Vérification de l'email"
+  "email_verification": "Vérification de l'email",
+  "valid_token_address": "✔️ Vous pouvez acheter de la publicité avec ce token !",
+  "invalid_token_address": "❌ Vous ne pouvez pas acheter de la publicité avec ce token!"
 }

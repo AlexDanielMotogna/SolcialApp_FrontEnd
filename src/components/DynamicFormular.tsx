@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import BannerUpload from "@/components/BannerUpload";
+import { useTranslation } from "react-i18next";
+import { request } from "http";
 
 const adPackages = [
   { views: "10k", price: "$299.00" },
@@ -14,8 +16,12 @@ const adPackages = [
 ];
 
 export default function DynamicFormular() {
+  const { t } = useTranslation();
+
   const [chain, setChain] = useState("Solana");
   const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenValid, setTokenValid] = useState<null | boolean>(null);
+
   const [selectedPackage, setSelectedPackage] = useState(0);
   const [title, setTitle] = useState("");
   const [pitch, setPitch] = useState("");
@@ -40,6 +46,32 @@ export default function DynamicFormular() {
     }
   };
 
+  useEffect(() => {
+    if(!tokenAddress) {
+      setTokenValid(null);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+    // ...existing code...
+    fetch(`/api/advertising/solscan?address=${tokenAddress}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Solscan data:", data);
+        
+        if (data?.success == true) {
+          setTokenValid(true);
+        } else {
+          setTokenValid(false);
+        }
+      })
+      .catch(() => setTokenValid(false));
+    // ...existing code...
+        }, 600);
+
+    return () => clearTimeout(timeout);
+  }, [tokenAddress]);
+
   return (
     <form className="w-full max-w-3xl mx-auto bg-gradient-to-br from-[#18181B] via-[#23232A] to-[#161618] rounded-3xl shadow-2xl p-10 flex flex-col gap-10 text-white border border-[#23232A] backdrop-blur-lg">
       <h2 className="text-4xl font-extrabold mb-10 text-center bg-gradient-to-r from-[#3B82F6] via-[#9945FF] to-[#14F195] bg-clip-text text-transparent drop-shadow-lg">
@@ -62,9 +94,17 @@ export default function DynamicFormular() {
           className="bg-[#18181B] text-white rounded-xl p-3 border-2 border-[#3B82F6] focus:border-[#9945FF] transition-colors shadow"
           placeholder="Enter token address..."
         />
+        {tokenValid === true && (
         <span className="text-sm text-[#22C55E] mt-2">
-          ✔️ Ad can be purchased for this token!
+          {t("valid_token_address")}
+          
         </span>
+        )}
+        {tokenValid === false && (
+          <span className="text-sm text-[#EA3030] mt-2">
+          {t("invalid_token_address")}
+          </span>
+        )}
       </div>
 
       {/* Ad Packages */}
