@@ -260,7 +260,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
   // RENDER
   // ============================================================================
   return (
-    <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50">
+    <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-end md:items-center z-50 overflow-x-hidden">
       {/* ✅ SUCCESS MODAL */}
       <SuccessModal
         isOpen={showSuccess}
@@ -291,7 +291,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
 
         {/* ✅ FORM CONTENT */}
         <div
-          className="w-full flex flex-col items-start justify-start gap-6 px-8 overflow-y-auto"
+          className="w-full flex flex-col items-start justify-start gap-6 px-8 overflow-y-auto overflow-x-hidden"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -468,13 +468,117 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
             </div>
 
-             {/* ✅ TASKS CHECKBOXES ÉPICOS */}
-             {/* ✅ TASK SELECTOR COMPONENT */}
-            <TaskSelector 
-              tasks={form.tasks}
-              onChange={handleChange}
-              className="animate-slideInUp"
-            />
+            {/* ✅ TASK SELECTOR COMPONENT - EPIC DESIGN */}
+            <div className="w-full flex flex-col items-start justify-start gap-4 animate-slideInUp">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#9945FF] to-[#14F195] rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30">
+                  <span className="text-white text-lg">⚡</span>
+                </div>
+                <h6 className="text-[1.2rem] text-[#ACB5BB] font-normal">
+                  Tasks * (Select at least one)
+                </h6>
+              </div>
+              {/* Grid of tasks */}
+              <div className="grid grid-cols-1 gap-3 w-full">
+                {require('@/components/ui/TaskSelector').TASK_CONFIG.map((task: any) => {
+                  const isSelected = form.tasks[task.key] || false;
+                  return (
+                    <label
+                      key={task.key}
+                      className={`
+                        relative group cursor-pointer 
+                        bg-gradient-to-r ${task.color} ${task.hoverColor}
+                        border ${isSelected ? 'border-[#9945FF] shadow-lg shadow-purple-500/25 bg-gradient-to-r from-purple-500/10 to-blue-500/10' : 'border-[#44444A]'}
+                        rounded-xl p-4 
+                        transition-all duration-300 
+                        hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10
+                        ${isSelected ? 'transform scale-[1.01]' : ''}
+                      `}
+                    >
+                      <input
+                        type="checkbox"
+                        name={task.key}
+                        checked={isSelected}
+                        onChange={handleChange}
+                        className="sr-only"
+                      />
+                      <div className="flex items-center gap-4">
+                        <div className={`relative w-14 h-14 rounded-xl ${task.iconBg} flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${isSelected ? 'animate-pulse shadow-lg' : ''} border border-white/10`}>
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="relative z-10 text-2xl transform transition-transform group-hover:scale-110">{task.icon}</div>
+                          {isSelected && (
+                            <>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full animate-ping" />
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full" />
+                            </>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[1.4rem] text-white font-semibold group-hover:text-white transition-colors">{task.label}</span>
+                            {isSelected && (
+                              <span className="px-3 py-1 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white text-xs rounded-full font-bold animate-fadeIn shadow-lg">✨ Active</span>
+                            )}
+                          </div>
+                          <p className="text-[1.2rem] text-[#ACB5BB] group-hover:text-[#EDF1F3] transition-colors">{task.description}</p>
+                        </div>
+                        <div className={`relative w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isSelected ? 'bg-gradient-to-br from-[#9945FF] to-[#14F195] border-[#9945FF] shadow-lg shadow-purple-500/30' : 'border-[#6C7278] group-hover:border-[#ACB5BB] bg-transparent'} transform group-hover:scale-110`}>
+                          {isSelected && (
+                            <>
+                              <svg className="w-4 h-4 text-white animate-checkmark drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={4}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                              <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/50 to-[#14F195]/50 rounded-lg blur-sm -z-10" />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-all duration-500 animate-shimmer pointer-events-none" />
+                      {isSelected && (
+                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#9945FF]/20 via-[#14F195]/20 to-[#9945FF]/20 animate-pulse pointer-events-none" />
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+              {/* Counter */}
+              {(() => {
+                const tasks = form.tasks;
+                const selectedCount = Object.values(tasks).filter(Boolean).length;
+                const selectedTasks = Object.entries(tasks).filter(([_, value]) => value).map(([key, _]) => key);
+                return (
+                  <div className="w-full mt-3 p-4 bg-gradient-to-r from-[#1A1A1C] to-[#2C2C30] rounded-xl border border-[#44444A]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {selectedCount > 0 ? (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full animate-pulse shadow-lg shadow-green-500/30" />
+                              <span className="text-[#10B981] font-semibold text-sm">{selectedCount} task{selectedCount !== 1 ? 's' : ''} selected</span>
+                            </div>
+                            <div className="flex gap-1">
+                              {selectedTasks.slice(0, 3).map((task) => (
+                                <span key={task} className="px-2 py-1 bg-[#9945FF]/20 text-[#9945FF] text-xs rounded-md font-medium border border-[#9945FF]/30">{task}</span>
+                              ))}
+                              {selectedTasks.length > 3 && (
+                                <span className="px-2 py-1 bg-[#6C7278]/20 text-[#ACB5BB] text-xs rounded-md font-medium">+{selectedTasks.length - 3} more</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gradient-to-r from-[#EF4444] to-[#F87171] rounded-full animate-pulse shadow-lg shadow-red-500/30" />
+                            <span className="text-[#EF4444] font-semibold text-sm">Please select at least one task</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-[#6C7278] text-sm font-medium">Max: 5 tasks</div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         </div>
 
