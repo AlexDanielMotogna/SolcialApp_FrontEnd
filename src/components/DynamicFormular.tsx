@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import BannerUpload from "@/components/BannerUpload";
 import { useTranslation } from "react-i18next";
-import { request } from "http";
+import i18n from "@/lib/i18next";
 
 const adPackages = [
   { views: "10k", price: "$299.00" },
@@ -21,7 +21,8 @@ export default function DynamicFormular() {
   const [chain, setChain] = useState("Solana");
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenValid, setTokenValid] = useState<null | boolean>(null);
-
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const [tokenInfo, setTokenInfo] = useState<{ name: string; icon: string } | null>(null);
   const [selectedPackage, setSelectedPackage] = useState(0);
   const [title, setTitle] = useState("");
   const [pitch, setPitch] = useState("");
@@ -34,8 +35,8 @@ export default function DynamicFormular() {
   });
   const [discordUsername, setDiscordUsername] = useState("");
   const [telegramUsername, setTelegramUsername] = useState("");
-  const [agree1, setAgree1] = useState(false);
-  const [agree2, setAgree2] = useState(false);
+  const [dataVerifiableChecked, setDataVerifiableChecked] = useState(false);
+  const [termsAcceptedChecked, setTermsAcceptedChecked] = useState(false);
 
   // Image upload handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,30 +48,42 @@ export default function DynamicFormular() {
   };
 
   useEffect(() => {
-    if(!tokenAddress) {
-      setTokenValid(null);
-      return;
+    if (i18n.language !== "en") {
+      i18n.changeLanguage("en");
     }
+  }, [i18n]);
 
-    const timeout = setTimeout(() => {
-    // ...existing code...
+ useEffect(() => {
+  setTokenValid(null);
+  setTokenInfo(null);
+  if (!tokenAddress) {
+    setTokenValid(null);
+    setTokenLoading(false);
+    return;
+  }
+  setTokenLoading(true);
+  const timeout = setTimeout(() => {
     fetch(`/api/advertising/solscan?address=${tokenAddress}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Solscan data:", data);
-        
-        if (data?.success == true) {
+        if (data?.success === true && data?.data?.name && data?.data?.icon) {
           setTokenValid(true);
+          setTokenInfo({ name: data.data.name, icon: data.data.icon });
         } else {
           setTokenValid(false);
+          setTokenInfo(null);
         }
+        setTokenLoading(false);
       })
-      .catch(() => setTokenValid(false));
-    // ...existing code...
-        }, 600);
+      .catch(() => {
+        setTokenValid(false);
+        setTokenInfo(null);
+        setTokenLoading(false);
+      });
+  }, 600);
 
-    return () => clearTimeout(timeout);
-  }, [tokenAddress]);
+  return () => clearTimeout(timeout);
+}, [tokenAddress]);
 
   return (
     <form className="w-full max-w-3xl mx-auto bg-gradient-to-br from-[#18181B] via-[#23232A] to-[#161618] rounded-3xl shadow-2xl p-10 flex flex-col gap-10 text-white border border-[#23232A] backdrop-blur-lg">
@@ -94,17 +107,27 @@ export default function DynamicFormular() {
           className="bg-[#18181B] text-white rounded-xl p-3 border-2 border-[#3B82F6] focus:border-[#9945FF] transition-colors shadow"
           placeholder="Enter token address..."
         />
-        {tokenValid === true && (
-        <span className="text-sm text-[#22C55E] mt-2">
-          {t("valid_token_address")}
-          
-        </span>
-        )}
-        {tokenValid === false && (
-          <span className="text-sm text-[#EA3030] mt-2">
-          {t("invalid_token_address")}
-          </span>
-        )}
+          {tokenLoading && (
+            <span className="text-sm text-[#A3A3A3] mt-2 flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4 text-[#3B82F6]" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+              </svg>
+              Vérification en cours...
+            </span>
+          )}
+          {tokenValid === true && tokenInfo && (
+            <span className="text-sm text-[#22C55E] mt-2 flex items-center gap-2">
+              {t("valid_token_address")}
+              <img src={tokenInfo.icon} alt={tokenInfo.name} className="w-5 h-5 rounded-full border border-[#9945FF]" />
+              <span className="font-bold">{tokenInfo.name}</span>
+            </span>
+          )}
+          {tokenValid === false && (
+            <span className="text-sm text-[#EA3030] mt-2">
+              {t("invalid_token_address")}
+            </span>
+          )}
       </div>
 
       {/* Ad Packages */}
@@ -268,8 +291,8 @@ export default function DynamicFormular() {
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              checked={agree1}
-              onChange={(e) => setAgree1(e.target.checked)}
+              checked={dataVerifiableChecked}
+              onChange={(e) => setDataVerifiableChecked(e.target.checked)}
             />
             I understand that all supplied data must be verifiable through
             official channels such as websites and socials.
@@ -277,8 +300,8 @@ export default function DynamicFormular() {
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              checked={agree2}
-              onChange={(e) => setAgree2(e.target.checked)}
+              checked={termsAcceptedChecked}
+              onChange={(e) => setTermsAcceptedChecked(e.target.checked)}
             />
             I understand and accept that Solcial reserves the right to reject or
             modify the provided information.
@@ -286,8 +309,39 @@ export default function DynamicFormular() {
         </div>
         <button
           type="submit"
-          className="mt-8 bg-gradient-to-r from-[#3B82F6] to-[#9945FF] hover:from-[#2563EB] hover:to-[#9945FF] text-white font-extrabold py-4 px-12 rounded-2xl text-2xl shadow-xl transition-all duration-200 scale-100 hover:scale-105 tracking-wide"
-          disabled={!agree1 || !agree2}
+          className={`mt-8 font-extrabold py-4 px-12 rounded-2xl text-2xl shadow-xl transition-all duration-200 scale-100 tracking-wide
+            ${!dataVerifiableChecked || !termsAcceptedChecked || !tokenValid  
+              ? "bg-gradient-to-r from-gray-500 to-gray-700 text-gray-300 cursor-not-allowed opacity-60"
+              : "bg-gradient-to-r from-[#3B82F6] to-[#9945FF] hover:from-[#2563EB] hover:to-[#9945FF] text-white hover:scale-105"
+            }`
+          }
+          disabled={!dataVerifiableChecked || !termsAcceptedChecked || !tokenValid }
+          onClick={async (e) => {
+            e.preventDefault();
+              if (dataVerifiableChecked && termsAcceptedChecked && tokenValid) {
+                const formData = {
+                  chain,
+                  tokenAddress,
+                  tokenInfo,
+                  selectedPackage: adPackages[selectedPackage],
+                  title,
+                  pitch,
+                  image,
+                  links,
+                  discordUsername,
+                  telegramUsername,
+                  dataVerifiableChecked,
+                  termsAcceptedChecked,
+                };
+                // Remplace ce console.log par un appel API POST pour l'enregistrement
+                console.log("Form data to send:", formData);
+                await fetch("/api/advertising/order", {
+                   method: "POST",
+                   headers: { "Content-Type": "application/json" },
+                   body: JSON.stringify(formData),
+                 });
+              }
+          }}
         >
           Order Now
         </button>

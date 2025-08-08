@@ -81,6 +81,6 @@
   "verification_failed": "La verificación falló:",
   "something_went_wrong": "Algo salió mal:",
   "email_verification": "Verificación de correo",
-  "valid_token_address": "✔️ ¡Se puede comprar publicidad con este token!",
+  "valid_token_address": "✔️ ¡Se puede comprar publicidad con este token : ",
   "invalid_token_address": "❌ ¡No se puede comprar publicidad con este token!"
 }

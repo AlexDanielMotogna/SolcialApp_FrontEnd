@@ -81,6 +81,6 @@
   "verification_failed": "Verification failed:",
   "something_went_wrong": "Something went wrong:",
   "email_verification": "Email verification",
-  "valid_token_address": "✔️ Ad can be purchased for this token!",
+  "valid_token_address": "✔️ Ad can be purchased for this token : ",
   "invalid_token_address": "❌ Ad can't be purchased for this token!"
 }
