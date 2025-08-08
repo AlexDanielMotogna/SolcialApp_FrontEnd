@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import bcrypt from "bcryptjs";
+import { unique } from "next/dist/build/utils";
 
 export interface IAuthUser extends Document {
   name: string;
@@ -8,6 +9,8 @@ export interface IAuthUser extends Document {
   phone?: string;
   avatar?: string;
   online?: boolean;
+  referralCode: string;
+  referredBy?: string;
   twitter_id?: string;
   twitter_handle?: string;
   oauth_token?: string;
@@ -69,6 +72,16 @@ const UserSchema = new Schema<IAuthUser>({
     type: Boolean,
     default: false,
   },
+  referralCode: {
+    type: String,
+    unique: true,
+    index: true,
+  },
+  referredBy: {
+    type: String,
+    ref: "AuthUser",
+    default: null,
+  },
   twitter_id: {
     type: String,
     unique: true,
@@ -92,8 +105,9 @@ const UserSchema = new Schema<IAuthUser>({
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorSecret: { type: String },
   walletaddress: {
-  type: String,
-  default: null,},
+    type: String,
+    default: null,
+  },
   twitterAccessToken: { type: String, default: null },
   twitterAccessSecret: { type: String, default: null },
   twitterScreenName: { type: String, default: null }, 
@@ -102,7 +116,11 @@ const UserSchema = new Schema<IAuthUser>({
   friends: [{ type: Schema.Types.ObjectId, ref: "AuthUser" }],
   pendingRequests: [
     {
-      senderId: { type: Schema.Types.ObjectId, ref: "AuthUser", required: true },
+      senderId: {
+        type: Schema.Types.ObjectId,
+        ref: "AuthUser",
+        required: true,
+      },
       requestType: { type: String, enum: ["sent", "received"], required: true },
     },
   ],

@@ -71,6 +71,8 @@ export const authOptions: AuthOptions = {
             email: user.email,
             phone: user.phone,
             image: user.avatar,
+            referralCode: user.referralCode,
+            referredBy: user.referredBy,
             walletaddress: user.walletaddress,
             hasTwitterAccess: user.hasTwitterAccess,
             isVerified: user.isVerified,
@@ -120,6 +122,8 @@ export const authOptions: AuthOptions = {
             hasTwitterAccess: dbUser.hasTwitterAccess,
             isVerified: dbUser.isVerified,
             avatar: dbUser.avatar,
+            referralCode: dbUser.referralCode,
+            referredBy: dbUser.referredBy,
             twitter_id: dbUser.twitter_id,
             twitter_handle: dbUser.twitter_handle,
             twitterScreenName: dbUser.twitterScreenName,
@@ -142,6 +146,8 @@ export const authOptions: AuthOptions = {
         token.email = user.email;
         token.name = user.name;
         token.avatar = user.avatar;
+        token.referralCode = user.referralCode;
+        token.referredBy = user.referredBy;
         token.walletaddress = user.walletaddress;
         token.hasTwitterAccess = user.hasTwitterAccess;
         token.isVerified = user.isVerified;
@@ -154,6 +160,8 @@ export const authOptions: AuthOptions = {
           token.id = dbUser._id.toString();
           token.name = dbUser.name;
           token.avatar = dbUser.avatar;
+          token.referralCode = dbUser.referralCode;
+          token.referredBy = dbUser.referredBy;
           token.walletaddress = dbUser.walletaddress;
           token.hasTwitterAccess = dbUser.hasTwitterAccess;
           token.isVerified = dbUser.isVerified;

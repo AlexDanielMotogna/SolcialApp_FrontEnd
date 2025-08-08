@@ -13,6 +13,8 @@ export interface AuthUser {
   hasTwitterAccess?: boolean;
   isVerified?: boolean;
   avatar?: string;
+  referralCode: string;
+  referredBy?: string;
   twitter_id?: string;
   twitter_handle?: string;
   twitterScreenName?: string;
@@ -33,10 +35,10 @@ export const useAuthUser = () => {
 
   const user = useMemo((): AuthUser | null => {
     if (!session?.user) return null;
-    
+
     // Type assertion to access our custom properties
     const sessionUser = session.user as any;
-    
+
     return {
       id: sessionUser.id || sessionUser._id,
       _id: sessionUser._id || sessionUser.id,
@@ -47,6 +49,8 @@ export const useAuthUser = () => {
       hasTwitterAccess: sessionUser.hasTwitterAccess || false,
       isVerified: sessionUser.isVerified || false,
       avatar: sessionUser.avatar || sessionUser.image,
+      referralCode: sessionUser.referralCode || "",
+      referredBy: sessionUser.referredBy || "",
       twitter_id: sessionUser.twitter_id,
       twitter_handle: sessionUser.twitter_handle,
       twitterScreenName: sessionUser.twitterScreenName,
@@ -68,6 +72,8 @@ export const useAuthUser = () => {
   const refreshUser = async () => {
     await update();
   };
+
+  console.log(user);
 
   return {
     user,

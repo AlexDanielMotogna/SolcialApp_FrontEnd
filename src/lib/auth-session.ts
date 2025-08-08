@@ -15,14 +15,14 @@ export async function getAuthenticatedUser() {
         success: false,
         error: "Not authenticated",
         user: null,
-        status: 401
+        status: 401,
       };
     }
 
     // ✅ OBTENER DATOS FRESCOS DE LA BASE DE DATOS
     await connectDB();
     const user = await User.findOne({ email: session.user.email });
-     console.log("🔍 DEBUG - User from DB:", {
+    console.log("🔍 DEBUG - User from DB:", {
       id: user?._id,
       email: user?.email,
       walletaddress: user?.walletaddress,
@@ -33,7 +33,7 @@ export async function getAuthenticatedUser() {
         success: false,
         error: "User not found in database",
         user: null,
-        status: 404
+        status: 404,
       };
     }
 
@@ -42,7 +42,7 @@ export async function getAuthenticatedUser() {
         success: false,
         error: "Email not verified",
         user: null,
-        status: 403
+        status: 403,
       };
     }
 
@@ -54,12 +54,14 @@ export async function getAuthenticatedUser() {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        referralCode: user.referralCode,
+        referredBy: user.referredBy,
         walletaddress: user.walletaddress,
         hasTwitterAccess: user.hasTwitterAccess,
         isVerified: user.isVerified,
         phone: user.phone,
       },
-      status: 200
+      status: 200,
     };
   } catch (error) {
     console.error("Error getting authenticated user:", error);
@@ -67,23 +69,22 @@ export async function getAuthenticatedUser() {
       success: false,
       error: "Authentication error",
       user: null,
-      status: 500
+      status: 500,
     };
   }
-  
 }
 
 // ✅ HELPER PARA MIDDLEWARE DE AUTENTICACIÓN
 export function createAuthResponse(authResult: any) {
   if (!authResult.success) {
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: authResult.error 
-      }), 
-      { 
+      JSON.stringify({
+        success: false,
+        error: authResult.error,
+      }),
+      {
         status: authResult.status,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

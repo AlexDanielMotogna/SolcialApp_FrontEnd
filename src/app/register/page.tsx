@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import Image from 'next/image';
+import Image from "next/image";
 import Link from "next/link";
 import User from "../../../public/imgs/user.svg";
 import Key from "../../../public/imgs/key.svg";
 import Eye from "../../../public/imgs/eye.svg";
 import EyeSlash from "../../../public/imgs/eye-slash.svg";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { LoadingBar } from "@/components/ui/LoadingBar";
 import AuthLayout from "@/components/layouts/auth-layout";
 import AuthErrorModal from "@/components/modals/AuthErrorModal";
@@ -34,6 +34,8 @@ const getPasswordStrength = (password: string) => {
 };
 
 const Register = () => {
+  const searchParams = useSearchParams();
+
   const { t, i18n } = useTranslation();
   const [ready, setReady] = useState(false);
   const [form, setForm] = useState(initialForm);
@@ -49,6 +51,8 @@ const Register = () => {
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  console.log(searchParams.get("referredBy"));
 
   useEffect(() => {
     // Attend que la langue soit détectée côté client
@@ -102,17 +106,25 @@ const Register = () => {
     if (!form.email.trim()) errors.email = t("email_is_required");
     else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(form.email)) errors.email = t("valid_email_is_required");
+      if (!emailRegex.test(form.email))
+        errors.email = t("valid_email_is_required");
     }
     if (!form.phone.trim()) errors.phone = t("phone_number_is_required");
     else {
       const phoneRegex = /^\+?\d{7,15}$/;
-      if (!phoneRegex.test(form.phone)) errors.phone = t("invalid_phone_number");
+      if (!phoneRegex.test(form.phone))
+        errors.phone = t("invalid_phone_number");
     }
     if (!form.password.trim()) errors.password = t("password_is_required");
-    else if (getPasswordStrength(form.password) < 3) errors.password = t("password_too_weak");
-    if (!form.repeatPassword.trim()) errors.repeatPassword = t("repeat_password_is_required");
-    if (form.password && form.repeatPassword && form.password !== form.repeatPassword)
+    else if (getPasswordStrength(form.password) < 3)
+      errors.password = t("password_too_weak");
+    if (!form.repeatPassword.trim())
+      errors.repeatPassword = t("repeat_password_is_required");
+    if (
+      form.password &&
+      form.repeatPassword &&
+      form.password !== form.repeatPassword
+    )
       errors.repeatPassword = t("passwords_dont_match");
     if (!form.avatar) errors.avatar = t("avatar_is_required");
 
@@ -127,7 +139,11 @@ const Register = () => {
     formData.append("email", form.email);
     formData.append("phone", form.phone);
     formData.append("password", form.password);
+
     if (form.avatar) formData.append("avatar", form.avatar);
+
+    const referredBy = searchParams.get("referredBy");
+    if (referredBy) formData.append("referredBy", referredBy);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -166,7 +182,11 @@ const Register = () => {
           <LoadingBar
             variant="success"
             size="md"
-            text={<span className="text-xl font-semibold">Redirecting to login page...</span>}
+            text={
+              <span className="text-xl font-semibold">
+                Redirecting to login page...
+              </span>
+            }
             className="shadow-md shadow-green-500/20 mb-6"
           />
           <p className="text-[#ACB5BB] text-xl font-semibold">Redirecting...</p>
@@ -201,16 +221,25 @@ const Register = () => {
                   />
                 ) : (
                   <div className="w-24 h-24 flex justify-center items-center border-4 border-gray-300 rounded-full shadow-md bg-[#232326]">
-                    <Image src={User} alt="Upload Avatar" width={44} height={44} />
+                    <Image
+                      src={User}
+                      alt="Upload Avatar"
+                      width={44}
+                      height={44}
+                    />
                   </div>
                 )}
               </div>
               {fieldErrors.avatar && (
-                <p className="text-red-500 text-xl mt-2">{fieldErrors.avatar}</p>
+                <p className="text-red-500 text-xl mt-2">
+                  {fieldErrors.avatar}
+                </p>
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">{t("full_name")}</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">
+                {t("full_name")}
+              </label>
               <input
                 name="fullName"
                 placeholder={t("your_name")}
@@ -222,11 +251,15 @@ const Register = () => {
                 required
               />
               {fieldErrors.fullName && (
-                <p className="text-red-500 text-xl mt-1">{fieldErrors.fullName}</p>
+                <p className="text-red-500 text-xl mt-1">
+                  {fieldErrors.fullName}
+                </p>
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">{t("email")}</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">
+                {t("email")}
+              </label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={User} alt="user" width={32} height={32} />
@@ -248,7 +281,9 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">{t("phone_number")}</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">
+                {t("phone_number")}
+              </label>
               <input
                 name="phone"
                 placeholder={t("placeholder_phone")}
@@ -264,7 +299,9 @@ const Register = () => {
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">{t("password")}</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">
+                {t("password")}
+              </label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={Key} alt="key" width={32} height={32} />
@@ -284,11 +321,19 @@ const Register = () => {
                   type="button"
                   tabIndex={-1}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6C7278] hover:text-[#9945FF] transition-colors"
-                  onClick={() => setShowPassword(v => !v)}
+                  onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  <span className="inline-block" style={{ filter: "contrast(2) brightness(1.5)" }}>
-                    <Image src={showPassword ? EyeSlash : Eye} alt="toggle password" width={28} height={28} />
+                  <span
+                    className="inline-block"
+                    style={{ filter: "contrast(2) brightness(1.5)" }}
+                  >
+                    <Image
+                      src={showPassword ? EyeSlash : Eye}
+                      alt="toggle password"
+                      width={28}
+                      height={28}
+                    />
                   </span>
                 </button>
               </div>
@@ -297,11 +342,15 @@ const Register = () => {
                 <PasswordStrengthBar password={form.password} />
               </div>
               {fieldErrors.password && (
-                <p className="text-red-500 text-xl mt-1">{fieldErrors.password}</p>
+                <p className="text-red-500 text-xl mt-1">
+                  {fieldErrors.password}
+                </p>
               )}
             </div>
             <div className="w-full flex flex-col gap-2">
-              <label className="text-xl text-[#ACB5BB] font-medium">{t("repeat_password")}</label>
+              <label className="text-xl text-[#ACB5BB] font-medium">
+                {t("repeat_password")}
+              </label>
               <div className="relative w-full">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <Image src={Key} alt="key" width={32} height={32} />
@@ -313,7 +362,9 @@ const Register = () => {
                   onChange={handleChange}
                   type={showRepeatPassword ? "text" : "password"}
                   className={`w-full py-5 pl-16 pr-12 bg-[#232326] border-2 rounded-xl text-xl text-white placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all ${
-                    fieldErrors.repeatPassword ? "border-red-500" : "border-[#44444A]"
+                    fieldErrors.repeatPassword
+                      ? "border-red-500"
+                      : "border-[#44444A]"
                   }`}
                   required
                 />
@@ -321,16 +372,28 @@ const Register = () => {
                   type="button"
                   tabIndex={-1}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6C7278] hover:text-[#9945FF] transition-colors"
-                  onClick={() => setShowRepeatPassword(v => !v)}
-                  aria-label={showRepeatPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowRepeatPassword((v) => !v)}
+                  aria-label={
+                    showRepeatPassword ? "Hide password" : "Show password"
+                  }
                 >
-                  <span className="inline-block" style={{ filter: "contrast(2) brightness(1.5)" }}>
-                    <Image src={showRepeatPassword ? EyeSlash : Eye} alt="toggle password" width={28} height={28} />
+                  <span
+                    className="inline-block"
+                    style={{ filter: "contrast(2) brightness(1.5)" }}
+                  >
+                    <Image
+                      src={showRepeatPassword ? EyeSlash : Eye}
+                      alt="toggle password"
+                      width={28}
+                      height={28}
+                    />
                   </span>
                 </button>
               </div>
               {fieldErrors.repeatPassword && (
-                <p className="text-red-500 text-xl mt-1">{fieldErrors.repeatPassword}</p>
+                <p className="text-red-500 text-xl mt-1">
+                  {fieldErrors.repeatPassword}
+                </p>
               )}
             </div>
           </div>
@@ -349,7 +412,9 @@ transform transition-all duration-200 hover:scale-105 hover:shadow-lg hover:from
                 <LoadingBar
                   variant="success"
                   size="md"
-                  text={<span className="text-xl">{t("creating_account")}...</span>}
+                  text={
+                    <span className="text-xl">{t("creating_account")}...</span>
+                  }
                   className="shadow-md shadow-green-500/20"
                 />
               </div>

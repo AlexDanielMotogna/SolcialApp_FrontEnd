@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 import HeroHelmet from "../../../../public/imgs/HeroHelmet.png";
@@ -10,8 +12,11 @@ import ArrowUp from "../../../../public/icons/ArrowUp";
 import Search from "../../../../public/icons/Search";
 import Filter from "../../../../public/icons/Filter";
 import Button from "../../../components/Button";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const Referrals = () => {
+  const { user } = useAuthUser();
+
   return (
     <div className="w-full py-[1.8rem] px-[2.4rem] flex flex-col items-start justify-start gap-[2.4rem]">
       <div className="w-full flex flex-col md:flex-row md:gap-8 items-center justify-between gap-5">
@@ -69,11 +74,11 @@ const Referrals = () => {
           >
             <a
               className="text-white text-[1.4rem] font-semibold py-[1.3rem] cursor-pointer truncate sm:text-[1.2rem] sm:py-[1rem] md:text-[1.1rem] md:py-[0.8rem] max-w-full"
-              href="https://solcialapp.com/0x2CJGFKDJSKKWJAJCJAKAKCJ0394"
+              href={`https://solcialapp.com/referral/${user?.referralCode}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              https://solcialapp.com/0x2CJGFKDJSKKWJAJCJAKAKCJ0394
+              https://solcialapp.com/referral/{user?.referralCode}
             </a>
           </div>
         </div>
@@ -278,8 +283,6 @@ const Referrals = () => {
                   $175.00
                 </td>
               </tr>
-
-          
             </tbody>
           </table>
         </div>
