@@ -42,6 +42,7 @@ import CreateQuest from "@/components/modals/CreateQuest";
 import CreateMatch from "@/components/modals/CreateMatch";
 import CreateLadder from "@/components/modals/CreateLadder";
 import CreateToken from "@/components/modals/CreateToken";
+import BoostTokenModal from "@/components/modals/BoostTokenModal";
 const DashboardMain: React.FC = () => {
   const [openModal, setOpenModal] = useState<string | null>(null);
 
@@ -1049,7 +1050,10 @@ const DashboardMain: React.FC = () => {
               </div>
 
               <div className="w-full flex flex-col items-center justify-center gap-6">
-                <Button text="Create Advertisement" size="sm" onClick={() => openModalHandler("Token")} />
+                <div className="w-full flex flex-col gap-3">
+                  <Button text="Create Advertisement" size="sm" onClick={() => openModalHandler("Token")} />
+                  <Button text="Boost Token" size="sm" onClick={() => openModalHandler("BoostToken")} />
+                </div>
                 <a className="cursor-pointer text-white font-semibold text-[1.2rem]">
                   Learn more
                 </a>
@@ -1069,6 +1073,9 @@ const DashboardMain: React.FC = () => {
       )}
       {openModal === "Token" && (
         <CreateToken isOpen={true} onClose={closeModalHandler} />
+      )}
+      {openModal === "BoostToken" && (
+        <BoostTokenModal isOpen={true} onClose={closeModalHandler} />
       )}
       <Chat />
     </div>
