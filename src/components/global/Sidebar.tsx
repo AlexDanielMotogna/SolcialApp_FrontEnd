@@ -21,6 +21,7 @@ import Sort from "../../../public/icons/Sort";
 import Avatar from "../../../public/imgs/Avatar.png";
 import UserAvatar from "./UserAvatar";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { handleLogout } from "@/lib/clients";
 
 interface MenuItemProps {
   icon: JSX.Element;
@@ -66,6 +67,7 @@ const Sidebar: FC<{
 }> = ({ activePath, setActivePath, isSidebarOpen, setIsSidebarOpen }) => {
   const router = useRouter();
   const { user } = useAuthUser();
+  const logout = handleLogout;
 
   const handleNavigation = useCallback(
     (path: string) => {
@@ -185,11 +187,7 @@ const Sidebar: FC<{
               name={user?.name || "User"}
               email={user?.email || ""}
               avatar={user?.avatar || Avatar}
-              onLogout={() => {
-                // TODO: Implement logout logic here
-                // For example: auth.signOut() or router.push('/login')
-                console.log("Logout clicked");
-              }}
+              onLogout={logout}
             />
           </div>
         </div>

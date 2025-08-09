@@ -8,6 +8,7 @@ export interface Quest {
   tasks?: Record<string, boolean>;
   questName?: string;
   description?: string;
+  twitterId?: string;
   _id?: string;
 }
 
@@ -18,6 +19,7 @@ export interface UserQuest {
   sessionExpiresAt?: string;
   quest?: Quest;
   questId?: string;
+  twitterId?: string;
   _id?: string;
 }
 
@@ -35,11 +37,13 @@ export function getRequiredTasks(quest: Quest): string[] {
   return quest.tasks ? Object.keys(quest.tasks) : [];
 }
 
-export function getIncompleteRequiredTasks(quest: Quest, userQuest: UserQuest | null): string[] {
+export function getIncompleteRequiredTasks(
+  quest: Quest,
+  userQuest: UserQuest | null
+): string[] {
   const requiredTasks = getRequiredTasks(quest);
-  return requiredTasks.filter(task => !userQuest?.completedTasks?.[task]);
+  return requiredTasks.filter((task) => !userQuest?.completedTasks?.[task]);
 }
-
 
 export function formatDate(dateString: string) {
   if (!dateString) return "";
@@ -52,5 +56,3 @@ export function formatDate(dateString: string) {
     minute: "2-digit",
   });
 }
-
-

@@ -8,6 +8,7 @@ export interface IUserQuest extends Document {
   completedTasks: { [key: string]: boolean };
   rewardClaimed: boolean;
   enrolledAt: Date;
+  twitter_id?: string;
   rewardAmount: mongoose.Types.Decimal128;
   sessionExpiresAt?: Date;
   status: "active" | "finished";
@@ -21,10 +22,11 @@ const UserQuestSchema = new Schema<IUserQuest>(
     walletaddress: { type: String, required: true },
     completedTasks: { type: Object, required: true },
     rewardClaimed: { type: Boolean, default: false },
+    twitter_id: { type: String, required: false },
     enrolledAt: { type: Date, default: Date.now },
     rewardAmount: {
       type: Schema.Types.Decimal128,
-      default: () => mongoose.Types.Decimal128.fromString("0"), // ✅ Usar fromString
+      default: () => mongoose.Types.Decimal128.fromString("0"),
     },
     sessionExpiresAt: { type: Date },
     status: {
@@ -38,7 +40,6 @@ const UserQuestSchema = new Schema<IUserQuest>(
       virtuals: true,
       versionKey: false,
       transform: function (doc, ret) {
-        // ✅ Convertir Decimal128 a string en JSON
         if (ret.rewardAmount && ret.rewardAmount.toString) {
           (ret as any).rewardAmount = ret.rewardAmount.toString();
         }

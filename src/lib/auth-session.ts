@@ -4,10 +4,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/AuthUser";
+import { t } from "i18next";
 
 export async function getAuthenticatedUser() {
   try {
-    // ✅ OBTENER SESIÓN DEL SERVIDOR
+    // get session from NextAuth
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -15,25 +16,26 @@ export async function getAuthenticatedUser() {
         success: false,
         error: "Not authenticated",
         user: null,
-        status: 401
+        status: 401,
       };
     }
 
-    // ✅ OBTENER DATOS FRESCOS DE LA BASE DE DATOS
+    // get user from database
     await connectDB();
     const user = await User.findOne({ email: session.user.email });
-     console.log("🔍 DEBUG - User from DB:", {
+    console.log("🔍 DEBUG - User from DB:", {
       id: user?._id,
       email: user?.email,
       walletaddress: user?.walletaddress,
       hasTwitterAccess: user?.hasTwitterAccess,
+      twitterUserId: user?.twitterUserId,
     });
     if (!user) {
       return {
         success: false,
         error: "User not found in database",
         user: null,
-        status: 404
+        status: 404,
       };
     }
 
@@ -42,10 +44,9 @@ export async function getAuthenticatedUser() {
         success: false,
         error: "Email not verified",
         user: null,
-        status: 403
+        status: 403,
       };
     }
-
     return {
       success: true,
       error: null,
@@ -56,10 +57,11 @@ export async function getAuthenticatedUser() {
         avatar: user.avatar,
         walletaddress: user.walletaddress,
         hasTwitterAccess: user.hasTwitterAccess,
+        twitterUserId: user.twitterUserId,
         isVerified: user.isVerified,
         phone: user.phone,
       },
-      status: 200
+      status: 200,
     };
   } catch (error) {
     console.error("Error getting authenticated user:", error);
@@ -67,23 +69,22 @@ export async function getAuthenticatedUser() {
       success: false,
       error: "Authentication error",
       user: null,
-      status: 500
+      status: 500,
     };
   }
-  
 }
 
-// ✅ HELPER PARA MIDDLEWARE DE AUTENTICACIÓN
+// function to create a standardized response for authentication errors
 export function createAuthResponse(authResult: any) {
   if (!authResult.success) {
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: authResult.error 
-      }), 
-      { 
+      JSON.stringify({
+        success: false,
+        error: authResult.error,
+      }),
+      {
         status: authResult.status,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
