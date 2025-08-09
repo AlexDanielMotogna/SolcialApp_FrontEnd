@@ -353,7 +353,7 @@ const Quests = () => {
                 <LoadingBar
                   variant="secondary"
                   size="lg"
-                  text="Fetching your epic quests..."
+                  text="Fetching quests..."
                   className="mb-6"
                 />
                 <ListLoadingSkeleton items={questsPerPage} />
@@ -363,19 +363,19 @@ const Quests = () => {
                 <QuestGrid
                   quests={quests}
                   userQuests={userQuests}
-                  user={user} // ✅ SIMPLIFIED USER FROM SESSION
+                  user={user}
                   loading={loading}
                   loadingQuestId={loadingQuestId}
                   isExecutingQuest={isExecutingQuest}
                   onQuestClick={handleQuestCardClick}
-                  getButtonProps={getButtonPropsCallback} // ✅ USE MEMOIZED FUNCTION
+                  getButtonProps={getButtonPropsCallback}
                 />
               </div>
             )}
           </div>
         </div>
 
-        {/* ✅ LOADING OVERLAY PARA QUEST ACTIONS */}
+        {/*  LOADING OVERLAY PARA QUEST ACTIONS */}
         <LoadingOverlay
           show={isExecutingQuest}
           text="Processing your quest action..."
@@ -383,7 +383,7 @@ const Quests = () => {
           blur={true}
         />
 
-        {/* ✅ LOADING OVERLAY PARA USER QUESTS */}
+        {/*  LOADING OVERLAY PARA USER QUESTS */}
         <LoadingOverlay
           show={loadingUserQuests && !loading}
           text="Syncing your quest progress..."

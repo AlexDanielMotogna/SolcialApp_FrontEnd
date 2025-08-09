@@ -6,82 +6,98 @@ import { createQuestSession } from "@/lib/questSession";
 
 export async function POST(req: NextRequest) {
   const requestId = Date.now();
-  console.log(`🚀 [${requestId}] Starting user-quest creation...`);
-  
+  console.log(`[${requestId}] Starting user-quest creation...`);
+
   try {
-    // ✅ OBTENER USUARIO DE LA SESIÓN (SEGURO)
+    //obtain authenticated user
     const authResult = await getAuthenticatedUser();
     const authError = createAuthResponse(authResult);
     if (authError) {
-      console.log(`❌ [${requestId}] Authentication failed:`, authResult.error);
+      console.log(`[${requestId}] Authentication failed:`, authResult.error);
       return authError;
     }
 
     const { user } = authResult;
     if (!user) {
-      console.log(`❌ [${requestId}] User object is null after authentication`);
+      console.log(`[${requestId}] User object is null after authentication`);
       return NextResponse.json(
         { error: "Authenticated user not found" },
         { status: 401 }
       );
     }
-    console.log(`✅ [${requestId}] User authenticated:`, user.email);
+    console.log(`[${requestId}] User authenticated:`, user.email);
 
     await connectDB();
-    console.log(`✅ [${requestId}] Database connected`);
+    console.log(`[${requestId}] Database connected`);
 
     const data = await req.json();
-    console.log(`📝 [${requestId}] Request data:`, {
-      userId: user.id, // ✅ DE LA SESIÓN
+    console.log(`[${requestId}] Request data:`, {
+      userId: user.id,
       questId: data.questId,
-      walletaddress: user.walletaddress, // ✅ DE LA SESIÓN
+      twitterUserId: user.twitterUserId,
+      walletaddress: user.walletaddress,
       tasksCount: data.tasks?.length || 0,
     });
-
-    // ✅ BASIC INPUT VALIDATION
     if (!data.questId) {
-      console.log(`❌ [${requestId}] Missing questId`);
+      console.log(`[${requestId}] Missing questId`);
       return NextResponse.json(
         { error: "Quest ID is required" },
         { status: 400 }
       );
     }
 
-    // ✅ QUEST JOIN VALIDATION CON DATOS DE SESIÓN
+    // Quest validation
     const questValidation = await validateQuestJoin(
       data.questId,
-      user.id, // ✅ DE LA SESIÓN
-      user.walletaddress // ✅ DE LA SESIÓN
+      user.id,
+      user.walletaddress,
+      user.twitterUserId ?? ""
     );
-    
+
     if (!questValidation.valid) {
       console.log(
-        `❌ [${requestId}] Quest validation failed:`,
+        `[${requestId}] Quest validation failed:`,
         questValidation.error
       );
 
-      // ✅ MANEJAR CASO ESPECIAL: Ya completado
+      // Handle case where user already has an active session or completed the quest
       if (questValidation.statusCode === 409 && questValidation.userQuest) {
         const userQuest = questValidation.userQuest;
-        
+
         if (userQuest.status === "finished") {
-          console.log(`ℹ️ [${requestId}] User already completed this quest, returning existing data`);
-          
-          return NextResponse.json({
-            ...userQuest.toObject(),
-            message: "Quest already completed",
-            alreadyCompleted: true,
-          }, { status: 200 });
+          // Check if the twitterId matches
+          if (
+            userQuest.twitterId === user.twitterUserId &&
+            userQuest.questId === data.questId
+          ) {
+            console.log(
+              `[${requestId}] This Twitter user already completed this quest`
+            );
+            return NextResponse.json(
+              {
+                ...userQuest.toObject(),
+                message: "This Twitter user already completed this quest",
+                alreadyCompleted: true,
+                twitterId: userQuest.twitterId,
+              },
+              { status: 200 }
+            );
+          }
         }
-        
+
         if (userQuest.status === "active") {
-          console.log(`ℹ️ [${requestId}] User already has active session, returning existing data`);
-          
-          return NextResponse.json({
-            ...userQuest.toObject(),
-            message: "Quest session already active",
-            alreadyActive: true,
-          }, { status: 200 });
+          console.log(
+            `[${requestId}] User already has active session, returning existing data`
+          );
+
+          return NextResponse.json(
+            {
+              ...userQuest.toObject(),
+              message: "Quest session already active",
+              alreadyActive: true,
+            },
+            { status: 200 }
+          );
         }
       }
 
@@ -90,16 +106,17 @@ export async function POST(req: NextRequest) {
         { status: questValidation.statusCode || 400 }
       );
     }
-    
+
     console.log(`✅ [${requestId}] Quest validations passed`);
 
-    // ✅ CREATE QUEST SESSION CON DATOS DE SESIÓN
+    // Create quest session
     console.log(`📊 [${requestId}] Creating quest session...`);
-    
+
     const sessionResult = await createQuestSession({
       ...data,
-      userId: user.id, // ✅ DE LA SESIÓN
-      walletaddress: user.walletaddress, // ✅ DE LA SESIÓN
+      userId: user.id,
+      walletaddress: user.walletaddress,
+      twitterId: user.twitterUserId,
       quest: questValidation.quest,
     });
 
@@ -112,7 +129,7 @@ export async function POST(req: NextRequest) {
 
     if (!sessionResult.success) {
       console.log(
-        `❌ [${requestId}] Session creation failed:`,
+        ` [${requestId}] Session creation failed:`,
         sessionResult.error
       );
 
@@ -153,7 +170,6 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-    
   } catch (error) {
     console.error(`❌ [${requestId}] Error in user-quests:`, error);
     return NextResponse.json(

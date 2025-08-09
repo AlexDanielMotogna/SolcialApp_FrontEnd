@@ -102,13 +102,13 @@ export const authOptions: AuthOptions = {
       }
       return true;
     },
-    // ✅ ENHANCED SESSION CALLBACK - Include all user data
+    // This callback is used to include additional user data in the session
     async session({ session, token }: { session: any; token: any }) {
       if (session.user?.email) {
         await connectDB();
         const dbUser = await User.findOne({ email: session.user.email }).lean();
         if (dbUser) {
-          // ✅ Include all necessary user data in session
+          // Include all user data in the session
           session.user = {
             ...session.user,
             id: dbUser._id.toString(),
@@ -136,7 +136,7 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async jwt({ token, user }: { token: any; user?: any }) {
-      // Si el usuario existe (primer login), añade datos al token
+      // If user is defined, it means this is the initial sign-in
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -146,7 +146,7 @@ export const authOptions: AuthOptions = {
         token.hasTwitterAccess = user.hasTwitterAccess;
         token.isVerified = user.isVerified;
       }
-      // Si el token tiene email, busca el usuario en la base de datos y añade datos
+      // if the user email is available, fetch additional user data
       if (token.email) {
         await connectDB();
         const dbUser = await User.findOne({ email: token.email }).lean();
@@ -164,7 +164,7 @@ export const authOptions: AuthOptions = {
   },
   pages: {
     signIn: "/login",
-    error: "/login", // Redirect errors to login page
+    error: "/login",
   },
   session: {
     strategy: "jwt" as const,
