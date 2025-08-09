@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { questService } from "@/services/questService";
-import { QUEST_MESSAGES } from "@/constants/questConstants";
+import { QUEST_MESSAGES } from "@/constants/quest/questConstants";
 import type { Quest, User } from "@/types/quest";
 
 interface UseQuestActionsProps {
@@ -47,102 +47,109 @@ export const useQuestActions = ({
   const [isExecutingQuest, setIsExecutingQuest] = useState(false);
   const [loadingQuestId, setLoadingQuestId] = useState<string | null>(null);
 
- // MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useQuestActions.ts
+  // MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useQuestActions.ts
 
-const handleQuestCardClick = useCallback(
-  async (quest: Quest) => {
-    // ✅ VALIDACIONES BÁSICAS DE FRONTEND (MANTENER)
-    if (!user) {
-      toast.error("Please login to join quests");
-      return;
-    }
-
-    if (!isConnected || !walletAddress) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (!user.hasTwitterAccess) {
-      setShowConnectTwitterModal(true);
-      return;
-    }
-
-    try {
-      // ✅ SOLO ENVIAR QUEST ID (NO USER DATA)
-      const accessResponse = await fetch("/api/quest-access", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          questId: quest._id,
-          walletAddress: walletAddress, 
-        }),
-      });
-
-      const accessResult = await accessResponse.json();
-
-      if (!accessResponse.ok) {
-        if (
-          accessResult.error?.includes("Connect") ||
-          accessResult.error === "twitter_required"
-        ) {
-          setShowConnectTwitterModal(true);
-          return;
-        }
-        toast.error(accessResult.error || "Cannot access quest");
+  const handleQuestCardClick = useCallback(
+    async (quest: Quest) => {
+      // ✅ VALIDACIONES BÁSICAS DE FRONTEND (MANTENER)
+      if (!user) {
+        toast.error("Please login to join quests");
         return;
       }
 
-      // ✅ HANDLE QUEST ACCESS LOGIC (IGUAL QUE ANTES)
-      if (accessResult.hasParticipated && accessResult.userQuest) {
-        if (accessResult.userQuest.status === "active") {
-          const expirationResult = await questService.checkQuestExpiration(
-            quest._id
-          );
+      if (!isConnected || !walletAddress) {
+        toast.error("Please connect your wallet");
+        return;
+      }
 
+      if (!user.hasTwitterAccess) {
+        setShowConnectTwitterModal(true);
+        return;
+      }
+
+      try {
+        // ✅ SOLO ENVIAR QUEST ID (NO USER DATA)
+        const accessResponse = await fetch("/api/quest-access", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questId: quest._id,
+            walletAddress: walletAddress,
+          }),
+        });
+
+        const accessResult = await accessResponse.json();
+
+        if (!accessResponse.ok) {
           if (
-            expirationResult.success &&
-            expirationResult.data?.expired &&
-            expirationResult.data?.found
+            accessResult.error?.includes("Connect") ||
+            accessResult.error === "twitter_required"
           ) {
+            setShowConnectTwitterModal(true);
+            return;
+          }
+          toast.error(accessResult.error || "Cannot access quest");
+          return;
+        }
+
+        // ✅ PREVENIR MODAL SI LA SESIÓN ESTÁ EXPIRADA
+        if (accessResult.hasParticipated && accessResult.userQuest) {
+          if (accessResult.userQuest.status === "expired") {
             setExpiredQuestName(quest.questName);
             setShowExpirationModal(true);
             toast.error(`Session expired: ${quest.questName}`);
             await refreshAllData();
             return;
           }
+          if (accessResult.userQuest.status === "active") {
+            const expirationResult = await questService.checkQuestExpiration(
+              quest._id
+            );
+
+            if (
+              expirationResult.success &&
+              expirationResult.data?.expired &&
+              expirationResult.data?.found
+            ) {
+              setExpiredQuestName(quest.questName);
+              setShowExpirationModal(true);
+              toast.error(`Session expired: ${quest.questName}`);
+              await refreshAllData();
+              return;
+            }
+          }
+
+          setSelectedQuestId(quest._id);
+          openModal("QuestModal");
+          return;
         }
 
-        setSelectedQuestId(quest._id);
-        openModal("QuestModal");
-        return;
-      }
+        if (quest.status === "finished" && !accessResult.hasParticipated) {
+          toast.error("Quest has ended and you didn't participate.");
+          return;
+        }
 
-      if (quest.status === "finished" && !accessResult.hasParticipated) {
-        toast.error("Quest has ended and you didn't participate.");
-        return;
+        if (!accessResult.hasParticipated) {
+          await handleJoinQuest(quest);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking quest access:", error);
+        toast.error("Error accessing quest. Please try again.");
       }
-
-      if (!accessResult.hasParticipated) {
-        await handleJoinQuest(quest);
-        return;
-      }
-    } catch (error) {
-      console.error("Error checking quest access:", error);
-      toast.error("Error accessing quest. Please try again.");
-    }
-  },
-  [
-    user,
-    isConnected,
-    walletAddress,
-    refreshAllData,
-    setSelectedQuestId,
-    openModal,
-    setShowConnectTwitterModal,
-    setShowExpirationModal,
-    setExpiredQuestName,
-  ]
-);
+    },
+    [
+      user,
+      isConnected,
+      walletAddress,
+      refreshAllData,
+      setSelectedQuestId,
+      openModal,
+      setShowConnectTwitterModal,
+      setShowExpirationModal,
+      setExpiredQuestName,
+    ]
+  );
 
   const handleJoinQuest = useCallback(
     async (quest: Quest) => {

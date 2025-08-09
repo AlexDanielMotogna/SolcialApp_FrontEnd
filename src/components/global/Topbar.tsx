@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import React from 'react';
+import Image from "next/image";
+import React from "react";
 import Analyzer from "../../../public/icons/Analyzer";
 import ButtonSm from "../ButtonSm";
 import Notification from "../../../public/icons/Notification";
@@ -15,45 +15,60 @@ import Alert1 from "../../../public/imgs/Alert1.png";
 import Alert2 from "../../../public/imgs/Alert2.png";
 import Alert3 from "../../../public/imgs/Alert3.png";
 import Alert4 from "../../../public/imgs/Alert4.png";
-import Menu from '../../../public/icons/Menu';
+import Menu from "../../../public/icons/Menu";
 import NotificationCard from "./NotificationCard";
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useState, useEffect } from 'react';
-import Wallet from '../../../public/icons/Wallet';
-import { SolanaWalletProvider } from '@/providers/WalletProvider';
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useState, useEffect } from "react";
+import Wallet from "../../../public/icons/Wallet";
+import { SolanaWalletProvider } from "@/providers/WalletProvider";
 
 const notifications = [
   {
     image: Alert1,
     title: "SOL Price Alert!",
-    message: "Solana has just surpassed $50! 🚀 Tap here to view details or adjust your trading strategy."
+    message:
+      "Solana has just surpassed $50! 🚀 Tap here to view details or adjust your trading strategy.",
   },
   {
     image: Alert2,
     title: "Transaction Confirmed",
-    message: "Your purchase of 1 SOL at $35 per coin has been successfully confirmed. View transaction details."
+    message:
+      "Your purchase of 1 SOL at $35 per coin has been successfully confirmed. View transaction details.",
   },
   {
     image: Alert3,
     title: "Weekly Portfolio Summary",
-    message: "Your portfolio gained 3.2% this week! Tap here to review your top-performing tokens."
+    message:
+      "Your portfolio gained 3.2% this week! Tap here to review your top-performing tokens.",
   },
   {
     image: Alert4,
     title: "Market Update: Ladder Match Rankings",
-    message: "The latest Ladder Match rankings are out! See if you've moved up the leaderboard and view your recent matches."
-  }
+    message:
+      "The latest Ladder Match rankings are out! See if you've moved up the leaderboard and view your recent matches.",
+  },
 ];
 
-const Topbar = ({ activePath, toggleSidebar }: { activePath: string, toggleSidebar: () => void }) => {
+const Topbar = ({
+  activePath,
+  toggleSidebar,
+}: {
+  activePath: string;
+  toggleSidebar: () => void;
+}) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
-  
 
   let topbarLabel = "";
   let topbarIcon = null;
 
-  switch (activePath) {
+  // Normalize path: remove trailing slash except for root
+  const normalizedPath =
+    activePath.length > 1 && activePath.endsWith("/")
+      ? activePath.slice(0, -1)
+      : activePath;
+
+  switch (normalizedPath) {
     case "/dashboard":
       topbarLabel = "Analyzer";
       topbarIcon = <Analyzer />;
@@ -78,7 +93,7 @@ const Topbar = ({ activePath, toggleSidebar }: { activePath: string, toggleSideb
       topbarLabel = "Ads";
       topbarIcon = <Tournaments />;
       break;
-    case "/dashboard/boost":
+    case "/dashboard/adverstising":
       topbarLabel = "Boost Token";
       topbarIcon = <Clock />;
       break;
@@ -94,7 +109,7 @@ const Topbar = ({ activePath, toggleSidebar }: { activePath: string, toggleSideb
   return (
     <div className="w-full px-9 py-[16px] flex items-center justify-between border-b border-b-[#2C2C30] relative">
       <div className="flex items-center gap-5">
-        <div className='flex items-center justify-center mr-2 lg:hidden'>
+        <div className="flex items-center justify-center mr-2 lg:hidden">
           <button onClick={toggleSidebar} aria-label="Toggle Sidebar">
             <Menu />
           </button>

@@ -2,6 +2,7 @@ import InfoRow from "@/components/global/InfoRow";
 import Notification from "@/components/global/Notification";
 import TaskList from "@/components/global/TaskList";
 import RewardSuccessModal from "@/components/ui/RewardSuccessModal";
+import { LoadingOverlay } from "@/components/ui/LoadingBar";
 import { useNotificaciones } from "@/context/NotificacionesContext";
 import {
   getIncompleteRequiredTasks,
@@ -11,9 +12,12 @@ import {
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Close from "../../../public/icons/Close";
+import QuestsIcon from "../../../public/icons/Quests";
 import Button from "../ButtonBorder";
-import { parseDecimal128ToNumber, formatDecimalForDisplay } from "@/utils/decimal";
-
+import {
+  parseDecimal128ToNumber,
+  formatDecimalForDisplay,
+} from "@/utils/decimal";
 
 interface QuestModalProps {
   isOpen: boolean;
@@ -42,6 +46,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
 }) => {
   const { setMensaje } = useNotificaciones();
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // for verify/claim
 
   // ============================================================================
   // COMPUTED VALUES
@@ -126,9 +131,10 @@ const QuestModal: React.FC<QuestModalProps> = ({
     }
   };
 
-  const handleClaimReward = async () => {
+  const handleClaimReward = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!userQuest) return;
-
+    setActionLoading(true);
     try {
       const res = await fetch("/api/user-quests/claim", {
         method: "POST",
@@ -147,9 +153,12 @@ const QuestModal: React.FC<QuestModalProps> = ({
     } catch (error) {
       toast.error("Error claiming reward. Please try again.");
     }
+    setActionLoading(false);
   };
 
-  const handleVerifyTasks = async () => {
+  const handleVerifyTasks = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setActionLoading(true);
     try {
       const verifyRes = await fetch("/api/user-quests/verify-twitter", {
         method: "POST",
@@ -175,6 +184,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
             },
           }
         );
+        setActionLoading(false);
         return;
       }
       if (
@@ -193,6 +203,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
             },
           }
         );
+        setActionLoading(false);
         return;
       }
       if (verifyData.success) {
@@ -205,6 +216,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
     } catch (error) {
       toast.error("Error verifying tasks. Please try again.");
     }
+    setActionLoading(false);
   };
 
   // ============================================================================
@@ -214,7 +226,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
   const getFooterButton = () => {
     // Session expired - close modal to restart
     if (isSessionExpired) {
-      return <Button text="Session Expired - Close" onClick={onClose} />;
+      return <Button text="Session Expired - Close" onClick={onClose} type="button" />;
     }
 
     // Quest inactive (but allow claim if user completed and quest finished)
@@ -226,7 +238,7 @@ const QuestModal: React.FC<QuestModalProps> = ({
         userQuest.status === "finished"
       )
     ) {
-      return <Button text={`Quest ${quest.status}`} disabled />;
+      return <Button text={`Quest ${quest.status}`} disabled type="button" />;
     }
 
     // Reward ready to claim (highest priority)
@@ -236,24 +248,25 @@ const QuestModal: React.FC<QuestModalProps> = ({
       allUserTasksCompleted &&
       !rewardClaimed
     ) {
-      return <Button text="Claim Reward" onClick={handleClaimReward} />;
+      return <Button text="Claim Reward" onClick={handleClaimReward} type="button" disabled={actionLoading} />;
     }
 
     // Tasks verification available (only if quest not finished)
     if (canVerifyAgain && quest.status !== "finished") {
       return (
         <Button
-          text="Verify Tasks"
+          text={actionLoading ? "Verifying..." : "Verify Tasks"}
           className="bg-yellow-500 hover:bg-yellow-600 text-black"
-          disabled={!user?.hasTwitterAccess}
+          disabled={!user?.hasTwitterAccess || actionLoading}
           onClick={handleVerifyTasks}
+          type="button"
         />
       );
     }
 
     // Quest finished but tasks not completed
     if (quest.status === "finished" && userQuest && !allUserTasksCompleted) {
-      return <Button text="Quest ended - Tasks not completed" disabled />;
+      return <Button text="Quest ended - Tasks not completed" disabled type="button" />;
     }
 
     // Session completed, reward available (alternative path)
@@ -263,34 +276,35 @@ const QuestModal: React.FC<QuestModalProps> = ({
       return (
         <Button
           text="Claim Reward"
-          disabled={!canClaim}
+          disabled={!canClaim || actionLoading}
           onClick={canClaim ? handleClaimReward : undefined}
+          type="button"
         />
       );
     }
 
     // All tasks completed (final verification)
     if (allUserTasksCompleted && !rewardClaimed) {
-      return <Button text="Claim Reward" onClick={handleClaimReward} />;
+      return <Button text="Claim Reward" onClick={handleClaimReward} type="button" disabled={actionLoading} />;
     }
 
     // Active session but pending tasks (only if quest not finished)
     if (hasActiveSession && quest.status !== "finished") {
-      return <Button text="Complete all tasks to claim reward" disabled />;
+      return <Button text="Complete all tasks to claim reward" disabled type="button" />;
     }
 
     // Reward already claimed
     if (rewardClaimed) {
-      return <Button text="Reward already claimed" disabled />;
+      return <Button text="Reward already claimed" disabled type="button" />;
     }
 
     // No userQuest - modal shouldn't be open
     if (!userQuest) {
-      return <Button text="Close" onClick={onClose} />;
+      return <Button text="Close" onClick={onClose} type="button" />;
     }
 
     // Default state
-    return <Button text="Close" onClick={onClose} />;
+    return <Button text="Close" onClick={onClose} type="button" />;
   };
 
   // ============================================================================
@@ -301,24 +315,39 @@ const QuestModal: React.FC<QuestModalProps> = ({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-        <div className="bg-[#161618] w-[420px] flex items-center justify-center rounded-2xl p-10">
-          <span className="text-white text-xl">Loading...</span>
-        </div>
-      </div>
+      <LoadingOverlay
+        show={true}
+        text="Loading quest details..."
+        variant="dots"
+        blur={true}
+      />
     );
   }
 
   if (!quest) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-        <div className="bg-[#161618] w-[420px] flex items-center justify-center rounded-2xl p-10">
-          <span className="text-white text-xl">Quest not found</span>
-          <button className="ml-4 text-white underline" onClick={onClose}>
+      <>
+        <LoadingOverlay
+          show={true}
+          text="Quest not found"
+          variant="dots"
+          blur={true}
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <button
+            className="mt-4 text-white underline text-base pointer-events-auto bg-black/60 px-6 py-3 rounded-xl shadow-lg"
+            style={{
+              position: "absolute",
+              top: "60%",
+              left: "50%",
+              transform: "translate(-50%, 0)",
+            }}
+            onClick={onClose}
+          >
             Close
           </button>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -339,8 +368,10 @@ const QuestModal: React.FC<QuestModalProps> = ({
         >
           {/* Header */}
           <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
-            <h3 className="text-[1.8rem] text-white font-semibold">
-              {quest.questName}
+            <h3 className="text-[1.8rem] text-white font-semibold flex items-center gap-3">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#222] border border-[#44444A]">
+                <QuestsIcon color="#12994aff" />
+              </span>
             </h3>
             <Close onClick={onClose} />
           </div>
@@ -358,10 +389,35 @@ const QuestModal: React.FC<QuestModalProps> = ({
 
             {/* Quest Details */}
             <div className="w-full flex flex-col gap-[0.8rem]">
-              <InfoRow label="Total Reward" value={`${formattedRewardPool} SOL`} />
+              <InfoRow
+                label="Total Reward"
+                value={
+                  <span className="inline-flex items-center">
+                    {formattedRewardPool}
+                    <img
+                      src="/icons/SolanaIconReward.png"
+                      alt="Solana"
+                      className="w-6 h-6 sm:w-7 sm:h-7 object-contain ml-1"
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                  </span>
+                }
+              />
               <InfoRow
                 label="Reward per User"
-                value={`${formattedRewardPerUser} SOL`}
+                value={
+                  <span className="inline-flex items-center">
+                    {formattedRewardPerUser}
+                    <img
+                      src="/icons/SolanaIconReward.png"
+                      alt="Solana"
+                      className="w-6 h-6 sm:w-7 sm:h-7 object-contain ml-1"
+                    />
+                  </span>
+                }
               />
               <InfoRow
                 label="Start Date"
@@ -388,20 +444,27 @@ const QuestModal: React.FC<QuestModalProps> = ({
             {quest.tweetLink && (
               <div className="w-full">
                 <p className="text-[#ACB5BB] text-[1.2rem] mb-3">
-                  Complete all required tasks on this tweet:
+                  Complete all required tasks on this post:
                 </p>
                 <button
                   onClick={handleTweetLinkClick}
-                  className="w-full p-4 bg-[#1DA1F2] hover:bg-[#1A94DA] transition-colors duration-200 rounded-lg border border-[#1DA1F2] text-white font-medium text-[1.4rem] flex items-center justify-center gap-2"
+                  className="w-full p-4 bg-[#181818] hover:bg-[#222] transition-colors duration-200 rounded-lg border border-[#222] text-white font-medium text-[1.4rem] flex items-center justify-center gap-2"
+                  style={{ boxShadow: "0 2px 8px 0 #00000030" }}
                 >
+                  {/* X Logo SVG */}
                   <svg
                     className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+                    viewBox="0 0 120 120"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                    <rect width="120" height="120" rx="24" fill="#181818" />
+                    <path
+                      d="M85.5 34H74.7L60.1 54.1L45.7 34H34.5L54.2 61.1L34 86H44.8L60.1 66.1L75.3 86H86.5L66.2 59.1L85.5 34ZM62.2 62.7L74.1 78.1H70.2L60.1 64.7L49.9 78.1H45.9L57.8 62.7L45.9 47.3H49.9L60.1 60.7L70.2 47.3H74.1L62.2 62.7Z"
+                      fill="white"
+                    />
                   </svg>
-                  Open Tweet on Twitter
+                  Open Post on X
                   <svg
                     className="w-4 h-4"
                     fill="none"

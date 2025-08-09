@@ -14,16 +14,10 @@ export const questUtils = {
     const questStartTime = new Date(quest.startDateTime);
     const currentTime = new Date();
 
-    // Loading state
+    // If quest hasn't started yet, show countdown or "Starting soon"
     if (isLoading) {
       return { text: "Joining quest...", disabled: true };
     }
-
-    // ✅ NO USER - PERMITIR CLICK
-    if (!user) {
-      return { text: "Login Required", disabled: false }; // ✅ FALSE para permitir click
-    }
-
     // Quest hasn't started yet
     if (currentTime < questStartTime) {
       const timeUntilStart = questStartTime.getTime() - currentTime.getTime();
@@ -38,12 +32,10 @@ export const questUtils = {
         return { text: "Starting soon...", disabled: true };
       }
     }
-
     // Quest canceled
     if (quest.status === "canceled") {
       return { text: "Quest Canceled", disabled: true };
     }
-
     // Quest finished
     if (quest.status === "finished") {
       if (userQuest) {
@@ -53,16 +45,16 @@ export const questUtils = {
           ).every(Boolean);
 
           if (allTasksCompleted && !userQuest.rewardClaimed) {
-            return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+            return { text: "Complete", disabled: false };
           }
 
           if (userQuest.rewardClaimed) {
-            return { text: "Reward Claimed", disabled: false }; // ✅ Siempre clickeable
+            return { text: "Reward Claimed", disabled: false };
           }
 
-          return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+          return { text: "Complete", disabled: false };
         }
-        return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+        return { text: "Complete", disabled: false };
       }
       return { text: "Quest Ended", disabled: true };
     }
@@ -72,35 +64,40 @@ export const questUtils = {
       return { text: "No spots available", disabled: true };
     }
 
-    // ✅ SIN TWITTER - BOTÓN CLICKEABLE PARA CONECTAR
+    // User not connected to Twitter
     if (!isConnectedToTwitter) {
-      return { text: "Connect to Twitter", disabled: false }; // ✅ FALSE para permitir click
+      return { text: "Connect to Twitter", disabled: false };
     }
 
-    // Usuario con quest
+    // User already joined quest
     if (userQuest) {
+      // UI-only: If sessionExpiresAt is in the past, treat as expired (even if backend hasn't updated status yet)
+      if (userQuest.sessionExpiresAt) {
+        const expiresAt = new Date(userQuest.sessionExpiresAt).getTime();
+        if (expiresAt < Date.now()) {
+          return { text: "Join Quest", disabled: false };
+        }
+      }
       if (userQuest.status === "expired") {
         return { text: "Join Quest", disabled: false };
       }
-
       if (userQuest.status === "active") {
-        return { text: "Continue Quest", disabled: false }; // ✅ Siempre clickeable
+        return { text: "Continue Quest", disabled: false };
       }
-
       if (userQuest.status === "finished") {
         const allTasksCompleted = Object.values(
           userQuest.completedTasks || {}
         ).every(Boolean);
 
         if (allTasksCompleted && !userQuest.rewardClaimed) {
-          return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+          return { text: "Complete", disabled: false };
         }
 
         if (userQuest.rewardClaimed) {
-          return { text: "Reward Claimed", disabled: false }; // ✅ Siempre clickeable
+          return { text: "Reward Claimed", disabled: false };
         }
 
-        return { text: "Complete", disabled: false }; // ✅ Siempre clickeable
+        return { text: "Complete", disabled: false };
       }
     }
 

@@ -1,5 +1,3 @@
-// CREAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\components\ui\TableSkeletons.tsx
-
 "use client";
 import React from 'react';
 
