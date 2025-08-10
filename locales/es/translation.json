@@ -82,5 +82,7 @@
   "something_went_wrong": "Algo salió mal:",
   "email_verification": "Verificación de correo",
   "Invalid credentials": "Credenciales inválidas",
-  "internal_server_error": "Error interno del servidor"
+  "internal_server_error": "Error interno del servidor",
+  "redirecting": "Redirigiendo...",
+  "close": "Cerrar"
 }

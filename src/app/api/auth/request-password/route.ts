@@ -1,10 +1,18 @@
-import { encryptAES } from "@/lib/security-hash";
+import { encryptAES,decryptAES } from "@/lib/security-hash";
 import { sendMail } from "@/lib/mailer";
-import requestPasswordEmailTemplate from "@/mail-templates/requestPassword"; // À créer (copie de forgotPassword)
+import requestPasswordEmailTemplate from "@/mail-templates/requestPassword";
 import { connectDB } from "@/lib/mongodb";
 import AuthUser from "@/models/AuthUser";
 import crypto from "crypto";
 import { NextRequest } from "next/server";
+
+function isTokenValid(user: any) {
+  return (
+    user.resetPasswordToken &&
+    user.resetPasswordExpire &&
+    user.resetPasswordExpire > Date.now()
+  );
+}
 
 export async function POST(request: NextRequest) {
   await connectDB();
@@ -25,11 +33,18 @@ export async function POST(request: NextRequest) {
       return new Response(JSON.stringify({ msg: "This account already has a password" }), { status: 400 });
     }
 
-    const resetToken = crypto.randomBytes(20).toString("hex");
-    const encryptedToken = encryptAES(resetToken);
-    user.resetPasswordToken = encryptedToken;
-    user.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
-    await user.save();
+    let resetToken: string;
+    if (isTokenValid(user)) {
+      // Reuse existing token
+      resetToken = decryptAES(user.resetPasswordToken);
+    } else {
+      // Generate a new token
+      resetToken = crypto.randomBytes(20).toString("hex");
+      const encryptedToken = encryptAES(resetToken);
+      user.resetPasswordToken = encryptedToken;
+      user.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
+      await user.save();
+    }
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     const templateData = requestPasswordEmailTemplate(user.name, resetUrl, lang);

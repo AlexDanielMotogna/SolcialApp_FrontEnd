@@ -284,22 +284,7 @@ const SettingsPage: React.FC = () => {
               </button>
               <button
                 className="flex-1 px-6 py-3 rounded-xl bg-red-600 text-white text-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
-                onClick={() =>
-                  handleDeleteAccount()({
-                    onSuccess: () => {
-                      console.log("Delete account: Success");
-                      /* ... */
-                    },
-                    onError: () => {
-                      console.log("Delete account: Error");
-                      /* ... */
-                    },
-                    onFinally: () => {
-                      console.log("Delete account: Finally");
-                      /* ... */
-                    },
-                  })
-                }
+                onClick={handleDelete}
                 disabled={deleteLoading}
               >
                 {deleteLoading ? "Deleting..." : "Delete Account"}

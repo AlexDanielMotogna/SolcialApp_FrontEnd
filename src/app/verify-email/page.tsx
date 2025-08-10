@@ -1,10 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import logo from "../../../public/imgs/logo.png";
-import CryptoBalance from "../../../public/imgs/Crypto-Balancee.png";
-import Headline from "../../../public/imgs/Headline.png";
 import { LoadingBar } from "@/components/ui/LoadingBar";
 import AuthLayout from "@/components/layouts/auth-layout";
 import { useTranslation } from "react-i18next";
@@ -36,7 +32,7 @@ const VerifyEmail = () => {
           setTimeout(() => {
             router.push("/login");
             setLoading(false);
-          }, 3000);
+          });
         } else {
           setStatus(
             t("verification_failed", "Verification failed:") +

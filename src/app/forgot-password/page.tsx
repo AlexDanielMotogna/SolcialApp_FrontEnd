@@ -3,8 +3,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import User from "../../../public/imgs/user.svg";
 import AuthLayout from "@/components/layouts/auth-layout";
 import AuthErrorModal from "@/components/modals/AuthErrorModal";
 import AuthSuccessModal from "@/components/modals/AuthSuccessModal";
@@ -12,7 +10,7 @@ import { LoadingBar } from "@/components/ui/LoadingBar";
 import Link from "next/link";
 
 const ForgotPassword: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
@@ -31,7 +29,7 @@ const ForgotPassword: React.FC = () => {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, lang: i18n.language }),
       });
       const data = await res.json();
 
@@ -71,13 +69,10 @@ const ForgotPassword: React.FC = () => {
           <div className="w-full flex flex-col gap-2">
             <label className="font-semibold text-[#ACB5BB] text-xl">{t("email")}</label>
             <div className="relative w-full">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Image src={User} alt="user" width={28} height={28} />
-              </span>
               <input
                 type="email"
                 placeholder={t("placeholder_email")}
-                className="w-full py-5 pl-16 pr-4 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                className="w-full py-5 px-4 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required

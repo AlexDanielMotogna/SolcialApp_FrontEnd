@@ -82,5 +82,7 @@
   "something_went_wrong": "Une erreur est survenue :",
   "email_verification": "Vérification de l'email",
   "Invalid credentials": "Identifiants invalides",
-  "internal_server_error": "Erreur interne du serveur"
+  "internal_server_error": "Erreur interne du serveur",
+  "redirecting": "Redirection...",
+  "close": "Fermer"
 }

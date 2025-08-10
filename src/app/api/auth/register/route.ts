@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
   const phone = formData.get("phone") as string;
   const password = formData.get("password") as string;
   const avatarFile = formData.get("avatar");
+  const lang = formData.get("lang") as string || "en";
 
   if (!username || !email || !password || !phone) {
     return new Response(JSON.stringify({ msg: "missing_required_fields" }), { status: 400 });
@@ -47,8 +48,11 @@ export async function POST(req: NextRequest) {
     verificationTokenExpire,
   });
 
-  // Envoie le token non hashé dans l’email
-  const templateObj = verificationEmailTemplate(username, `${process.env.NEXTAUTH_URL}/verify-email?token=${verificationToken}`, "en");
+  const templateObj = verificationEmailTemplate(
+    username,
+    `${process.env.NEXTAUTH_URL}/verify-email?token=${verificationToken}`,
+    lang // <-- Use the received language
+  );
   await sendMail({
     to: email,
     subject: templateObj.subject,
