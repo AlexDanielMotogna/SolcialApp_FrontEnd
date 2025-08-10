@@ -84,5 +84,6 @@
   "Invalid credentials": "Credenciales inválidas",
   "internal_server_error": "Error interno del servidor",
   "redirecting": "Redirigiendo...",
-  "close": "Cerrar"
+  "close": "Cerrar",
+  "not-verified": "No verificado"
 }
