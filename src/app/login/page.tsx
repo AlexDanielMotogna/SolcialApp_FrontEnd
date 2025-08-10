@@ -4,7 +4,6 @@ import AuthLayout from "@/components/layouts/auth-layout";
 import AuthErrorModal from "@/components/modals/AuthErrorModal";
 import AuthSuccessModal from "@/components/modals/AuthSuccessModal";
 import { LoadingBar } from "@/components/ui/LoadingBar";
-import { useAuthUser } from "@/hooks/useAuthUser";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -14,11 +13,8 @@ import { useTranslation } from "react-i18next";
 import EyeSlash from "../../../public/imgs/eye-slash.svg";
 import Eye from "../../../public/imgs/eye.svg";
 import google from "../../../public/imgs/google.svg";
-import Key from "../../../public/imgs/key.svg";
-import User from "../../../public/imgs/user.svg";
 
 const Login: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuthUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [is2faRequired, setIs2faRequired] = useState(false);
@@ -30,22 +26,20 @@ const Login: React.FC = () => {
   const [verificationSent, setVerificationSent] = useState(false);
   const [noPasswordModal, setNoPasswordModal] = useState(false);
   const [noPasswordEmail, setNoPasswordEmail] = useState("");
-  const [loginLoadingVariant, setLoginLoadingVariant] = useState<
-    "bar" | "dots" | "spinner"
-  >("dots");
   const [hasTried2fa, setHasTried2fa] = useState(false);
   const [redirectingMsg, setRedirectingMsg] = useState<string | null>(null);
   const [mailSent, setMailSent] = useState(false);
   const { t, i18n } = useTranslation();
+  const [ready, setReady] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Force la langue navigateur côté client uniquement
-    if (typeof window !== "undefined") {
-      const lang = window.navigator.language.startsWith("fr") ? "fr" : "en";
-      if (i18n.language !== lang) {
-        i18n.changeLanguage(lang);
-      }
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => i18n.off("initialized", onInit);
     }
   }, [i18n]);
 
@@ -142,7 +136,7 @@ const Login: React.FC = () => {
     // Éxito
     setLoginLoading(false);
     setShowSpinner(true);
-    setTimeout(() => router.push("/dashboard"), 1500);
+    setTimeout(() => router.push("/dashboard"));
   };
 
   const handleGoogleLogin = async () => {
@@ -155,8 +149,8 @@ const Login: React.FC = () => {
     setTimeout(() => {
       setShowSpinner(false);
       setRedirectingMsg(null);
-      router.push(url);
-    }, 1200);
+      router.push(url,60000);
+    });
   };
 
   // Envoi automatique du mail quand la modale s'ouvre
@@ -166,7 +160,10 @@ const Login: React.FC = () => {
       fetch("/api/auth/request-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: noPasswordEmail }),
+        body: JSON.stringify({
+          email: noPasswordEmail,
+          lang: i18n.language,
+        }),
       })
         .then((res) => {
           if (res.ok) {
@@ -190,7 +187,9 @@ const Login: React.FC = () => {
     }
     // Reset mailSent quand la modale se ferme
     if (!noPasswordModal) setMailSent(false);
-  }, [noPasswordModal, noPasswordEmail, t, mailSent]);
+  }, [noPasswordModal, noPasswordEmail, t, mailSent, i18n.language]);
+
+  if (!ready) return null;
 
   return (
     <AuthLayout>
@@ -212,13 +211,10 @@ const Login: React.FC = () => {
               {t("email")}
             </label>
             <div className="relative w-full">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Image src={User} alt="user" width={28} height={28} />
-              </span>
               <input
                 type="email"
                 placeholder={t("placeholder_email")}
-                className="w-full py-5 pl-16 pr-4 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-[1.15em] placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                className="w-full py-5 px-4 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-[1.15em] placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -232,13 +228,10 @@ const Login: React.FC = () => {
               {t("password")}
             </label>
             <div className="relative w-full">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Image src={Key} alt="key" width={28} height={28} />
-              </span>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
-                className="w-full py-5 pl-16 pr-12 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-[1.15em] placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                className="w-full py-5 pr-12 px-4 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-[1.15em] placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

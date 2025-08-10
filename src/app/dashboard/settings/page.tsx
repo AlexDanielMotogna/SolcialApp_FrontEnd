@@ -94,28 +94,30 @@ const SettingsPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  setDeleteLoading(true);
-  try {
-    const response = await fetch("/api/auth/delete-account", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const handleDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      const response = await fetch("/api/auth/delete-account", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (response.ok) {
-      toast.success("Account deleted successfully");
-      await signOut({ callbackUrl: "/login", redirect: true });
-    } else {
-      const data = await response.json();
-      toast.error(data.message || "Failed to delete account");
+      if (response.ok) {
+        toast.success("Account deleted successfully");
+        await signOut({ callbackUrl: "/login", redirect: true });
+      } else {
+        const data = await response.json();
+        toast.error(data.message || "Failed to delete account");
+      }
+    } catch (error) {
+      toast.error("Failed to delete account");
+    } finally {
+      setDeleteLoading(false);
+      setShowDeleteModal(false);
     }
-  } catch (error) {
-    toast.error("Failed to delete account");
-  } finally {
-    setDeleteLoading(false);
-    setShowDeleteModal(false);
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#111113] relative">
@@ -307,22 +309,7 @@ const SettingsPage: React.FC = () => {
               </button>
               <button
                 className="flex-1 px-6 py-3 rounded-xl bg-red-600 text-white text-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
-                onClick={() =>
-                  handleDeleteAccount()({
-                    onSuccess: () => {
-                      console.log("Delete account: Success");
-                      /* ... */
-                    },
-                    onError: () => {
-                      console.log("Delete account: Error");
-                      /* ... */
-                    },
-                    onFinally: () => {
-                      console.log("Delete account: Finally");
-                      /* ... */
-                    },
-                  })
-                }
+                onClick={handleDelete}
                 disabled={deleteLoading}
               >
                 {deleteLoading ? "Deleting..." : "Delete Account"}

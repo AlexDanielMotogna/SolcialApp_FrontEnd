@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import Key from "../../../public/imgs/key.svg";
 import Eye from "../../../public/imgs/eye.svg";
 import EyeSlash from "../../../public/imgs/eye-slash.svg";
 import AuthLayout from "@/components/layouts/auth-layout";
@@ -25,7 +24,8 @@ function getPasswordStrength(password: string): number {
 }
 
 const ResetPassword = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [ready, setReady] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,16 @@ const ResetPassword = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => i18n.off("initialized", onInit);
+    }
+  }, [i18n]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +80,11 @@ const ResetPassword = () => {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({
+          token,
+          password,
+          lang: i18n.language,
+        }),
       });
       const data = await res.json();
 
@@ -91,6 +105,8 @@ const ResetPassword = () => {
     setLoading(false);
   };
 
+  if (!ready) return null;
+
   return (
     <AuthLayout>
       <form
@@ -106,13 +122,11 @@ const ResetPassword = () => {
           <div className="w-full flex flex-col gap-2">
             <label className="font-semibold text-[#ACB5BB] text-xl">{t("new_password", "New password")}</label>
             <div className="relative w-full">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Image src={Key} alt="key" width={28} height={28} />
-              </span>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
-                className="w-full py-5 pl-16 pr-12 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                className="w-full py-3 pl-6 pr-12 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                style={{ lineHeight: "1.5", height: "48px" }}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -133,13 +147,11 @@ const ResetPassword = () => {
           <div className="w-full flex flex-col gap-2">
             <label className="font-semibold text-[#ACB5BB] text-xl">{t("confirm_password", "Confirm password")}</label>
             <div className="relative w-full">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Image src={Key} alt="key" width={28} height={28} />
-              </span>
               <input
                 type={showConfirm ? "text" : "password"}
                 placeholder="********"
-                className="w-full py-5 pl-16 pr-12 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                className="w-full py-3 pl-6 pr-12 bg-[#232326] border-2 border-[#44444A] rounded-xl text-white text-xl placeholder-[#6C7278] shadow focus:border-[#9945FF] focus:ring-2 focus:ring-[#9945FF] focus:outline-none transition-all"
+                style={{ lineHeight: "1.5", height: "48px" }}
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 required
