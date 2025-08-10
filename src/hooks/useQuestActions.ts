@@ -1,16 +1,15 @@
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import { questService } from "@/services/questService";
-import { QUEST_MESSAGES } from "@/constants/quest/questConstants";
 import type { Quest, User } from "@/types/quest";
+import { useCallback, useState } from "react";
+import toast from "react-hot-toast";
 
+// Custom hook to handle quest actions like joining quests, checking access, and managing session timers
+// This hook is used in the QuestCard component and handles user interactions with quests
 interface UseQuestActionsProps {
   user: User | null;
   walletAddress: string | null;
   isConnected: boolean;
   refreshAllData: () => Promise<void>;
-  // ✅ CORREGIR EL TIPO DEL HANDLER
   startSessionTimer: (
     questId: string,
     questName: string,
@@ -22,14 +21,11 @@ interface UseQuestActionsProps {
   setShowConnectTwitterModal: (show: boolean) => void;
   setShowExpirationModal: (show: boolean) => void;
   setExpiredQuestName: (name: string) => void;
-  // ✅ AGREGAR EL HANDLER DE EXPIRACIÓN
   handleSessionExpiration: (
     questId: string,
     questName: string
   ) => Promise<void>;
 }
-
-// MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useQuestActions.ts
 
 export const useQuestActions = ({
   user,
@@ -47,28 +43,21 @@ export const useQuestActions = ({
   const [isExecutingQuest, setIsExecutingQuest] = useState(false);
   const [loadingQuestId, setLoadingQuestId] = useState<string | null>(null);
 
-  // MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useQuestActions.ts
-
   const handleQuestCardClick = useCallback(
     async (quest: Quest) => {
-      // ✅ VALIDACIONES BÁSICAS DE FRONTEND (MANTENER)
       if (!user) {
         toast.error("Please login to join quests");
         return;
       }
-
       if (!isConnected || !walletAddress) {
         toast.error("Please connect your wallet");
         return;
       }
-
       if (!user.hasTwitterAccess) {
         setShowConnectTwitterModal(true);
         return;
       }
-
       try {
-        // ✅ SOLO ENVIAR QUEST ID (NO USER DATA)
         const accessResponse = await fetch("/api/quest-access", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,8 +80,6 @@ export const useQuestActions = ({
           toast.error(accessResult.error || "Cannot access quest");
           return;
         }
-
-        // ✅ PREVENIR MODAL SI LA SESIÓN ESTÁ EXPIRADA
         if (accessResult.hasParticipated && accessResult.userQuest) {
           if (accessResult.userQuest.status === "expired") {
             setExpiredQuestName(quest.questName);
@@ -154,17 +141,13 @@ export const useQuestActions = ({
   const handleJoinQuest = useCallback(
     async (quest: Quest) => {
       if (isExecutingQuest || !user || !walletAddress) return;
-
-      // ✅ VERIFICAR TWITTER ANTES DE UNIRSE
       if (!user.hasTwitterAccess) {
         console.log("🐦 Twitter access required for joining quest");
         setShowConnectTwitterModal(true);
         return;
       }
-
       setIsExecutingQuest(true);
       setLoadingQuestId(quest._id);
-
       try {
         const result = await questService.createQuestSession({
           walletaddress: walletAddress,
@@ -173,7 +156,6 @@ export const useQuestActions = ({
         });
 
         if (!result.success) {
-          // ✅ MANEJO ESPECÍFICO DE ERRORES TWITTER
           if (
             result.error?.includes("Connect") ||
             result.error?.includes("twitter")
@@ -181,7 +163,6 @@ export const useQuestActions = ({
             setShowConnectTwitterModal(true);
             return;
           }
-
           if (
             result.error?.includes("already completed") ||
             result.error?.includes("already active")
@@ -211,7 +192,6 @@ export const useQuestActions = ({
         openModal("QuestModal");
         toast.success(`Joined quest: ${quest.questName}`);
       } catch (error) {
-        console.error("❌ Error joining quest:", error);
         toast.error("Could not start quest");
       } finally {
         setIsExecutingQuest(false);
@@ -230,7 +210,6 @@ export const useQuestActions = ({
       setShowConnectTwitterModal,
     ]
   );
-
   return {
     handleQuestCardClick,
     handleJoinQuest,

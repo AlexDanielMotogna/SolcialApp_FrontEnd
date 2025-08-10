@@ -94,29 +94,6 @@ const SettingsPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  setDeleteLoading(true);
-  try {
-    const response = await fetch("/api/auth/delete-account", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
-      toast.success("Account deleted successfully");
-      await signOut({ callbackUrl: "/login", redirect: true });
-    } else {
-      const data = await response.json();
-      toast.error(data.message || "Failed to delete account");
-    }
-  } catch (error) {
-    toast.error("Failed to delete account");
-  } finally {
-    setDeleteLoading(false);
-    setShowDeleteModal(false);
-  }
-
   return (
     <div className="min-h-screen bg-[#111113] relative">
       {/* Background pattern */}

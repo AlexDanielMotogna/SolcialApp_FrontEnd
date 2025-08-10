@@ -5,7 +5,7 @@ import SuccessModal from "@/components/ui/SuccessModal";
 import { useCreateQuest } from "@/hooks/useCreateQuest";
 import type { User } from "@/types/quest";
 import { validateQuestFormWithToast } from "@/utils/questValidation";
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -14,6 +14,15 @@ import SolanaIcon from "../../../public/imgs/SolanaIconReward.png";
 import { toUTCISOString } from "../../utils/dateUtils";
 import BannerUpload from "../BannerUpload";
 import ButtonBorder from "../ButtonBorder";
+
+const FEE_PERCENTAGE = 0.05;
+// Simulating payment validation
+async function validatePayment(): Promise<{ paid: boolean; txId?: string }> {
+  // Simula una llamada a la API del proveedor de pagos
+  await new Promise((r) => setTimeout(r, 1000));
+  // Aquí podrías recibir { paid: true, txId: "0x123..." } si el pago fue exitoso
+  return { paid: true, txId: "0x123456789abcdef" };
+}
 
 export const initialForm = {
   questName: "",
@@ -41,10 +50,10 @@ export interface CreateQuestProps {
   isOpen: boolean;
   onClose: () => void;
   refreshQuests: () => void;
-  initialData?: Partial<typeof initialForm> & { 
-    _id?: string; 
-    banner?: string; 
-    bannerPublicId?: string 
+  initialData?: Partial<typeof initialForm> & {
+    _id?: string;
+    banner?: string;
+    bannerPublicId?: string;
   };
   isEdit?: boolean;
   user: User | null;
@@ -88,6 +97,14 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     url: string;
   } | null>(null);
 
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [proceedToPayment, setProceedToPayment] = useState(false);
+
+  const rewardPool = parseFloat(form.rewardPool || "0");
+  const platformFee = rewardPool * FEE_PERCENTAGE;
+  const totalToPay = rewardPool + platformFee;
+
   // ============================================================================
   // EFFECTS
   // ============================================================================
@@ -102,19 +119,19 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tweetLink: form.tweetLink }),
         });
-        
+
         const data = await res.json();
-        
+
         if (data.success && data.userId) {
-            setForm((prev: typeof initialForm) => ({
+          setForm((prev: typeof initialForm) => ({
             ...prev,
             authorId: data.userId as string,
-            }));
+          }));
         } else {
-          toast.error('Could not fetch author ID:', data.error);
+          toast.error("Could not fetch author ID:", data.error);
         }
       } catch (error) {
-        console.error('Error fetching author ID:', error);
+        console.error("Error fetching author ID:", error);
       }
     };
 
@@ -133,7 +150,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
       if (initialData.banner) {
         setBannerData({
           url: initialData.banner,
-          publicId: initialData.bannerPublicId || '',
+          publicId: initialData.bannerPublicId || "",
         });
       }
     }
@@ -147,11 +164,11 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
       const endDateTime = new Date(`${form.endDate}T${form.endTime}`);
 
       if (startDateTime < now) {
-        console.warn('Start date is in the past');
+        console.warn("Start date is in the past");
       }
 
       if (endDateTime <= startDateTime) {
-        console.warn('End date must be after start date');
+        console.warn("End date must be after start date");
       }
     }
   }, [form.startDate, form.startTime, form.endDate, form.endTime]);
@@ -159,65 +176,88 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
+  const handleProceedToPayment = () => {
+    setProceedToPayment(true);
+  };
+
   const handleSubmitWithPopup = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  //validate form
-  const isValid = await validateQuestFormWithToast(form, user);
-  if (!isValid) return;
+    //validate form
+    const isValid = await validateQuestFormWithToast(form, user);
+    if (!isValid) return;
 
-  try {
-    // convert dates to UTC
-    const startDateTimeUTC = toUTCISOString(form.startDate, form.startTime);
-    const endDateTimeUTC = toUTCISOString(form.endDate, form.endTime);
+    // Validar pago antes de crear el quest
+    setIsPaying(true);
+    setPaymentError(null);
 
-    // remove tasks that are not selected
-    const filteredTasks = Object.fromEntries(
-      Object.entries(form.tasks).filter(([_, value]) => value === true)
-    );
+    const paymentResult = await validatePayment();
 
-    // construct quest data
-    const questData = {
-      ...form,
-      tasks: filteredTasks,
-      banner: bannerData?.url || "",
-      bannerPublicId: bannerData?.publicId || "",
-      startDateTime: startDateTimeUTC,
-      endDateTime: endDateTimeUTC,
-      userId: user!.id,
-      authorId: form.authorId,
-      ...(isEdit && initialData?._id && { _id: initialData._id }),
-    };
-
-    // remove temporary fields
-    delete questData.startDate;
-    delete questData.startTime;
-    delete questData.endDate;
-    delete questData.endTime;
-
-    //
-    if (isEdit) {
-      await questAPI.updateQuest(initialData?._id || "", questData);
-      toast.success("Quest updated successfully!");
-    } else {
-      await questAPI.createQuest(questData);
-      setShowSuccess(true);
+    if (!paymentResult.paid) {
+      setPaymentError("Payment required to create this quest.");
+      setIsPaying(false);
+      return;
     }
-    refreshQuests();
-    if (isEdit) {
-      onClose();
+
+    try {
+      // convert dates to UTC
+      const startDateTimeUTC = toUTCISOString(form.startDate, form.startTime);
+      const endDateTimeUTC = toUTCISOString(form.endDate, form.endTime);
+
+      // remove tasks that are not selected
+      const filteredTasks = Object.fromEntries(
+        Object.entries(form.tasks).filter(([_, value]) => value === true)
+      );
+
+      // construct quest data
+      const questData = {
+        ...form,
+        tasks: filteredTasks,
+        banner: bannerData?.url || "",
+        bannerPublicId: bannerData?.publicId || "",
+        startDateTime: startDateTimeUTC,
+        endDateTime: endDateTimeUTC,
+        userId: user!.id,
+        authorId: form.authorId,
+        ...(isEdit && initialData?._id && { _id: initialData._id }),
+        paymentTxId: paymentResult.txId || "",
+        platformFee: platformFee,
+        totalToPay: totalToPay,
+      };
+
+      // remove temporary fields
+      delete questData.startDate;
+      delete questData.startTime;
+      delete questData.endDate;
+      delete questData.endTime;
+
+      if (isEdit) {
+        await questAPI.updateQuest(initialData?._id || "", questData);
+        toast.success("Quest updated successfully!");
+      } else {
+        await questAPI.createQuest(questData);
+        setShowSuccess(true);
+      }
+      refreshQuests();
+      if (isEdit) {
+        onClose();
+      }
+    } catch (error) {
+      toast.error(
+        `Error ${isEdit ? "updating" : "creating"} quest: ` +
+          (error as Error).message
+      );
+    } finally {
+      setIsPaying(false);
     }
-  } catch (error) {
-    toast.error(`Error ${isEdit ? 'updating' : 'creating'} quest: ` + (error as Error).message);
-  }
-};
+  };
 
   // ============================================================================
   // RENDER CONDITIONS
   // ============================================================================
   if (!isOpen) return null;
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="fixed inset-0 bg-[#000000] bg-opacity-60 flex justify-center items-center z-50">
         <div className="text-white text-lg">Loading...</div>
@@ -225,7 +265,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
     );
   }
 
-  if (status === 'unauthenticated') {
+  if (status === "unauthenticated") {
     return null;
   }
 
@@ -265,7 +305,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
         {/* header */}
         <div className="w-full p-8 border-b border-[#44444A] flex items-center justify-between">
           <h3 className="text-[1.8rem] text-white font-semibold">
-            {isEdit ? 'Edit Quest' : 'Create Quest'}
+            {isEdit ? "Edit Quest" : "Create Quest"}
           </h3>
           <Close onClick={onClose} />
         </div>
@@ -278,13 +318,12 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
         >
           <div className="w-full flex flex-col items-start justify-start gap-1">
             <h4 className="text-white font-semibold text-[1.8rem]">
-              {isEdit ? 'Update Your Quest' : 'Launch a New Quest'}
+              {isEdit ? "Update Your Quest" : "Launch a New Quest"}
             </h4>
             <p className="text-[#ACB5BB] text-[1.4rem]">
-              {isEdit 
-                ? 'Make changes to your quest details'
-                : 'Engage your community with exciting quests and earn traction!'
-              }
+              {isEdit
+                ? "Make changes to your quest details"
+                : "Engage your community with exciting quests and earn traction!"}
             </p>
             {/* user info, for development enviorment*/}
             <p className="text-[#6C7278] text-[1.2rem] mt-2">
@@ -323,10 +362,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 required
                 maxLength={500}
               />
-              <BannerUpload 
-                onImageUpload={setBannerData} 
-                disabled={loading}
-              />
+              <BannerUpload onImageUpload={setBannerData} disabled={loading} />
             </div>
 
             {/* Tweet link*/}
@@ -345,7 +381,7 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               />
               {form.authorId && (
                 <p className="text-[#10B981] text-[1.1rem]">
-                  Tweet author detected 
+                  Tweet author detected
                 </p>
               )}
             </div>
@@ -420,17 +456,20 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               </div>
             </div>
 
-        
-             {/* Date and time, DateTimePicked from UI component */}
-           <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Date and time, DateTimePicked from UI component */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* START DATE TIME */}
               <DateTimePicker
                 label="Start Date & Time"
                 dateValue={form.startDate}
                 timeValue={form.startTime}
-                onDateChange={(date) => setForm((prev: any) => ({ ...prev, startDate: date }))}
-                onTimeChange={(time) => setForm((prev: any) => ({ ...prev, startTime: time }))}
-                minDate={new Date().toISOString().split('T')[0]}
+                onDateChange={(date) =>
+                  setForm((prev: any) => ({ ...prev, startDate: date }))
+                }
+                onTimeChange={(time) =>
+                  setForm((prev: any) => ({ ...prev, startTime: time }))
+                }
+                minDate={new Date().toISOString().split("T")[0]}
                 required
               />
 
@@ -439,9 +478,15 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                 label="End Date & Time"
                 dateValue={form.endDate}
                 timeValue={form.endTime}
-                onDateChange={(date) => setForm((prev: any) => ({ ...prev, endDate: date }))}
-                onTimeChange={(time) => setForm((prev: any) => ({ ...prev, endTime: time }))}
-                minDate={form.startDate || new Date().toISOString().split('T')[0]}
+                onDateChange={(date) =>
+                  setForm((prev: any) => ({ ...prev, endDate: date }))
+                }
+                onTimeChange={(time) =>
+                  setForm((prev: any) => ({ ...prev, endTime: time }))
+                }
+                minDate={
+                  form.startDate || new Date().toISOString().split("T")[0]
+                }
                 required
               />
             </div>
@@ -459,72 +504,111 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
               </div>
               {/* Grid of tasks */}
               <div className="grid grid-cols-1 gap-3 w-full">
-                {require('@/components/ui/TaskSelector').TASK_CONFIG.map((task: any) => {
-                  const isSelected = form.tasks[task.key] || false;
-                  return (
-                    <label
-                      key={task.key}
-                      className={`
+                {require("@/components/ui/TaskSelector").TASK_CONFIG.map(
+                  (task: any) => {
+                    const isSelected = form.tasks[task.key] || false;
+                    return (
+                      <label
+                        key={task.key}
+                        className={`
                         relative group cursor-pointer 
                         bg-gradient-to-r ${task.color} ${task.hoverColor}
-                        border ${isSelected ? 'border-[#9945FF] shadow-lg shadow-purple-500/25 bg-gradient-to-r from-purple-500/10 to-blue-500/10' : 'border-[#44444A]'}
+                        border ${
+                          isSelected
+                            ? "border-[#9945FF] shadow-lg shadow-purple-500/25 bg-gradient-to-r from-purple-500/10 to-blue-500/10"
+                            : "border-[#44444A]"
+                        }
                         rounded-xl p-4 
                         transition-all duration-300 
                         hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10
-                        ${isSelected ? 'transform scale-[1.01]' : ''}
+                        ${isSelected ? "transform scale-[1.01]" : ""}
                       `}
-                    >
-                      <input
-                        type="checkbox"
-                        name={task.key}
-                        checked={isSelected}
-                        onChange={handleChange}
-                        className="sr-only"
-                      />
-                      <div className="flex items-center gap-4">
-                        <div className={`relative w-14 h-14 rounded-xl ${task.iconBg} flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${isSelected ? 'animate-pulse shadow-lg' : ''} border border-white/10`}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          <div className="relative z-10 text-2xl transform transition-transform group-hover:scale-110">{task.icon}</div>
-                          {isSelected && (
-                            <>
-                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full animate-ping" />
-                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full" />
-                            </>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[1.4rem] text-white font-semibold group-hover:text-white transition-colors">{task.label}</span>
+                      >
+                        <input
+                          type="checkbox"
+                          name={task.key}
+                          checked={isSelected}
+                          onChange={handleChange}
+                          className="sr-only"
+                        />
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`relative w-14 h-14 rounded-xl ${
+                              task.iconBg
+                            } flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${
+                              isSelected ? "animate-pulse shadow-lg" : ""
+                            } border border-white/10`}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="relative z-10 text-2xl transform transition-transform group-hover:scale-110">
+                              {task.icon}
+                            </div>
                             {isSelected && (
-                              <span className="px-3 py-1 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white text-xs rounded-full font-bold animate-fadeIn shadow-lg">✨ Active</span>
+                              <>
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full animate-ping" />
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#9945FF] rounded-full" />
+                              </>
                             )}
                           </div>
-                          <p className="text-[1.2rem] text-[#ACB5BB] group-hover:text-[#EDF1F3] transition-colors">{task.description}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-[1.4rem] text-white font-semibold group-hover:text-white transition-colors">
+                                {task.label}
+                              </span>
+                              {isSelected && (
+                                <span className="px-3 py-1 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white text-xs rounded-full font-bold animate-fadeIn shadow-lg">
+                                  ✨ Active
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[1.2rem] text-[#ACB5BB] group-hover:text-[#EDF1F3] transition-colors">
+                              {task.description}
+                            </p>
+                          </div>
+                          <div
+                            className={`relative w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
+                              isSelected
+                                ? "bg-gradient-to-br from-[#9945FF] to-[#14F195] border-[#9945FF] shadow-lg shadow-purple-500/30"
+                                : "border-[#6C7278] group-hover:border-[#ACB5BB] bg-transparent"
+                            } transform group-hover:scale-110`}
+                          >
+                            {isSelected && (
+                              <>
+                                <svg
+                                  className="w-4 h-4 text-white animate-checkmark drop-shadow-lg"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={4}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/50 to-[#14F195]/50 rounded-lg blur-sm -z-10" />
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div className={`relative w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isSelected ? 'bg-gradient-to-br from-[#9945FF] to-[#14F195] border-[#9945FF] shadow-lg shadow-purple-500/30' : 'border-[#6C7278] group-hover:border-[#ACB5BB] bg-transparent'} transform group-hover:scale-110`}>
-                          {isSelected && (
-                            <>
-                              <svg className="w-4 h-4 text-white animate-checkmark drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={4}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                              <div className="absolute inset-0 bg-gradient-to-br from-[#9945FF]/50 to-[#14F195]/50 rounded-lg blur-sm -z-10" />
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-all duration-500 animate-shimmer pointer-events-none" />
-                      {isSelected && (
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#9945FF]/20 via-[#14F195]/20 to-[#9945FF]/20 animate-pulse pointer-events-none" />
-                      )}
-                    </label>
-                  );
-                })}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-all duration-500 animate-shimmer pointer-events-none" />
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#9945FF]/20 via-[#14F195]/20 to-[#9945FF]/20 animate-pulse pointer-events-none" />
+                        )}
+                      </label>
+                    );
+                  }
+                )}
               </div>
               {/* Counter */}
               {(() => {
                 const tasks = form.tasks;
-                const selectedCount = Object.values(tasks).filter(Boolean).length;
-                const selectedTasks = Object.entries(tasks).filter(([_, value]) => value).map(([key, _]) => key);
+                const selectedCount =
+                  Object.values(tasks).filter(Boolean).length;
+                const selectedTasks = Object.entries(tasks)
+                  .filter(([_, value]) => value)
+                  .map(([key, _]) => key);
                 return (
                   <div className="w-full mt-3 p-4 bg-gradient-to-r from-[#1A1A1C] to-[#2C2C30] rounded-xl border border-[#44444A]">
                     <div className="flex items-center justify-between">
@@ -533,25 +617,39 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
                           <>
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full animate-pulse shadow-lg shadow-green-500/30" />
-                              <span className="text-[#10B981] font-semibold text-sm">{selectedCount} task{selectedCount !== 1 ? 's' : ''} selected</span>
+                              <span className="text-[#10B981] font-semibold text-sm">
+                                {selectedCount} task
+                                {selectedCount !== 1 ? "s" : ""} selected
+                              </span>
                             </div>
                             <div className="flex gap-1">
                               {selectedTasks.slice(0, 3).map((task) => (
-                                <span key={task} className="px-2 py-1 bg-[#9945FF]/20 text-[#9945FF] text-xs rounded-md font-medium border border-[#9945FF]/30">{task}</span>
+                                <span
+                                  key={task}
+                                  className="px-2 py-1 bg-[#9945FF]/20 text-[#9945FF] text-xs rounded-md font-medium border border-[#9945FF]/30"
+                                >
+                                  {task}
+                                </span>
                               ))}
                               {selectedTasks.length > 3 && (
-                                <span className="px-2 py-1 bg-[#6C7278]/20 text-[#ACB5BB] text-xs rounded-md font-medium">+{selectedTasks.length - 3} more</span>
+                                <span className="px-2 py-1 bg-[#6C7278]/20 text-[#ACB5BB] text-xs rounded-md font-medium">
+                                  +{selectedTasks.length - 3} more
+                                </span>
                               )}
                             </div>
                           </>
                         ) : (
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 bg-gradient-to-r from-[#EF4444] to-[#F87171] rounded-full animate-pulse shadow-lg shadow-red-500/30" />
-                            <span className="text-[#EF4444] font-semibold text-sm">Please select at least one task</span>
+                            <span className="text-[#EF4444] font-semibold text-sm">
+                              Please select at least one task
+                            </span>
                           </div>
                         )}
                       </div>
-                      <div className="text-[#6C7278] text-sm font-medium">Max: 5 tasks</div>
+                      <div className="text-[#6C7278] text-sm font-medium">
+                        Max: 5 tasks
+                      </div>
                     </div>
                   </div>
                 );
@@ -559,18 +657,62 @@ const CreateQuest: React.FC<CreateQuestProps> = ({
             </div>
           </div>
         </div>
+        {/* Payment summary */}
+        <div className="w-full mt-4 mb-2 p-4 bg-zinc-900 rounded-xl border border-zinc-800">
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="text-zinc-400">Reward Pool:</span>
+              <span className="text-white font-semibold">
+                {rewardPool.toFixed(3)} SOL
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-zinc-400">Platform Fee (5%):</span>
+              <span className="text-white font-semibold">
+                {platformFee.toFixed(3)} SOL
+              </span>
+            </div>
+            <div className="flex justify-between items-center border-t border-zinc-700 pt-2 mt-2">
+              <span className="text-zinc-400 font-bold">Total to Pay:</span>
+              <span className="text-[#FFD700] font-bold text-lg">
+                {totalToPay.toFixed(3)} SOL
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Footer / Button place */}
-        <div className="w-full border-t border-[#44444A] p-8">
-          <ButtonBorder
-            text={loading 
-              ? (isEdit ? "Updating..." : "Creating...") 
-              : (isEdit ? "Update Quest" : "Create Quest")
-            }
-            onClick={handleSubmitWithPopup}
-            disabled={loading || !user?.id}
-            type="button"
-          />
+        <div className="w-full border-t border-[#44444A] p-8 flex flex-col gap-3">
+          {!proceedToPayment ? (
+            <ButtonBorder
+              text="Proceed to Payment"
+              onClick={handleProceedToPayment}
+              disabled={loading || !user?.id || rewardPool <= 0}
+              type="button"
+            />
+          ) : (
+            <ButtonBorder
+              text={
+                isPaying
+                  ? "Validating Payment..."
+                  : loading
+                  ? isEdit
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEdit
+                  ? "Update Quest"
+                  : "Create Quest"
+              }
+              onClick={handleSubmitWithPopup}
+              disabled={loading || !user?.id || isPaying}
+              type="button"
+            />
+          )}
+          {paymentError && (
+            <div className="text-red-400 mt-3 p-2 bg-red-950 rounded-lg text-[1.2rem]">
+              ❌ {paymentError}
+            </div>
+          )}
           {error && (
             <div className="text-red-400 mt-3 p-2 bg-red-950 rounded-lg text-[1.2rem]">
               ❌ {error}

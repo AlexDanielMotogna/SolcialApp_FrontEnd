@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-
+// This module is responsible for sending emails using Nodemailer
+// It is used for functionalities like sending verification emails, password reset links, etc.
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || "gmail",
   auth: {
@@ -9,7 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Envoie un email avec le template fourni
+ * Sends an email using the configured transporter.
  */
 export async function sendMail({
   to,

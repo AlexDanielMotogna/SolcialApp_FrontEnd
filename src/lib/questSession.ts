@@ -1,7 +1,9 @@
 import Quest from "@/models/Quest";
 import UserQuest from "@/models/UserQuest";
 import mongoose from "mongoose";
-
+// This module handles the creation and management of quest sessions
+// It includes functions to create a new quest session, check session expiration, and clean up expired sessions
+// It uses Mongoose for database operations and handles atomic transactions to ensure data integrity
 interface CreateSessionData {
   userId: string;
   questId: string;
@@ -21,35 +23,23 @@ interface SessionResult {
 export async function createQuestSession(
   data: CreateSessionData
 ): Promise<SessionResult> {
-  console.log("Starting quest session creation...");
-
   const { userId, questId, walletaddress, twitterId, tasks, quest } = data;
 
   try {
-    // 1. Preparar datos de la sesión
-    console.log("Preparing session data...");
-
+    // 1. Prepare data for the session
     const completedTasks = Object.fromEntries(
       Object.keys(tasks).map((k) => [k, false])
     );
 
     const sessionExpiresAt = new Date(Date.now() + 10 * 1000); // 5 minutos
 
-    console.log("Session data prepared:", {
-      completedTasksCount: Object.keys(completedTasks).length,
-      sessionExpiresAt,
-      rewardAmount: quest.rewardPerTask,
-    });
-
-    // 2. Ejecutar transacción atómica
-    console.log("Starting atomic transaction...");
+    // 2. Start transaction for creating a quest session
+    // This ensures that all operations are atomic and can be rolled back in case of an error
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // 2a. Intentar reservar un spot
-      console.log("Attempting to reserve quest spot...");
-
+      // 2a. Try to update the quest and reserve a spot
       const updatedQuest = await Quest.findOneAndUpdate(
         {
           _id: questId,
@@ -59,15 +49,7 @@ export async function createQuestSession(
         { new: true, session }
       );
 
-      console.log(
-        "Quest reservation result:",
-        updatedQuest
-          ? `Success: reservedParticipants=${updatedQuest.reservedParticipants}/${updatedQuest.maxParticipants}`
-          : "FAILED - No spots available"
-      );
-
       if (!updatedQuest) {
-        console.log("ould not reserve spot, aborting transaction");
         await session.abortTransaction();
         session.endSession();
 
@@ -77,9 +59,7 @@ export async function createQuestSession(
         };
       }
 
-      // 2b. Crear UserQuest
-      console.log("👤 Creating UserQuest record...");
-
+      // 2b. Creeate the user quest session
       const userQuestData = {
         userId,
         questId,
@@ -95,15 +75,8 @@ export async function createQuestSession(
 
       const userQuest = await UserQuest.create([userQuestData], { session });
 
-      console.log("UserQuest created:", {
-        id: userQuest[0]._id,
-        questName: userQuest[0].questName,
-        status: userQuest[0].status,
-      });
-
-      // 2c. Confirmar transacción
+      // 2c. Confirm the transaction
       await session.commitTransaction();
-      console.log("Transaction committed successfully");
       session.endSession();
 
       return {
@@ -112,16 +85,12 @@ export async function createQuestSession(
         sessionExpiresAt,
       };
     } catch (transactionError: any) {
-      console.error("Transaction error:", transactionError);
-
       try {
         await session.abortTransaction();
         session.endSession();
-      } catch (abortError) {
-        console.error("Error aborting transaction:", abortError);
-      }
+      } catch (abortError) {}
 
-      // Clasificar el error para better UX
+      // Handle specific transaction errors
       let errorMessage = "Error creating quest session";
 
       if (
@@ -141,22 +110,19 @@ export async function createQuestSession(
       };
     }
   } catch (error: any) {
-    console.error("Session creation error:", error);
-
     return {
       success: false,
       error: `Quest session creation failed: ${error.message}`,
     };
   }
 }
-
+// Function to handle session expiration
+// This function checks if a quest session has expired and cleans up if necessary
 export async function handleSessionExpiration(
   questId: string,
   userId: string,
   walletaddress: string
 ): Promise<{ expired: boolean; found: boolean }> {
-  console.log("Checking session expiration...");
-
   try {
     const userQuest = await UserQuest.findOne({
       questId,
@@ -165,22 +131,13 @@ export async function handleSessionExpiration(
     });
 
     if (!userQuest) {
-      console.log("No active session found");
       return { expired: false, found: false };
     }
 
     const now = new Date();
     const expiresAt = new Date(userQuest.sessionExpiresAt);
 
-    console.log("Session time check:", {
-      now: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-      hasExpired: now > expiresAt,
-    });
-
     if (now > expiresAt) {
-      console.log("Session has expired, cleaning up...");
-
       // Start transaction for cleanup
       const session = await mongoose.startSession();
       session.startTransaction();
@@ -199,10 +156,8 @@ export async function handleSessionExpiration(
         await session.commitTransaction();
         session.endSession();
 
-        console.log("Expired session cleaned up successfully");
         return { expired: true, found: true };
       } catch (cleanupError) {
-        console.error("Error cleaning up expired session:", cleanupError);
         await session.abortTransaction();
         session.endSession();
 
@@ -210,10 +165,8 @@ export async function handleSessionExpiration(
       }
     }
 
-    console.log("Session is still active");
     return { expired: false, found: true };
   } catch (error) {
-    console.error("Error checking session expiration:", error);
     return { expired: false, found: false };
   }
 }

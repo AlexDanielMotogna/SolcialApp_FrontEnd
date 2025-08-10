@@ -4,7 +4,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import enTranslation from "../../locales/en/translation.json";
 import frTranslation from "../../locales/fr/translation.json";
 import esTranslation from "../../locales/es/translation.json";
-
+// Initialize i18next with language detection and translations
+// This setup allows the application to support multiple languages
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -12,16 +13,23 @@ i18n
     resources: {
       en: { translation: enTranslation },
       fr: { translation: frTranslation },
-      es: { translation: esTranslation }
+      es: { translation: esTranslation },
     },
     fallbackLng: "en",
     defaultNS: "translation",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
     detection: {
-      order: ["navigator", "htmlTag", "cookie", "localStorage", "path", "subdomain"],
-      caches: ["localStorage", "cookie"]
-    }
+      order: [
+        "navigator",
+        "htmlTag",
+        "cookie",
+        "localStorage",
+        "path",
+        "subdomain",
+      ],
+      caches: ["localStorage", "cookie"],
+    },
   });
 
 export default i18n;

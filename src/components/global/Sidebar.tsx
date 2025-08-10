@@ -1,27 +1,24 @@
 "use client";
 
-import React, { FC, useState, useCallback, JSX } from "react";
-import ReactLoading from "react-loading";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Menu from "../../../public/icons/Menu";
-import Close from "../../../public/icons/Close";
-import Analyzer from "../../../public/icons/Analyzer";
-import Matches from "../../../public/icons/Matches";
-import Quests from "../../../public/icons/Quests";
-import Profile from "../../../public/icons/Profile";
-import Events from "../../../public/icons/Events";
-import Tournaments from "../../../public/icons/Tournaments";
-import Referrals from "../../../public/icons/Referrals";
-import Clock from "../../../public/icons/Clock";
-import Settings from "../../../public/icons/Settings";
-import Help from "../../../public/icons/Help";
-import Logo from "../../../public/imgs/logo.png";
-import Sort from "../../../public/icons/Sort";
-import Avatar from "../../../public/imgs/Avatar.png";
-import UserAvatar from "./UserAvatar";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { handleLogout } from "@/lib/clients";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { FC, JSX, useCallback } from "react";
+import Analyzer from "../../../public/icons/Analyzer";
+import BoostIcon from "../../../public/icons/Boost";
+import Clock from "../../../public/icons/Clock";
+import Close from "../../../public/icons/Close";
+import Help from "../../../public/icons/Help";
+import Matches from "../../../public/icons/Matches";
+import Menu from "../../../public/icons/Menu";
+import Profile from "../../../public/icons/Profile";
+import Quests from "../../../public/icons/Quests";
+import Referrals from "../../../public/icons/Referrals";
+import Settings from "../../../public/icons/Settings";
+import Avatar from "../../../public/imgs/Avatar.png";
+import Logo from "../../../public/imgs/logo.png";
+import UserAvatar from "./UserAvatar";
 
 interface MenuItemProps {
   icon: JSX.Element;
@@ -129,20 +126,7 @@ const Sidebar: FC<{
                   isActive={activePath === "/dashboard/profile"}
                   onClick={() => handleNavigation("/dashboard/profile")}
                 />
-                <MenuItem
-                  icon={<Events />}
-                  label="Events"
-                  path="/dashboard/events"
-                  isActive={activePath === "/dashboard/events"}
-                  onClick={() => handleNavigation("/dashboard/events")}
-                />
-                <MenuItem
-                  icon={<Tournaments />}
-                  label="Tournaments"
-                  path="/dashboard/tournaments"
-                  isActive={activePath === "/dashboard/tournaments"}
-                  onClick={() => handleNavigation("/dashboard/tournaments")}
-                />
+
                 <MenuItem
                   icon={<Clock />}
                   label="Advertising"
@@ -151,7 +135,7 @@ const Sidebar: FC<{
                   onClick={() => handleNavigation("/dashboard/adversting")}
                 />
                 <MenuItem
-                  icon={<Clock />}
+                  icon={<BoostIcon />}
                   label="Boost Token"
                   path="/dashboard/boost"
                   isActive={activePath === "/dashboard/boost"}

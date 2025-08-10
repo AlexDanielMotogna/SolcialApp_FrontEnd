@@ -100,7 +100,7 @@ const QuestModals = ({
                 className="flex-1 bg-[#1DA1F2] hover:bg-[#1A94DA] text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
                 onClick={() => {
                   // ✅ AGREGAR USER ID A LA URL
-                  const twitterAuthUrl = '/api/twitter-auth/twitter';
+                  const twitterAuthUrl = "/api/twitter-auth/twitter";
                   console.log(
                     "🐦 Redirecting to Twitter OAuth:",
                     twitterAuthUrl
@@ -145,7 +145,7 @@ const QuestModals = ({
           isOpen={true}
           onClose={onCloseModal}
           refreshQuests={onRefreshQuests}
-          user={user} // ✅ SOLO AGREGAR ESTA LÍNEA
+          user={user}
         />
       )}
     </>
