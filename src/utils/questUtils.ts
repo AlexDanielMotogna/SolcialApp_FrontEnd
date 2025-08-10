@@ -45,11 +45,11 @@ export const questUtils = {
           ).every(Boolean);
 
           if (allTasksCompleted && !userQuest.rewardClaimed) {
-            return { text: "Complete", disabled: false };
+            return { text: "Claim Reward", disabled: false };
           }
 
           if (userQuest.rewardClaimed) {
-            return { text: "Reward Claimed", disabled: false };
+            return { text: "Reward Claimed", disabled: true };
           }
 
           return { text: "Complete", disabled: false };
@@ -71,33 +71,36 @@ export const questUtils = {
 
     // User already joined quest
     if (userQuest) {
-      // UI-only: If sessionExpiresAt is in the past, treat as expired (even if backend hasn't updated status yet)
-      if (userQuest.sessionExpiresAt) {
-        const expiresAt = new Date(userQuest.sessionExpiresAt).getTime();
-        if (expiresAt < Date.now()) {
-          return { text: "Join Quest", disabled: false };
-        }
-      }
-      if (userQuest.status === "expired") {
-        return { text: "Join Quest", disabled: false };
-      }
-      if (userQuest.status === "active") {
-        return { text: "Continue Quest", disabled: false };
-      }
+      // Primero verifica si el quest está terminado y el reward fue reclamado
       if (userQuest.status === "finished") {
         const allTasksCompleted = Object.values(
           userQuest.completedTasks || {}
         ).every(Boolean);
 
         if (allTasksCompleted && !userQuest.rewardClaimed) {
-          return { text: "Complete", disabled: false };
+          return { text: "Claim Reward", disabled: false };
         }
 
         if (userQuest.rewardClaimed) {
-          return { text: "Reward Claimed", disabled: false };
+          return { text: "Reward Claimed", disabled: true };
         }
 
         return { text: "Complete", disabled: false };
+      }
+
+      // Luego verifica si la sesión expiró
+      if (userQuest.sessionExpiresAt) {
+        const expiresAt = new Date(userQuest.sessionExpiresAt).getTime();
+        if (expiresAt < Date.now()) {
+          return { text: "Join Quest", disabled: false };
+        }
+      }
+
+      if (userQuest.status === "expired") {
+        return { text: "Join Quest", disabled: false };
+      }
+      if (userQuest.status === "active") {
+        return { text: "Continue Quest", disabled: false };
       }
     }
 

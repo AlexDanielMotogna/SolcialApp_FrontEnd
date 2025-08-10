@@ -1,6 +1,7 @@
 import Quest from "@/models/Quest";
 import UserQuest from "@/models/UserQuest";
-
+// This module is responsible for validating quests
+// It includes functions to validate joining a quest, accessing a quest, and checking constraints
 interface QuestValidationResult {
   valid: boolean;
   error?: string;
@@ -25,11 +26,6 @@ export async function validateQuestJoin(
   try {
     // 1. Verify that the quest exists
     const quest = await Quest.findById(questId);
-    console.log(
-      "🎯 Quest found:",
-      quest ? `ID: ${quest._id}, Status: ${quest.status}` : "NOT FOUND"
-    );
-
     if (!quest) {
       return {
         valid: false,
@@ -114,7 +110,6 @@ export async function validateQuestJoin(
       quest,
     };
   } catch (error) {
-    console.error("❌ Error in quest join validation:", error);
     return {
       valid: false,
       error: "Internal validation error",
@@ -123,20 +118,21 @@ export async function validateQuestJoin(
   }
 }
 
-// ✅ NUEVA: Para acceder a un quest (validación permisiva)
+// Function to validate access to a quest
+// This function checks if a user can access a quest based on their participation status
 export async function validateQuestAccess(
   questId: string,
   userId: string,
   walletaddress: string
 ): Promise<QuestValidationResult> {
-  console.log("🔍 Starting quest ACCESS validation for:", {
+  console.log("Starting quest ACCESS validation for:", {
     questId,
     userId,
     walletaddress,
   });
 
   try {
-    // 1. Verificar que el quest existe
+    // 1. Find the quest by ID
     const quest = await Quest.findById(questId);
 
     if (!quest) {
@@ -153,9 +149,9 @@ export async function validateQuestAccess(
       $or: [{ userId }, { walletaddress }],
     });
 
-    // ✅ Si el usuario tiene un quest (activo o completado), SIEMPRE permitir acceso
+    // 3. verify if the user has an active participation
     if (userQuest) {
-      console.log("✅ User has participation, granting access");
+      console.log("User has participation, granting access");
       return {
         valid: true,
         quest,
@@ -163,7 +159,7 @@ export async function validateQuestAccess(
       };
     }
 
-    // ✅ Si no tiene userQuest, aplicar validaciones normales para unirse
+    // 4. If no userQuest found, validate if the quest is repeatable
     return await validateQuestJoin(
       questId,
       userId,
@@ -171,7 +167,7 @@ export async function validateQuestAccess(
       quest.twitter_id
     );
   } catch (error) {
-    console.error("❌ Error in quest access validation:", error);
+    console.error("Error in quest access validation:", error);
     return {
       valid: false,
       error: "Internal validation error",
@@ -180,11 +176,12 @@ export async function validateQuestAccess(
   }
 }
 
-// ✅ MANTENER: Para validar constraints
+// Function to validate quest constraints
+// This function checks if a quest meets certain constraints before allowing participation
 export async function validateQuestConstraints(
   quest: any
 ): Promise<QuestValidationResult> {
-  console.log("🔧 Validating quest constraints...");
+  console.log("Validating quest constraints...");
 
   try {
     if (quest.reservedParticipants >= quest.maxParticipants) {
@@ -200,7 +197,7 @@ export async function validateQuestConstraints(
       quest,
     };
   } catch (error) {
-    console.error("❌ Error validating quest constraints:", error);
+    console.error("Error validating quest constraints:", error);
     return {
       valid: false,
       error: "Error validating quest constraints",

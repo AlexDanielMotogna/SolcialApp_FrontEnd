@@ -43,9 +43,9 @@ export function getEndInColor(endDateTime: string, now: Date) {
 
   const mins = Math.floor(diffMs / 60000);
 
-  if (mins < 10) return "text-red-500"; 
+  if (mins < 10) return "text-red-500";
   if (mins < 60) return "text-yellow-400";
-  return "text-green-300"; 
+  return "text-green-300";
 }
 
 // ✅ AGREGAR NUEVA FUNCIÓN PARA VALORES HEX
@@ -65,63 +65,65 @@ export function getEndInColorValue(endDateTime: string, now: Date) {
 
 // ✅ FUNCIÓN COMBINADA PARA OBTENER ESTADO
 export function getTimeStatus(endDateTime: string, now: Date) {
-  if (!endDateTime) return { 
-    colorClass: "text-white", 
-    colorValue: "#ffffff", 
-    status: "unknown" 
-  };
+  if (!endDateTime)
+    return {
+      colorClass: "text-white",
+      colorValue: "#ffffff",
+      status: "unknown",
+    };
 
   const end = new Date(endDateTime);
   const diffMs = end.getTime() - now.getTime();
-  
-  if (diffMs <= 0) return { 
-    colorClass: "text-white", 
-    colorValue: "#ffffff", 
-    status: "ended" 
-  };
+
+  if (diffMs <= 0)
+    return {
+      colorClass: "text-white",
+      colorValue: "#ffffff",
+      status: "ended",
+    };
 
   const mins = Math.floor(diffMs / 60000);
 
-  if (mins < 10) return {
-    colorClass: "text-red-500",
-    colorValue: "#ef4444",
-    status: "critical"
-  };
-  
-  if (mins < 60) return {
-    colorClass: "text-yellow-400",
-    colorValue: "#fbbf24",
-    status: "warning"
-  };
-  
+  if (mins < 10)
+    return {
+      colorClass: "text-red-500",
+      colorValue: "#ef4444",
+      status: "critical",
+    };
+
+  if (mins < 60)
+    return {
+      colorClass: "text-yellow-400",
+      colorValue: "#fbbf24",
+      status: "warning",
+    };
+
   return {
     colorClass: "text-green-300",
     colorValue: "#86efac",
-    status: "safe"
+    status: "safe",
   };
-
-  
 }
 
 // MODIFICAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\utils\dateUtils.ts
 
 export const toUTCISOString = (date: string, time: string): string => {
   if (!date || !time) {
-    throw new Error('Date and time are required');
+    throw new Error("Date and time are required");
   }
-  
+
   // ✅ FIX: Crear fecha en timezone local del usuario
   const localDateTime = new Date(`${date}T${time}:00`);
-  
+
   // Verificar que la fecha sea válida
   if (isNaN(localDateTime.getTime())) {
-    throw new Error('Invalid date or time format');
+    throw new Error("Invalid date or time format");
   }
-  
+
   // ✅ LOG PARA DEBUG
-  console.log('🌍 [DateUtils] Local time:', localDateTime.toLocaleString());
-  console.log('🌍 [DateUtils] UTC time:', localDateTime.toISOString());
-  
+  console.log("🌍 [DateUtils] Local time:", localDateTime.toLocaleString());
+  console.log("🌍 [DateUtils] UTC time:", localDateTime.toISOString());
+
   // Convertir a UTC y retornar en formato ISO
   return localDateTime.toISOString();
 };
@@ -129,15 +131,15 @@ export const toUTCISOString = (date: string, time: string): string => {
 // ✅ FUNCIÓN PARA OBTENER TIEMPO MÍNIMO ACTUAL EN TIMEZONE LOCAL
 export const getMinimumDateTime = (): { date: string; time: string } => {
   const now = new Date();
-  
+
   // Añadir 15 minutos como margen
   now.setMinutes(now.getMinutes() + 15);
-  
-  const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
-  const time = now.toTimeString().slice(0, 5);  // HH:MM
-  
-  console.log('⏰ [DateUtils] Minimum time (local):', { date, time });
-  
+
+  const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+  const time = now.toTimeString().slice(0, 5); // HH:MM
+
+  console.log("⏰ [DateUtils] Minimum time (local):", { date, time });
+
   return { date, time };
 };
 
@@ -170,3 +172,12 @@ export const formatTimeLeft = (endDateTime: string, now: Date): string => {
 
   return `${minutes}m`;
 };
+
+// Convierte la fecha y hora local a UTC antes de guardar/enviar
+export function toUTCDate(date: string, time: string) {
+  // date: "2024-08-10", time: "23:30"
+  const [year, month, day] = date.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+  // Crea la fecha en UTC
+  return new Date(Date.UTC(year, month - 1, day, hour, minute));
+}

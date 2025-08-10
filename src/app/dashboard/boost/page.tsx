@@ -25,7 +25,7 @@ export default function BoostPage() {
         <h1 className="text-2xl font-bold mb-4">Boost Token</h1>
         <p className="text-gray-400">Redirection vers le modal...</p>
       </div>
-      
+
       {isModalOpen && (
         <BoostTokenModal isOpen={isModalOpen} onClose={handleCloseModal} />
       )}

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
+// Custom hook to fetch and manage quests created by a user
+// and quests completed by the user
+// This hook is used in the QuestAccount component
+
 export const useQuestAccount = (userId?: string) => {
   const [createdQuests, setCreatedQuests] = useState<any[]>([]);
   const [completedUserQuests, setCompletedUserQuests] = useState<any[]>([]);
@@ -26,7 +30,9 @@ export const useQuestAccount = (userId?: string) => {
 
   const fetchCompletedUserQuests = async (userId: string) => {
     try {
-      const response = await fetch(`/api/user-quests/completed?userId=${userId}`);
+      const response = await fetch(
+        `/api/user-quests/completed?userId=${userId}`
+      );
       const data = await response.json();
 
       if (!response.ok) {
@@ -46,8 +52,6 @@ export const useQuestAccount = (userId?: string) => {
 
     try {
       setRefreshing(true);
-      console.log("🔄 Refreshing quest account data...");
-
       const [created, completed] = await Promise.all([
         fetchCreatedQuests(userId),
         fetchCompletedUserQuests(userId),
@@ -55,27 +59,22 @@ export const useQuestAccount = (userId?: string) => {
 
       setCreatedQuests(created);
       setCompletedUserQuests(completed);
-      console.log("✅ Quest account data refreshed");
     } catch (error) {
-      console.error("❌ Error refreshing quests:", error);
       toast.error("Error refreshing quest data");
     } finally {
       setRefreshing(false);
     }
   };
-
   const loadInitialData = async () => {
     if (!userId) return;
-    
+
     setLoading(true);
     await refreshQuests();
     setLoading(false);
   };
-
   useEffect(() => {
     loadInitialData();
   }, [userId]);
-
   return {
     createdQuests,
     completedUserQuests,

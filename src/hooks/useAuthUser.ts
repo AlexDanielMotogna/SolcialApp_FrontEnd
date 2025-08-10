@@ -2,7 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
-
+// Custom hook to manage authenticated user data
+// This hook provides access to the authenticated user's information and session status
+// It is used throughout the application to access user details like ID, name, email, and wallet address
 export interface AuthUser {
   id: string;
   _id: string;
@@ -33,10 +35,10 @@ export const useAuthUser = () => {
 
   const user = useMemo((): AuthUser | null => {
     if (!session?.user) return null;
-    
+
     // Type assertion to access our custom properties
     const sessionUser = session.user as any;
-    
+
     return {
       id: sessionUser.id || sessionUser._id,
       _id: sessionUser._id || sessionUser.id,

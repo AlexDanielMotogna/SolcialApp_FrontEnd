@@ -1,18 +1,16 @@
-// CREAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\hooks\useWalletSync.ts
-
 "use client";
-import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useGlobalWallet } from '@/context/WalletContext';
-
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useGlobalWallet } from "@/context/WalletContext";
+// Custom hook to sync the user's wallet with their authenticated session
+// This hook ensures that the wallet address is updated in the database when the user is authenticated
 export const useWalletSync = () => {
   const { data: session, status } = useSession();
   const { walletAddress, isConnected, updateWalletInDB } = useGlobalWallet();
 
-  // ✅ SYNC WALLET CUANDO AMBOS ESTÉN DISPONIBLES
   useEffect(() => {
     if (session?.user && walletAddress && isConnected) {
-      console.log('🔄 Syncing wallet with authenticated user');
+      console.log("Syncing wallet with authenticated user");
       updateWalletInDB(walletAddress);
     }
   }, [session, walletAddress, isConnected, updateWalletInDB]);

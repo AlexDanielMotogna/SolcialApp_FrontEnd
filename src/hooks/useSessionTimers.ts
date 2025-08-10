@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+// Custom hook to manage session timers for quests
+// This hook is used to start, stop, and clear session timers for quests
+// It helps in tracking the time left for a quest session and handles expiration
 
 export const useSessionTimers = () => {
   const [sessionTimers, setSessionTimers] = useState<{

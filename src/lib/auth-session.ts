@@ -1,11 +1,11 @@
-// CREAR: c:\Users\Lian Li\Desktop\FrontEnd_Solcial\solcial\src\lib\auth-session.ts
-
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/AuthUser";
 import { t } from "i18next";
-
+// Function to get the authenticated user from the session
+// This function retrieves the user information from the database based on the session token
+// It returns the user details or an error if the user is not found or not verified
 export async function getAuthenticatedUser() {
   try {
     // get session from NextAuth
@@ -23,7 +23,7 @@ export async function getAuthenticatedUser() {
     // get user from database
     await connectDB();
     const user = await User.findOne({ email: session.user.email });
-    console.log("🔍 DEBUG - User from DB:", {
+    console.log(" DEBUG - User from DB:", {
       id: user?._id,
       email: user?.email,
       walletaddress: user?.walletaddress,

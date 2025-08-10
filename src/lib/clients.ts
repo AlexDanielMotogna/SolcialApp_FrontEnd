@@ -1,6 +1,8 @@
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
-
+// Function to handle user logout
+// This function is used to log out the user and redirect them to the login page
+// It can be called from various parts of the application where user logout is required used in Settings and Profile components
 export const handleLogout = async () => {
   try {
     await signOut({ callbackUrl: "/login", redirect: true });

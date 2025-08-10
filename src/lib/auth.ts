@@ -3,7 +3,9 @@ import GoogleProvider from "next-auth/providers/google";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/AuthUser";
 import type { AuthOptions } from "next-auth";
-
+// Function to handle user authentication
+// This function is used to authenticate users via email/password or OAuth providers
+// It connects to the database, verifies user credentials, and manages session data
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({

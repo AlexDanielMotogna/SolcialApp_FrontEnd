@@ -314,7 +314,7 @@ const Login: React.FC = () => {
               <LoadingBar
                 variant="primary"
                 size="md"
-                text={<span className="text-xl">{t("loading", "Loading...")}</span>}
+                text={t("loading", "Loading...")}
                 className="shadow-md shadow-blue-500/20"
               />
             </div>
@@ -360,8 +360,8 @@ const Login: React.FC = () => {
                     "Redirecting to registration page..."
                   )
                 )
-                }
-                className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
+              }
+              className="font-semibold bg-gradient-to-r from-[#9945FF] to-[#0BCB7B] bg-clip-text text-transparent cursor-pointer text-xl outline-none border-none hover:opacity-80"
             >
               {t("register_here")}
             </button>

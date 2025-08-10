@@ -380,7 +380,7 @@ const QuestAccount = () => {
             <LoadingBar
               variant="success"
               size="sm"
-              text="🎯 Loading your created quests..."
+              text="Loading your created quests..."
               className="shadow-md shadow-green-500/20"
             />
           </div>
@@ -417,7 +417,7 @@ const QuestAccount = () => {
             <LoadingBar
               variant="warning"
               size="sm"
-              text="💰 Loading your completed quests..."
+              text="Loading your completed quests..."
               className="shadow-md shadow-yellow-500/20"
             />
           </div>
